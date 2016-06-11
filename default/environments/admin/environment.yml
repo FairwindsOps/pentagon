@@ -1,0 +1,20 @@
+---
+- name:  ensure environment
+  hosts: localhost
+  connection: local
+  gather_facts: False
+
+  pre_tasks:
+    - include_vars: "{{ item }}"
+      with_items:
+        - ../../../account/vars.yml
+        - ../env.yml
+      tags: always
+
+  roles:
+    - role: environment
+      env_environment_name: "{{env}}"
+      env_bucket: "{{ secrets_bucket }}"
+      env_admin_security_group: true
+      env_create_vpn_bucket: true
+      env_subnet_groups: false

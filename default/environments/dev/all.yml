@@ -1,0 +1,4 @@
+---
+
+- include: environment.yml
+- include: tesla/stack.yml

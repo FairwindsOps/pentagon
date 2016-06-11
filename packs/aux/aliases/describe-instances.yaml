@@ -1,0 +1,23 @@
+---
+name: "describe_instances"
+action_ref: "aux.describe_instances"
+description: "describe_instances"
+formats:
+  - describe-instances
+
+
+result:
+  format: |
+    {% if execution.result.stdout|length %}
+    Instances found:
+    {% for item in execution.result.stdout %}
+
+      {% for line in item %}
+        {{ line.Name[0] }}
+        {{ line.PrivateIpAddress }}
+      {% endfor %}
+
+    {% endfor %}
+    {% else %}
+    couldn't find anything, sorry!
+    {% endif %} {~}

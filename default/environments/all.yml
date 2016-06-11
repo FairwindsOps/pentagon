@@ -1,0 +1,6 @@
+---
+
+- include: admin/all.yml
+- include: dev/all.yml
+- include: staging/all.yml
+- include: production/all.yml

@@ -1,0 +1,4 @@
+---
+
+- include: environment.yml
+- include: vpn/stack.yml
