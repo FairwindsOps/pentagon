@@ -1,0 +1,8 @@
+---
+dependencies:
+  # - role: reactiveops.get-vpc-facts
+
+  - role: reactiveops.iam-role
+    org: "{{ org_name }}"
+    iam_role_name: "{{ stackstorm_profile_name }}"
+    policy_name: 'stackstorm'

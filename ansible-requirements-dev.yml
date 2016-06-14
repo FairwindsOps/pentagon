@@ -3,9 +3,9 @@
 ##
 # Dependents not located in galaxy.ansible.com need to precede their parents
 ##
-- src: git+ssh://git@github.com/reactiveops/ansible-get-vpc-facts
-  name: reactiveops.get-vpc-facts
-  version: origin/master
+# - src: git+ssh://git@github.com/reactiveops/ansible-get-vpc-facts
+#   name: reactiveops.get-vpc-facts
+#   version: origin/master
 ##
 # End dependents not located in galaxy.ansible.com
 ##
@@ -14,14 +14,17 @@
 #   version: origin/master
 #   name: sumocollector
 
-- src: "https://github.com/shrikeh-ansible-roles/ansible-jumpcloud.git"
+# - src: "https://github.com/shrikeh-ansible-roles/ansible-jumpcloud.git"
+#   version: origin/master
+#   name: jumpcloud
+
+- src: git+ssh://git@github.com/reactiveops/ansible-packer
   version: origin/master
-  name: jumpcloud
+  name: reactiveops.packer
 
-
-# - src: git+ssh://git@github.com/reactiveops/ansible-stackstorm
-#   version: origin/1.4-alpha
-#   name: reactiveops.stackstorm
+- src: git+ssh://git@github.com/reactiveops/ansible-stackstorm
+  version: origin/1.4-alpha
+  name: reactiveops.stackstorm
 #
 # - src: "https://github.com/Stouts/Stouts.users.git"
 #   version: origin/master
@@ -32,9 +35,9 @@
 #   name: Stouts.openvpn-master
 #
 #
-# - src: "git+ssh://git@github.com/reactiveops/ansible-iam-role.git"
-#   version: origin/master
-#   name: reactiveops.iam-role
+- src: "git+ssh://git@github.com/reactiveops/ansible-iam-role.git"
+  version: origin/master
+  name: reactiveops.iam-role
 
 # - src: git+ssh://git@github.com/reactiveops/packer-base
 #   version: origin/os-agnostic
@@ -72,10 +75,10 @@
 #   version: origin/master
 #   name: reactiveops.remote_syslog2-master
 #
-- src: git+ssh://git@github.com/reactiveops/ansible-swap-deploy
-  version: origin/develop
-  name: reactiveops.deploy-swap
-
-- src: git+ssh://git@github.com/reactiveops/ansible-manage-elb
-  version: origin/advanced-options
-  name: reactiveops.manage-elb
+# - src: git+ssh://git@github.com/reactiveops/ansible-swap-deploy
+#   version: origin/develop
+#   name: reactiveops.deploy-swap
+#
+# - src: git+ssh://git@github.com/reactiveops/ansible-manage-elb
+#   version: origin/advanced-options
+#   name: reactiveops.manage-elb

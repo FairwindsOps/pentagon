@@ -10,34 +10,23 @@
         - ../env.yml
       tags: always
 
-    - name: get secrets.yml from S3
-      s3:
-        bucket: "{{ secrets_bucket }}"
-        object: "secrets.yml"
-        mode: 'getstr'
-      register: secrets
-      changed_when: false
+    # - name: get secrets.yml from S3
+    #   s3:
+    #     bucket: "{{ secrets_bucket }}"
+    #     object: "secrets.yml"
+    #     mode: 'getstr'
+    #   register: secrets
+    #   changed_when: false
 
-    - set_fact:
-        "{{item}}": "{{(secrets.contents|from_yaml)['all'][item]}}"
-      with_items:
-        - jumpcloud_connect_key
+    # - set_fact:
+    #     "{{item}}": "{{(secrets.contents|from_yaml)['all'][item]}}"
+    #   with_items:
+    #     - jumpcloud_connect_key
 
 
   roles:
-    - role: jumpcloud
-      jumpcloud_x_connect_key: "{{ jumpcloud_connect_key }}"
-      jumpcloud_use_sudo: yes
+    # - role: jumpcloud
+    #   jumpcloud_x_connect_key: "{{ jumpcloud_connect_key }}"
+    #   jumpcloud_use_sudo: yes
 
     - role: reactiveops.stackstorm
-
-    # http://help.sumologic.com/Send_Data/Installed_Collectors/Step_3._Download_Collector_Software/Download_a_Collector_from_a_Static_URL
-    # - role: sumocollector
-    #   become: yes
-    #   become_user: root
-    #   sumocollector_installer_download: 'https://collectors.sumologic.com/rest/download/deb/64'
-    #   sumologic_collector_application_log_path:
-    #     - name: "packer"
-    #       path: "/opt/packer/builds/*/packer.log"
-    #       use_multiline: false
-    #       category: "Packer"

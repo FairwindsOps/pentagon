@@ -1,0 +1,12 @@
+---
+
+# TODO: query the ASG for the private IP to use here.
+  # - name: DNS for st2
+  #   route53:
+  #     command: 'create'
+  #     overwrite: "{{ stackstorm_dns_overwrite }}"
+  #     zone: "{{ stackstorm_dns_zone }}"
+  #     record: "{{ stackstorm_dns_record }}.{{ stackstorm_dns_zone }}"
+  #     type: 'CNAME'
+  #     value:
+  #   tags: elb

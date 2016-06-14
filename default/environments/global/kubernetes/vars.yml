@@ -1,8 +1,0 @@
-
-clusters:
-  default:
-    master_instance_size: m3.medium
-    minimum_number_nodes: 4
-  cluster2:
-    master_instance_size: m3.medium
-    minimum_number_nodes: 4

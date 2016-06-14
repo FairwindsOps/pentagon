@@ -1,0 +1,69 @@
+---
+
+- name: ensure  ELB
+  ec2_elb_lb:
+    name: "{{ stackstorm_elb }}"
+    state: present
+    scheme: internal
+    connection_draining_timeout: 60
+    cross_az_load_balancing: "yes"
+    region: "{{ aws_region }}"
+    subnets: ["{{public_az1}}", "{{public_az2}}", "{{public_az3}}"]
+    security_group_ids: "{{ hostvars[inventory_hostname][env + '_presentation'] }}"
+    listeners:
+      - protocol: tcp
+        load_balancer_port: 443
+        instance_port: 443
+    health_check:
+      ping_protocol: tcp
+      ping_port: 443
+      response_timeout: 5
+      interval: 30
+      unhealthy_threshold: 2
+      healthy_threshold: 2
+  register: elb
+  tags: elb
+
+- name: DNS for ELB
+  route53:
+    command: 'create'
+    overwrite: "{{ stackstorm_dns_overwrite }}"
+    zone: "{{ stackstorm_dns_zone }}"
+    record: "{{ stackstrorm_dns_record }}.{{ stackstorm_dns_zone }}"
+    type: 'CNAME'
+    value: "{{elb.elb.dns_name}}"
+  tags: elb
+
+- name: create launch config
+  ec2_lc:
+    name:                   "{{ stackstorm_lc_name }}"
+    image_id:               "{{ stackstorm_ami_id }}"
+    key_name:               "{{ aws_key_name }}"
+    security_groups:        "{{ admin_application }}"
+    region:                 "{{ aws_region }}"
+    instance_type:          "{{ stackstorm_instance_type }}"
+    assign_public_ip:       no
+    instance_profile_name:  "{{ stackstorm_instance_profile_name }}"
+  tags: lc
+
+- name: update autoscaling group
+  ec2_asg:
+    name:                   "{{ stackstorm_asg_name }}"
+    launch_config_name:     "{{ stackstorm_lc_name }}"
+    load_balancers:         "{{ stackstorm_elb }}"
+    health_check_type:      "{{ stackstorm_health_check_type }}"
+    replace_all_instances:  no
+    min_size:               1
+    max_size:               1
+    desired_capacity:       1
+    region:                 "{{ aws_region }}"
+    vpc_zone_identifier:    "{{ stackstorm_vpc_zone_identifier }}"
+    availability_zones:     "{{ stackstorm_availability_zones }}"
+    wait_for_instances:     yes
+    state:                  present
+    tags:
+      - Env:    admin
+      - Stack:  control
+      - Layer:  stackstorm
+      - Name:   stackstorm
+  tags: asg

@@ -1,6 +1,0 @@
-# using vars in ./vars.yml, build kube clusters
-
-- host: local
-  include_vars vars.yml
-  role:
-    - kubernetes
