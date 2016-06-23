@@ -15,6 +15,6 @@
     - role: environment
       env_environment_name: "{{env}}"
       env_bucket: "{{ secrets_bucket }}"
-      env_admin_security_group: true
-      env_create_vpn_bucket: true
-      env_subnet_groups: false
+      env_admin_security_group: True
+      env_create_vpn_bucket: True
+      env_subnet_groups: False
