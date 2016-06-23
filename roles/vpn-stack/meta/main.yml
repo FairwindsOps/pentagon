@@ -1,0 +1,14 @@
+---
+galaxy_info:
+  author: ReactiveOps
+  description: Create / ensure stack and its prerequisites
+  company: ReactiveOps
+  license: license (GPLv2, CC-BY, etc)
+  min_ansible_version: 2.0
+dependencies:
+  - role: reactiveops.get-vpc-facts
+
+  - role: reactiveops.iam-role
+    iam_role_name: "{{env}}_vpn"
+    policy_name: 'rw_vpn'
+    iam_role_bucket_name: "{{ vpn_bucket }}"
