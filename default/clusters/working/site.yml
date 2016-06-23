@@ -1,0 +1,30 @@
+---
+- name:  SSL Certificate
+  hosts: localhost
+  connection: local
+  gather_facts: False
+
+  pre_tasks:
+    - include_vars: "{{ item }}"
+      with_items:
+        - ../../../account/vars.yml
+        - cluster-vars.yml
+      tags: always
+
+    - set_fact:
+        stack_config: "{{ elb_settings }}"
+
+  roles:
+    - role: reactiveops.acm
+    - role: k8s-cluster-additions
+    - role: reactiveops.manage-elb
+      elb_manage_elb_name:                 "{{ stack_config.name }}"
+      elb_manage_elb_scheme:               "{{ stack_config.scheme }}"
+      elb_manage_elb_listeners:            "{{ stack_config.listeners }}"
+      elb_manage_elb_health_check:         "{{ stack_config.health_check }}"
+      elb_manage_set_dns:                  "{{ stack_config.set_dns }}"
+      elb_manage_dns_overwrite:            "{{ stack_config.dns_overwrite }}"
+      elb_manage_dns_record:               "{{ stack_config.dns_record }}"
+      elb_manage_dns_zone:                 "{{ stack_config.dns_zone }}"
+      elb_manage_elb_subnets:              "{{ stack_config.subnets }}"
+      elb_manage_elb_security_group_ids:   "{{ stack_config.security_group_names }}"

@@ -1,0 +1,30 @@
+---
+env: working
+acm_domain_name: kube-working.farzoo.net
+acm_validation_domain: farzoo.net
+
+elb_settings:
+  name: kube-working
+  scheme: internet-facing
+  security_group_names: sg-e23a4899
+  subnets:
+    - 'subnet-902571ba'
+    - 'subnet-541b1f22'
+    - 'subnet-6449183c'
+  listeners:
+    - protocol: https
+      load_balancer_port: 443
+      instance_protocol: https
+      instance_port: 443
+      ssl_certificate_id: 'arn:aws:acm:us-east-1:321401415660:certificate/10e7f8da-7a1a-40a8-ab8d-c051ace8131d'
+  health_check:
+    ping_protocol: tcp
+    ping_port: 443
+    response_timeout: 4
+    interval: 5
+    unhealthy_threshold: 10
+    healthy_threshold: 2
+  set_dns: true
+  dns_overwrite: true
+  dns_zone: 'farzoo.net'
+  dns_record: kube-working.farzoo.net
