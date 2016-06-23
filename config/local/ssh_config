@@ -1,0 +1,11 @@
+Host 172.20.96.9
+  User admin
+  IdentityFile ~/workspace/projects/koombea/koombea-infrastructure/config/private/working_kube_aws_rsa
+  StrictHostKeyChecking no
+  UserKnownHostsFile=/dev/null
+
+Host *
+  User ubuntu
+  IdentityFile ~/workspace/projects/koombea/koombea-infrastructure/config/private/default-private-key
+  StrictHostKeyChecking no
+  UserKnownHostsFile=/dev/null
