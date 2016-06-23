@@ -1,0 +1,51 @@
+---
+
+- name: ensure security groups exist in proper state
+  ec2_group:
+    state: present
+    name: "{{env}}_{{item.key}}"
+    description: "{{env}}_{{item.key}}"
+    vpc_id: "{{ aws_vpc_id }}"
+    region: "{{ aws_region }}"
+    rules: "{{item.value.ingress | flatten}}"
+    rules_egress: "{{item.value.egress | flatten}}"
+  with_dict: security_rules
+  register: sgs
+  vars:
+    vpc_all_traffic:
+      - {cidr_ip: "{{aws_vpc_cidr}}", proto: 'tcp',   from_port: '1',   to_port: '65535'} # all tcp traffic
+      - {cidr_ip: "{{aws_vpc_cidr}}", proto: 'udp',   from_port: '1',   to_port: '65535'} # all udp traffic
+      - {cidr_ip: "{{aws_vpc_cidr}}", proto: 'icmp',  from_port: '-1',  to_port: '-1'}    # all icmp traffic
+    world_https:
+      - {cidr_ip: '0.0.0.0/0',        proto: 'tcp',   from_port: '443', to_port: '443'}   # https
+    security_rules:
+      dmz:
+        ingress:
+          - "{{world_https}}"
+        egress:
+          - "{{vpc_all_traffic}}"
+      presentation:
+        ingress: []
+        egress:
+          - "{{vpc_all_traffic}}"
+      application:
+        ingress: []
+        egress:
+          - "{{vpc_all_traffic}}"
+      data:
+        ingress: []
+        egress:
+          - "{{vpc_all_traffic}}"
+
+
+- name: tag security groups
+  local_action:
+    module: ec2_tag
+    resource: "{{item.group_id}}"
+    region: "{{ aws_region }}"
+    state: present
+    tags:
+      Source: "{{org_name}}"
+      Name: "{{env}}_{{item.item.key}}"
+      Env: "{{env}}"
+  with_items: sgs.results
