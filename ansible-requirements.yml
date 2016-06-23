@@ -1,18 +1,18 @@
 ---
 
 ##
-# Dependents not located in galaxy.ansible.com need to precede their parents.
-# Declare them in this section.
+# Dependents not located in galaxy.ansible.com need to precede their parents
 ##
-
 - src: git+ssh://git@github.com/reactiveops/ansible-get-vpc-facts
   name: reactiveops.get-vpc-facts
   version: origin/master
-
 ##
-# End
+# End dependents not located in galaxy.ansible.com
 ##
 
+- src: git+ssh://git@github.com/reactiveops/ansible-packer
+  version: origin/master
+  name: reactiveops.packer
 
 - src: git+ssh://git@github.com/reactiveops/ansible-stackstorm
   version: origin/1.4-alpha
@@ -27,45 +27,13 @@
   name: Stouts.openvpn-master
 
 - src: "git+ssh://git@github.com/reactiveops/ansible-iam-role.git"
-  version: origin/master
+  version: origin/additional-policies
   name: reactiveops.iam-role
 
-- src: git+ssh://git@github.com/reactiveops/packer-base
-  version: tags/1.1.0
-  name: reactiveops.packer-base
+- src: "git+ssh://git@github.com/reactiveops/ansible-acm.git"
+  version: 1.0.1
+  name: reactiveops.acm
 
-- src: git+ssh://git@github.com/reactiveops/ansible-packer
-  version: origin/master
-  name: reactiveops.packer
-
-# - src: git+ssh://git@github.com/reactiveops/ansible-volumes.git
-#   version: origin/master
-#   name: reactiveops.volumes-master
-#
-# - src: https://github.com/jdauphant/ansible-role-nginx.git
-#   version: origin/master
-#   name: jdauphant.nginx-master
-#
-# - src: git+ssh://git@github.com/reactiveops/ansible-manage-asg
-#   name: reactiveops.manage-asg-master
-#   version: origin/develop
-#
-# - src: https://github.com/reactiveops/ansible-role-passenger.git
-#   version: origin/master
-#   name: reactiveops.passenger-master
-#
-# - src: https://github.com/ANXS/postgresql.git
-#   version: origin/master
-#   name: ANXS.postgresql-master
-
-# - src: "https://github.com/reactiveops/ansible-papertrail.git"
-#   version: origin/master
-#   name: reactiveops.papertrail
-
-# - src: "https://github.com/reactiveops/ansible-remote_syslog2.git"
-#   version: origin/master
-#   name: reactiveops.remote_syslog2-master
-#
-- src: git+ssh://git@github.com/reactiveops/ansible-swap-deploy
-  version: origin/develop
-  name: reactiveops.deploy-swap
+- src: git+ssh://git@github.com/reactiveops/ansible-manage-elb
+  version: origin/advanced-options
+  name: reactiveops.manage-elb
