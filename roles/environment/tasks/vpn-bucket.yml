@@ -1,0 +1,10 @@
+---
+
+- name: create vpn S3 bucket
+  s3_bucket:
+    name: "{{ vpn_bucket }}"
+    state: 'present'
+    versioning: 'yes'
+    tags:
+      Env: 'admin'
+      Name: "{{ vpn_bucket }}"

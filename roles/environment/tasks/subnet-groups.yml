@@ -1,0 +1,27 @@
+---
+
+- debug:
+    var="{{item}}"
+  with_items:
+    - env_elasticache_subnet_group_name
+    - env_elasticache_subnet_group_name
+    - env_elasticache_subnets
+    - env_rds_subnet_group_name
+    - env_rds_subnet_group_name
+    - env_rds_subnets
+  when: env_debug
+
+
+- name: Elasticache subnet group
+  elasticache_subnet_group:
+    state: present
+    name:         "{{ env_elasticache_subnet_group_name }}"
+    description:  "{{ env_elasticache_subnet_group_name }}"
+    subnets:      "{{ env_elasticache_subnets }}"
+
+- name: RDS subnet group
+  rds_subnet_group:
+    state: present
+    name:         "{{ env_rds_subnet_group_name }}"
+    description:  "{{ env_rds_subnet_group_name }}"
+    subnets:      "{{ env_rds_subnets }}"

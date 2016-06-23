@@ -1,0 +1,77 @@
+---
+
+- name: ensure security groups exist in proper state
+  ec2_group:
+    state: present
+    name: "{{env}}_{{item.key}}"
+    description: "{{env}}_{{item.key}}"
+    vpc_id: "{{ aws_vpc_id }}"
+    region: "{{ aws_region }}"
+    rules: "{{item.value.ingress | flatten}}"
+    rules_egress: "{{item.value.egress | flatten}}"
+  with_dict: security_rules
+  register: sgs
+  vars:
+    nat_all_traffic:
+      - {group_name: "admin_nat", proto: 'tcp',   from_port: '1',   to_port: '65535'} # all tcp traffic to NAT
+    vpc_all_traffic:
+      - {cidr_ip: "{{aws_vpc_cidr}}", proto: 'tcp',   from_port: '1',   to_port: '65535'} # all tcp traffic
+      - {cidr_ip: "{{aws_vpc_cidr}}", proto: 'udp',   from_port: '1',   to_port: '65535'} # all udp traffic
+      - {cidr_ip: "{{aws_vpc_cidr}}", proto: 'icmp',  from_port: '-1',  to_port: '-1'}    # all icmp traffic
+    world_http_https:
+      - {cidr_ip: '0.0.0.0/0',              proto: 'tcp',     from_port: '80' , to_port: '80'}    # http to internet
+      - {cidr_ip: '0.0.0.0/0',              proto: 'tcp',     from_port: '443', to_port: '443'}   # https to internet
+    world_ping:
+      - {cidr_ip: '0.0.0.0/0',              proto: 'icmp',    from_port: '-1',  to_port: '-1'}    # all icmp traffic
+    world_ntp:
+      - {cidr_ip: '0.0.0.0/0',          proto: 'udp',     from_port: '123',  to_port: '123'}  # ntp to internet
+    security_rules:
+      dmz:
+        ingress:
+          - "{{world_http_https}}"
+        egress:
+          - {group_name: "{{env}}_application", proto: 'tcp', from_port: '80'   , to_port: '80'}   # http to application
+          - {group_name: "{{env}}_application", proto: 'tcp', from_port: '443'  , to_port: '443'}  # https to application
+      presentation:
+        ingress:
+          - {group_name: "admin_vpn", proto: tcp, from_port: '80' , to_port: '80'}  # http from vpn
+          - {group_name: "admin_vpn", proto: tcp, from_port: '443', to_port: '443'} # https from vpn
+        egress:
+          - "{{vpc_all_traffic}}"
+      application:
+        ingress:
+          - {group_name: "{{env}}_presentation", proto: tcp, from_port: '80'   , to_port: '80'}   # http from presentation
+          - {group_name: "{{env}}_presentation", proto: tcp, from_port: '443'  , to_port: '443'}  # https from presentation
+          - {group_name: "{{env}}_dmz",          proto: tcp, from_port: '80'   , to_port: '80'}   # http from dmz
+          - {group_name: "{{env}}_dmz",          proto: tcp, from_port: '443'  , to_port: '443'}  # https from dmz
+          - {group_name: "admin_vpn",            proto: tcp, from_port: '22' , to_port: '22'}     # ssh from vpn
+          - {group_name: "admin_application",    proto: tcp, from_port: '22' , to_port: '22'}     # ssh from admin hosts
+        egress:
+          - "{{vpc_all_traffic}}"
+          - "{{world_http_https}}"
+          - "{{world_ntp}}"
+          - {cidr_ip: '52.72.28.46/32',          proto: 'tcp',  from_port: '5432',  to_port: '5432'}    # postgres to default vpc rds
+          - {cidr_ip: '23.20.140.179/32',        proto: 'tcp',  from_port: '12344', to_port: '12344'}   # redis to hosted redislabs
+          - {cidr_ip: '23.20.140.179/32',        proto: 'tcp',  from_port: '16862', to_port: '16862'}   # redis to hosted redislabs
+          - {cidr_ip: "{{github_whitelist}}",    proto: 'tcp',  from_port: '22',    to_port: '22'  }    # ssh to github.com
+          - {cidr_ip: "{{github_whitelist}}",    proto: 'tcp',  from_port: '9418',  to_port: '9418'}    # git:// to github.com
+          - {cidr_ip: "{{ubuntu_ks_whitelist}}", proto: 'tcp',  from_port: '11371', to_port: '11371'}   # keyserver.ubuntu.com
+          - {cidr_ip: "0.0.0.0/0",               proto: 'tcp',  from_port: '465',   to_port: '465'}     # mailtrap.io
+      data:
+        ingress:
+          - {group_name: "{{env}}_application", proto: tcp, from_port: '5432'   , to_port: '5432'}  # postgres from application
+          - {group_name: "{{env}}_application", proto: tcp, from_port: '11211'  , to_port: '11211'} # postgres from application
+        egress:
+          - "{{vpc_all_traffic}}"
+
+- name: tag security groups
+  local_action:
+    module: ec2_tag
+    resource: "{{item.group_id}}"
+    region: "{{ aws_region }}"
+    state: present
+    tags:
+      Source: "{{org_name}}"
+      Name: "{{env}}_{{item.item.key}}"
+      Env: "{{env}}"
+  with_items: sgs.results

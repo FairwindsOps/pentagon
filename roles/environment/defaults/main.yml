@@ -1,0 +1,24 @@
+---
+
+# env_environment_name:
+# env_bucket:
+
+env_s3_bucket: true
+env_security_groups: true
+env_subnet_groups: true
+
+env_elasticache_subnet_group_name: "{{ env }}-cache"
+env_elasticache_subnets: "{{ private_subnets }}"
+
+env_rds_subnet_group_name: "{{ rds_subnet_group_name }}"
+env_rds_subnets: "{{ private_subnets }}"
+
+github_whitelist:
+  - "192.30.252.0/22"
+
+env_admin_security_group: false
+
+
+env_create_vpn_bucket: false
+
+env_debug: "{{ debug|default('False') }}"
