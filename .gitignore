@@ -1,6 +1,5 @@
 .DS_Store
 .terraform
-config/local
 config/private
 *.pyc
 *.pem
