@@ -4,7 +4,7 @@ Currently pentagon relies on Kubernetes version 1.2. Downloading the default wil
 
 Download the correct version.
 
-Then in the client repo create the `vendor/kubernetes` directory and place the [pentagon `get.sh`][https://github.com/reactiveops/pentagon/blob/dev/vendor/kubernetes/get.sh] in it. It's also possible to use the [official `get.sh`](https://get.k8s.io). Then untar the Kubernetes tarball in the same directory.
+Then in the client repo create the `vendor/kubernetes` directory and place the [pentagon `get.sh`](https://github.com/reactiveops/pentagon/blob/dev/vendor/kubernetes/get.sh) in it. It's also possible to use the [official `get.sh`](https://get.k8s.io). Then untar the Kubernetes tarball in the same directory.
 
 ```bash
 export KUBE_VERSION="v1.2.6"
