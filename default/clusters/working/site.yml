@@ -8,13 +8,14 @@
     - include_vars: "{{ item }}"
       with_items:
         - ../../../account/vars.yml
-        - cluster-vars.yml
+        - ...///....//{{context}}/cluster-vars.yml
       tags: always
 
     - set_fact:
         stack_config: "{{ elb_settings }}"
 
   roles:
+    # - pentagon
     - role: reactiveops.acm
     - role: k8s-cluster-additions
     - role: reactiveops.manage-elb
