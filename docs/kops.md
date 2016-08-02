@@ -3,9 +3,10 @@
 ## Basic Setup
 * This gets you an RO-style VPC, with a kube cluster inside that VPC.
   * Some cluster details:
-    * The cluster master and nodes are not in a private subnet
-    * The addons are not automatically installed
-    * Single master
+    * The cluster master and nodes are not in a [private subnet](https://github.com/kubernetes/kops/issues/220).
+    * The addons are not [automatically installed](https://github.com/kubernetes/kops/issues/243)
+    * This example is for a single master. HA master setups are supported. `etcd` needs a quorum of an odd number of instances, hence, a minimum of 3. See [Run with a HA master](https://github.com/kubernetes/kops/blob/master/README.md#other-interesting-modes)
+* For a working example, see [dev-infra](https://github.com/reactiveops/dev-infra).
 
 ## Prerequisites
 
@@ -92,7 +93,7 @@ To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
 ## Notes
 * Drop the def cooldown on the master ASG
 * How does master DNS work? It totally works, but I don't see how. user-data script?
-
+* Run through, test and document HA master.
 
 ## To Do / To Decide
 * How to represent this as infrastructure-as-code? The kops operations leave very little infrastructural code behind for the next operator to see. Initially, it can be a note in clusters/readme.md & vars in account/vars.sh
