@@ -1,0 +1,7 @@
+aws_vpc_name = "kops-dev2.hillghost.com"
+aws_azs = "us-west-2a, us-west-2b, us-west-2c"
+az_count = "3"
+aws_region = "us-west-2"
+nat_gateway_enabled = "1"
+vpc_cidr_base = "172.20"
+nat_instance_enabled = "0"

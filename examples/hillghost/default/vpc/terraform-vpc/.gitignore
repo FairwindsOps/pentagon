@@ -1,0 +1,7 @@
+*.zip
+*.tfvars
+*.tfplan
+*.tfstate
+*.tfstate.backup
+.terraform/
+bin/

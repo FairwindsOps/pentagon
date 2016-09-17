@@ -1,0 +1,9 @@
+dependencies:
+  cache_directories:
+    - bin
+  pre:
+    - make requirements TF_PLATFORM=linux
+
+test:
+  override:
+    - make test TF_PLATFORM=linux

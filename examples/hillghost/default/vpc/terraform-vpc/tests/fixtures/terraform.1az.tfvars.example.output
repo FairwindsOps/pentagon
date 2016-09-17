@@ -1,0 +1,119 @@
+Refreshing Terraform state prior to plan...
+
+
+The Terraform execution plan has been generated and is shown below.
+Resources are shown in alphabetical order for quick scanning. Green resources
+will be created (or destroyed and then created if an existing resource
+exists), yellow resources are being changed in-place, and red resources
+will be destroyed.
+
+Note: You didn't specify an "-out" parameter to save this plan, so when
+"apply" is called, Terraform can't guarantee this is what will execute.
+
+[32m+ aws_eip.mod_nat
+[0m    allocation_id:     "" => "<computed>"
+    association_id:    "" => "<computed>"
+    domain:            "" => "<computed>"
+    instance:          "" => "<computed>"
+    network_interface: "" => "<computed>"
+    private_ip:        "" => "<computed>"
+    public_ip:         "" => "<computed>"
+    vpc:               "" => "true"
+[0m
+[0m[32m+ aws_internet_gateway.default
+[0m    vpc_id: "" => "${aws_vpc.default.id}"
+[0m
+[0m[32m+ aws_nat_gateway.nat_gateway
+[0m    allocation_id:        "" => "${element(aws_eip.mod_nat.*.id, count.index)}"
+    network_interface_id: "" => "<computed>"
+    private_ip:           "" => "<computed>"
+    public_ip:            "" => "<computed>"
+    subnet_id:            "" => "${element(aws_subnet.public.*.id, count.index)}"
+[0m
+[0m[32m+ aws_route_table.private
+[0m    route.#:                                     "" => "1"
+    route.~3252072605.cidr_block:                "" => "0.0.0.0/0"
+    route.~3252072605.gateway_id:                "" => ""
+    route.~3252072605.instance_id:               "" => ""
+    route.~3252072605.nat_gateway_id:            "" => "${element(aws_nat_gateway.nat_gateway.*.id, count.index)}"
+    route.~3252072605.network_interface_id:      "" => ""
+    route.~3252072605.vpc_peering_connection_id: "" => ""
+    tags.#:                                      "" => "1"
+    tags.Name:                                   "" => "private_az1"
+    vpc_id:                                      "" => "${aws_vpc.default.id}"
+[0m
+[0m[32m+ aws_route_table.public
+[0m    route.#:                                     "" => "1"
+    route.~1259162026.cidr_block:                "" => "0.0.0.0/0"
+    route.~1259162026.gateway_id:                "" => "${aws_internet_gateway.default.id}"
+    route.~1259162026.instance_id:               "" => ""
+    route.~1259162026.nat_gateway_id:            "" => ""
+    route.~1259162026.network_interface_id:      "" => ""
+    route.~1259162026.vpc_peering_connection_id: "" => ""
+    tags.#:                                      "" => "1"
+    tags.Name:                                   "" => "public"
+    vpc_id:                                      "" => "${aws_vpc.default.id}"
+[0m
+[0m[32m+ aws_route_table_association.private_admin
+[0m    route_table_id: "" => "${element(aws_route_table.private.*.id, count.index)}"
+    subnet_id:      "" => "${element(aws_subnet.admin.*.id, count.index)}"
+[0m
+[0m[32m+ aws_route_table_association.private_private_prod
+[0m    route_table_id: "" => "${element(aws_route_table.private.*.id, count.index)}"
+    subnet_id:      "" => "${element(aws_subnet.private_prod.*.id, count.index)}"
+[0m
+[0m[32m+ aws_route_table_association.private_private_working
+[0m    route_table_id: "" => "${element(aws_route_table.private.*.id, count.index)}"
+    subnet_id:      "" => "${element(aws_subnet.private_working.*.id, count.index)}"
+[0m
+[0m[32m+ aws_route_table_association.public_public
+[0m    route_table_id: "" => "${aws_route_table.public.id}"
+    subnet_id:      "" => "${element(aws_subnet.public.*.id, count.index)}"
+[0m
+[0m[32m+ aws_subnet.admin
+[0m    availability_zone:       "" => "us-east-1a"
+    cidr_block:              "" => "10.21.0.0/21"
+    map_public_ip_on_launch: "" => "false"
+    tags.#:                  "" => "1"
+    tags.Name:               "" => "admin_az1"
+    vpc_id:                  "" => "${aws_vpc.default.id}"
+[0m
+[0m[32m+ aws_subnet.private_prod
+[0m    availability_zone:       "" => "us-east-1a"
+    cidr_block:              "" => "10.21.64.0/21"
+    map_public_ip_on_launch: "" => "false"
+    tags.#:                  "" => "1"
+    tags.Name:               "" => "private_prod_az1"
+    vpc_id:                  "" => "${aws_vpc.default.id}"
+[0m
+[0m[32m+ aws_subnet.private_working
+[0m    availability_zone:       "" => "us-east-1a"
+    cidr_block:              "" => "10.21.96.0/21"
+    map_public_ip_on_launch: "" => "false"
+    tags.#:                  "" => "1"
+    tags.Name:               "" => "private_working_az1"
+    vpc_id:                  "" => "${aws_vpc.default.id}"
+[0m
+[0m[32m+ aws_subnet.public
+[0m    availability_zone:       "" => "us-east-1a"
+    cidr_block:              "" => "10.21.32.0/21"
+    map_public_ip_on_launch: "" => "false"
+    tags.#:                  "" => "1"
+    tags.Name:               "" => "public_az1"
+    vpc_id:                  "" => "${aws_vpc.default.id}"
+[0m
+[0m[32m+ aws_vpc.default
+[0m    cidr_block:                "" => "10.21.0.0/16"
+    default_network_acl_id:    "" => "<computed>"
+    default_security_group_id: "" => "<computed>"
+    dhcp_options_id:           "" => "<computed>"
+    enable_classiclink:        "" => "false"
+    enable_dns_hostnames:      "" => "true"
+    enable_dns_support:        "" => "true"
+    instance_tenancy:          "" => "default"
+    main_route_table_id:       "" => "<computed>"
+    tags.#:                    "" => "1"
+    tags.Name:                 "" => "vpc-module-test"
+[0m
+[0m
+[0m[1mPlan:[0m 14 to add, 0 to change, 0 to destroy.[0m

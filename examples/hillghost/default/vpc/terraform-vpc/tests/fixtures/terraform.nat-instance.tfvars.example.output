@@ -1,0 +1,430 @@
+Refreshing Terraform state prior to plan...
+
+
+The Terraform execution plan has been generated and is shown below.
+Resources are shown in alphabetical order for quick scanning. Green resources
+will be created (or destroyed and then created if an existing resource
+exists), yellow resources are being changed in-place, and red resources
+will be destroyed.
+
+Note: You didn't specify an "-out" parameter to save this plan, so when
+"apply" is called, Terraform can't guarantee this is what will execute.
+
+[32m+ aws_eip.mod_nat.0
+[0m    allocation_id:     "" => "<computed>"
+    association_id:    "" => "<computed>"
+    domain:            "" => "<computed>"
+    instance:          "" => "${element(aws_instance.nat.*.id, count.index)}"
+    network_interface: "" => "<computed>"
+    private_ip:        "" => "<computed>"
+    public_ip:         "" => "<computed>"
+    vpc:               "" => "true"
+[0m
+[0m[32m+ aws_eip.mod_nat.1
+[0m    allocation_id:     "" => "<computed>"
+    association_id:    "" => "<computed>"
+    domain:            "" => "<computed>"
+    instance:          "" => "${element(aws_instance.nat.*.id, count.index)}"
+    network_interface: "" => "<computed>"
+    private_ip:        "" => "<computed>"
+    public_ip:         "" => "<computed>"
+    vpc:               "" => "true"
+[0m
+[0m[32m+ aws_eip.mod_nat.2
+[0m    allocation_id:     "" => "<computed>"
+    association_id:    "" => "<computed>"
+    domain:            "" => "<computed>"
+    instance:          "" => "${element(aws_instance.nat.*.id, count.index)}"
+    network_interface: "" => "<computed>"
+    private_ip:        "" => "<computed>"
+    public_ip:         "" => "<computed>"
+    vpc:               "" => "true"
+[0m
+[0m[32m+ aws_instance.nat.0
+[0m    ami:                         "" => "ami-4868ab25"
+    associate_public_ip_address: "" => "true"
+    availability_zone:           "" => "<computed>"
+    ebs_block_device.#:          "" => "<computed>"
+    ephemeral_block_device.#:    "" => "<computed>"
+    instance_state:              "" => "<computed>"
+    instance_type:               "" => "t2.small"
+    key_name:                    "" => "somekey"
+    placement_group:             "" => "<computed>"
+    private_dns:                 "" => "<computed>"
+    private_ip:                  "" => "<computed>"
+    public_dns:                  "" => "<computed>"
+    public_ip:                   "" => "<computed>"
+    root_block_device.#:         "" => "<computed>"
+    security_groups.#:           "" => "<computed>"
+    source_dest_check:           "" => "false"
+    subnet_id:                   "" => "${element(aws_subnet.public.*.id, count.index)}"
+    tags.#:                      "" => "1"
+    tags.Name:                   "" => "admin_nat_az1"
+    tenancy:                     "" => "<computed>"
+    vpc_security_group_ids.#:    "" => "<computed>"
+[0m
+[0m[32m+ aws_instance.nat.1
+[0m    ami:                         "" => "ami-4868ab25"
+    associate_public_ip_address: "" => "true"
+    availability_zone:           "" => "<computed>"
+    ebs_block_device.#:          "" => "<computed>"
+    ephemeral_block_device.#:    "" => "<computed>"
+    instance_state:              "" => "<computed>"
+    instance_type:               "" => "t2.small"
+    key_name:                    "" => "somekey"
+    placement_group:             "" => "<computed>"
+    private_dns:                 "" => "<computed>"
+    private_ip:                  "" => "<computed>"
+    public_dns:                  "" => "<computed>"
+    public_ip:                   "" => "<computed>"
+    root_block_device.#:         "" => "<computed>"
+    security_groups.#:           "" => "<computed>"
+    source_dest_check:           "" => "false"
+    subnet_id:                   "" => "${element(aws_subnet.public.*.id, count.index)}"
+    tags.#:                      "" => "1"
+    tags.Name:                   "" => "admin_nat_az2"
+    tenancy:                     "" => "<computed>"
+    vpc_security_group_ids.#:    "" => "<computed>"
+[0m
+[0m[32m+ aws_instance.nat.2
+[0m    ami:                         "" => "ami-4868ab25"
+    associate_public_ip_address: "" => "true"
+    availability_zone:           "" => "<computed>"
+    ebs_block_device.#:          "" => "<computed>"
+    ephemeral_block_device.#:    "" => "<computed>"
+    instance_state:              "" => "<computed>"
+    instance_type:               "" => "t2.small"
+    key_name:                    "" => "somekey"
+    placement_group:             "" => "<computed>"
+    private_dns:                 "" => "<computed>"
+    private_ip:                  "" => "<computed>"
+    public_dns:                  "" => "<computed>"
+    public_ip:                   "" => "<computed>"
+    root_block_device.#:         "" => "<computed>"
+    security_groups.#:           "" => "<computed>"
+    source_dest_check:           "" => "false"
+    subnet_id:                   "" => "${element(aws_subnet.public.*.id, count.index)}"
+    tags.#:                      "" => "1"
+    tags.Name:                   "" => "admin_nat_az3"
+    tenancy:                     "" => "<computed>"
+    vpc_security_group_ids.#:    "" => "<computed>"
+[0m
+[0m[32m+ aws_internet_gateway.default
+[0m    vpc_id: "" => "${aws_vpc.default.id}"
+[0m
+[0m[32m+ aws_route_table.private.0
+[0m    route.#:                                     "" => "1"
+    route.~4093859331.cidr_block:                "" => "0.0.0.0/0"
+    route.~4093859331.gateway_id:                "" => ""
+    route.~4093859331.instance_id:               "" => "${element(aws_instance.nat.*.id, count.index)}"
+    route.~4093859331.nat_gateway_id:            "" => ""
+    route.~4093859331.network_interface_id:      "" => ""
+    route.~4093859331.vpc_peering_connection_id: "" => ""
+    tags.#:                                      "" => "1"
+    tags.Name:                                   "" => "private_az1"
+    vpc_id:                                      "" => "${aws_vpc.default.id}"
+[0m
+[0m[32m+ aws_route_table.private.1
+[0m    route.#:                                     "" => "1"
+    route.~4093859331.cidr_block:                "" => "0.0.0.0/0"
+    route.~4093859331.gateway_id:                "" => ""
+    route.~4093859331.instance_id:               "" => "${element(aws_instance.nat.*.id, count.index)}"
+    route.~4093859331.nat_gateway_id:            "" => ""
+    route.~4093859331.network_interface_id:      "" => ""
+    route.~4093859331.vpc_peering_connection_id: "" => ""
+    tags.#:                                      "" => "1"
+    tags.Name:                                   "" => "private_az2"
+    vpc_id:                                      "" => "${aws_vpc.default.id}"
+[0m
+[0m[32m+ aws_route_table.private.2
+[0m    route.#:                                     "" => "1"
+    route.~4093859331.cidr_block:                "" => "0.0.0.0/0"
+    route.~4093859331.gateway_id:                "" => ""
+    route.~4093859331.instance_id:               "" => "${element(aws_instance.nat.*.id, count.index)}"
+    route.~4093859331.nat_gateway_id:            "" => ""
+    route.~4093859331.network_interface_id:      "" => ""
+    route.~4093859331.vpc_peering_connection_id: "" => ""
+    tags.#:                                      "" => "1"
+    tags.Name:                                   "" => "private_az3"
+    vpc_id:                                      "" => "${aws_vpc.default.id}"
+[0m
+[0m[32m+ aws_route_table.public
+[0m    route.#:                                     "" => "1"
+    route.~1259162026.cidr_block:                "" => "0.0.0.0/0"
+    route.~1259162026.gateway_id:                "" => "${aws_internet_gateway.default.id}"
+    route.~1259162026.instance_id:               "" => ""
+    route.~1259162026.nat_gateway_id:            "" => ""
+    route.~1259162026.network_interface_id:      "" => ""
+    route.~1259162026.vpc_peering_connection_id: "" => ""
+    tags.#:                                      "" => "1"
+    tags.Name:                                   "" => "public"
+    vpc_id:                                      "" => "${aws_vpc.default.id}"
+[0m
+[0m[32m+ aws_route_table_association.private_admin.0
+[0m    route_table_id: "" => "${element(aws_route_table.private.*.id, count.index)}"
+    subnet_id:      "" => "${element(aws_subnet.admin.*.id, count.index)}"
+[0m
+[0m[32m+ aws_route_table_association.private_admin.1
+[0m    route_table_id: "" => "${element(aws_route_table.private.*.id, count.index)}"
+    subnet_id:      "" => "${element(aws_subnet.admin.*.id, count.index)}"
+[0m
+[0m[32m+ aws_route_table_association.private_admin.2
+[0m    route_table_id: "" => "${element(aws_route_table.private.*.id, count.index)}"
+    subnet_id:      "" => "${element(aws_subnet.admin.*.id, count.index)}"
+[0m
+[0m[32m+ aws_route_table_association.private_private_prod.0
+[0m    route_table_id: "" => "${element(aws_route_table.private.*.id, count.index)}"
+    subnet_id:      "" => "${element(aws_subnet.private_prod.*.id, count.index)}"
+[0m
+[0m[32m+ aws_route_table_association.private_private_prod.1
+[0m    route_table_id: "" => "${element(aws_route_table.private.*.id, count.index)}"
+    subnet_id:      "" => "${element(aws_subnet.private_prod.*.id, count.index)}"
+[0m
+[0m[32m+ aws_route_table_association.private_private_prod.2
+[0m    route_table_id: "" => "${element(aws_route_table.private.*.id, count.index)}"
+    subnet_id:      "" => "${element(aws_subnet.private_prod.*.id, count.index)}"
+[0m
+[0m[32m+ aws_route_table_association.private_private_working.0
+[0m    route_table_id: "" => "${element(aws_route_table.private.*.id, count.index)}"
+    subnet_id:      "" => "${element(aws_subnet.private_working.*.id, count.index)}"
+[0m
+[0m[32m+ aws_route_table_association.private_private_working.1
+[0m    route_table_id: "" => "${element(aws_route_table.private.*.id, count.index)}"
+    subnet_id:      "" => "${element(aws_subnet.private_working.*.id, count.index)}"
+[0m
+[0m[32m+ aws_route_table_association.private_private_working.2
+[0m    route_table_id: "" => "${element(aws_route_table.private.*.id, count.index)}"
+    subnet_id:      "" => "${element(aws_subnet.private_working.*.id, count.index)}"
+[0m
+[0m[32m+ aws_route_table_association.public_public.0
+[0m    route_table_id: "" => "${aws_route_table.public.id}"
+    subnet_id:      "" => "${element(aws_subnet.public.*.id, count.index)}"
+[0m
+[0m[32m+ aws_route_table_association.public_public.1
+[0m    route_table_id: "" => "${aws_route_table.public.id}"
+    subnet_id:      "" => "${element(aws_subnet.public.*.id, count.index)}"
+[0m
+[0m[32m+ aws_route_table_association.public_public.2
+[0m    route_table_id: "" => "${aws_route_table.public.id}"
+    subnet_id:      "" => "${element(aws_subnet.public.*.id, count.index)}"
+[0m
+[0m[32m+ aws_security_group.nat
+[0m    description: "" => "Allow services from the private subnet through NAT"
+    egress.#:    "" => "<computed>"
+    ingress.#:   "" => "<computed>"
+    name:        "" => "admin_nat"
+    owner_id:    "" => "<computed>"
+    tags.#:      "" => "1"
+    tags.Name:   "" => "admin_nat"
+    vpc_id:      "" => "${aws_vpc.default.id}"
+[0m
+[0m[32m+ aws_security_group_rule.nat_allow_all_tcp_traffic_from_vpc
+[0m    cidr_blocks.#:            "" => "1"
+    cidr_blocks.0:            "" => "10.21.0.0/16"
+    from_port:                "" => "1"
+    protocol:                 "" => "tcp"
+    security_group_id:        "" => "${aws_security_group.nat.id}"
+    self:                     "" => "false"
+    source_security_group_id: "" => "<computed>"
+    to_port:                  "" => "65535"
+    type:                     "" => "ingress"
+[0m
+[0m[32m+ aws_security_group_rule.nat_allow_all_udp_traffic_from_vpc
+[0m    cidr_blocks.#:            "" => "1"
+    cidr_blocks.0:            "" => "10.21.0.0/16"
+    from_port:                "" => "1"
+    protocol:                 "" => "udp"
+    security_group_id:        "" => "${aws_security_group.nat.id}"
+    self:                     "" => "false"
+    source_security_group_id: "" => "<computed>"
+    to_port:                  "" => "65535"
+    type:                     "" => "ingress"
+[0m
+[0m[32m+ aws_security_group_rule.nat_allow_git_to_github
+[0m    cidr_blocks.#:            "" => "1"
+    cidr_blocks.0:            "" => "192.30.252.0/22"
+    from_port:                "" => "9418"
+    protocol:                 "" => "tcp"
+    security_group_id:        "" => "${aws_security_group.nat.id}"
+    self:                     "" => "false"
+    source_security_group_id: "" => "<computed>"
+    to_port:                  "" => "9418"
+    type:                     "" => "egress"
+[0m
+[0m[32m+ aws_security_group_rule.nat_allow_http_to_world
+[0m    cidr_blocks.#:            "" => "1"
+    cidr_blocks.0:            "" => "0.0.0.0/0"
+    from_port:                "" => "80"
+    protocol:                 "" => "tcp"
+    security_group_id:        "" => "${aws_security_group.nat.id}"
+    self:                     "" => "false"
+    source_security_group_id: "" => "<computed>"
+    to_port:                  "" => "80"
+    type:                     "" => "egress"
+[0m
+[0m[32m+ aws_security_group_rule.nat_allow_https_to_world
+[0m    cidr_blocks.#:            "" => "1"
+    cidr_blocks.0:            "" => "0.0.0.0/0"
+    from_port:                "" => "443"
+    protocol:                 "" => "tcp"
+    security_group_id:        "" => "${aws_security_group.nat.id}"
+    self:                     "" => "false"
+    source_security_group_id: "" => "<computed>"
+    to_port:                  "" => "443"
+    type:                     "" => "egress"
+[0m
+[0m[32m+ aws_security_group_rule.nat_allow_ntp_to_world
+[0m    cidr_blocks.#:            "" => "1"
+    cidr_blocks.0:            "" => "0.0.0.0/0"
+    from_port:                "" => "123"
+    protocol:                 "" => "tcp"
+    security_group_id:        "" => "${aws_security_group.nat.id}"
+    self:                     "" => "false"
+    source_security_group_id: "" => "<computed>"
+    to_port:                  "" => "123"
+    type:                     "" => "egress"
+[0m
+[0m[32m+ aws_security_group_rule.nat_allow_ping_from_world
+[0m    cidr_blocks.#:            "" => "1"
+    cidr_blocks.0:            "" => "0.0.0.0/0"
+    from_port:                "" => "-1"
+    protocol:                 "" => "icmp"
+    security_group_id:        "" => "${aws_security_group.nat.id}"
+    self:                     "" => "false"
+    source_security_group_id: "" => "<computed>"
+    to_port:                  "" => "-1"
+    type:                     "" => "ingress"
+[0m
+[0m[32m+ aws_security_group_rule.nat_allow_ping_to_world
+[0m    cidr_blocks.#:            "" => "1"
+    cidr_blocks.0:            "" => "0.0.0.0/0"
+    from_port:                "" => "-1"
+    protocol:                 "" => "icmp"
+    security_group_id:        "" => "${aws_security_group.nat.id}"
+    self:                     "" => "false"
+    source_security_group_id: "" => "<computed>"
+    to_port:                  "" => "-1"
+    type:                     "" => "egress"
+[0m
+[0m[32m+ aws_security_group_rule.nat_allow_ssh_to_github
+[0m    cidr_blocks.#:            "" => "1"
+    cidr_blocks.0:            "" => "192.30.252.0/22"
+    from_port:                "" => "22"
+    protocol:                 "" => "tcp"
+    security_group_id:        "" => "${aws_security_group.nat.id}"
+    self:                     "" => "false"
+    source_security_group_id: "" => "<computed>"
+    to_port:                  "" => "22"
+    type:                     "" => "egress"
+[0m
+[0m[32m+ aws_subnet.admin.0
+[0m    availability_zone:       "" => "us-east-1a"
+    cidr_block:              "" => "10.21.0.0/21"
+    map_public_ip_on_launch: "" => "false"
+    tags.#:                  "" => "1"
+    tags.Name:               "" => "admin_az1"
+    vpc_id:                  "" => "${aws_vpc.default.id}"
+[0m
+[0m[32m+ aws_subnet.admin.1
+[0m    availability_zone:       "" => "us-east-1d"
+    cidr_block:              "" => "10.21.8.0/21"
+    map_public_ip_on_launch: "" => "false"
+    tags.#:                  "" => "1"
+    tags.Name:               "" => "admin_az2"
+    vpc_id:                  "" => "${aws_vpc.default.id}"
+[0m
+[0m[32m+ aws_subnet.admin.2
+[0m    availability_zone:       "" => "us-east-1c"
+    cidr_block:              "" => "10.21.16.0/21"
+    map_public_ip_on_launch: "" => "false"
+    tags.#:                  "" => "1"
+    tags.Name:               "" => "admin_az3"
+    vpc_id:                  "" => "${aws_vpc.default.id}"
+[0m
+[0m[32m+ aws_subnet.private_prod.0
+[0m    availability_zone:       "" => "us-east-1a"
+    cidr_block:              "" => "10.21.64.0/21"
+    map_public_ip_on_launch: "" => "false"
+    tags.#:                  "" => "1"
+    tags.Name:               "" => "private_prod_az1"
+    vpc_id:                  "" => "${aws_vpc.default.id}"
+[0m
+[0m[32m+ aws_subnet.private_prod.1
+[0m    availability_zone:       "" => "us-east-1d"
+    cidr_block:              "" => "10.21.72.0/21"
+    map_public_ip_on_launch: "" => "false"
+    tags.#:                  "" => "1"
+    tags.Name:               "" => "private_prod_az2"
+    vpc_id:                  "" => "${aws_vpc.default.id}"
+[0m
+[0m[32m+ aws_subnet.private_prod.2
+[0m    availability_zone:       "" => "us-east-1c"
+    cidr_block:              "" => "10.21.80.0/21"
+    map_public_ip_on_launch: "" => "false"
+    tags.#:                  "" => "1"
+    tags.Name:               "" => "private_prod_az3"
+    vpc_id:                  "" => "${aws_vpc.default.id}"
+[0m
+[0m[32m+ aws_subnet.private_working.0
+[0m    availability_zone:       "" => "us-east-1a"
+    cidr_block:              "" => "10.21.96.0/21"
+    map_public_ip_on_launch: "" => "false"
+    tags.#:                  "" => "1"
+    tags.Name:               "" => "private_working_az1"
+    vpc_id:                  "" => "${aws_vpc.default.id}"
+[0m
+[0m[32m+ aws_subnet.private_working.1
+[0m    availability_zone:       "" => "us-east-1d"
+    cidr_block:              "" => "10.21.104.0/21"
+    map_public_ip_on_launch: "" => "false"
+    tags.#:                  "" => "1"
+    tags.Name:               "" => "private_working_az2"
+    vpc_id:                  "" => "${aws_vpc.default.id}"
+[0m
+[0m[32m+ aws_subnet.private_working.2
+[0m    availability_zone:       "" => "us-east-1c"
+    cidr_block:              "" => "10.21.112.0/21"
+    map_public_ip_on_launch: "" => "false"
+    tags.#:                  "" => "1"
+    tags.Name:               "" => "private_working_az3"
+    vpc_id:                  "" => "${aws_vpc.default.id}"
+[0m
+[0m[32m+ aws_subnet.public.0
+[0m    availability_zone:       "" => "us-east-1a"
+    cidr_block:              "" => "10.21.32.0/21"
+    map_public_ip_on_launch: "" => "false"
+    tags.#:                  "" => "1"
+    tags.Name:               "" => "public_az1"
+    vpc_id:                  "" => "${aws_vpc.default.id}"
+[0m
+[0m[32m+ aws_subnet.public.1
+[0m    availability_zone:       "" => "us-east-1d"
+    cidr_block:              "" => "10.21.40.0/21"
+    map_public_ip_on_launch: "" => "false"
+    tags.#:                  "" => "1"
+    tags.Name:               "" => "public_az2"
+    vpc_id:                  "" => "${aws_vpc.default.id}"
+[0m
+[0m[32m+ aws_subnet.public.2
+[0m    availability_zone:       "" => "us-east-1c"
+    cidr_block:              "" => "10.21.48.0/21"
+    map_public_ip_on_launch: "" => "false"
+    tags.#:                  "" => "1"
+    tags.Name:               "" => "public_az3"
+    vpc_id:                  "" => "${aws_vpc.default.id}"
+[0m
+[0m[32m+ aws_vpc.default
+[0m    cidr_block:                "" => "10.21.0.0/16"
+    default_network_acl_id:    "" => "<computed>"
+    default_security_group_id: "" => "<computed>"
+    dhcp_options_id:           "" => "<computed>"
+    enable_classiclink:        "" => "false"
+    enable_dns_hostnames:      "" => "true"
+    enable_dns_support:        "" => "true"
+    instance_tenancy:          "" => "default"
+    main_route_table_id:       "" => "<computed>"
+    tags.#:                    "" => "1"
+    tags.Name:                 "" => "vpc-module-test"
+[0m
+[0m
+[0m[1mPlan:[0m 46 to add, 0 to change, 0 to destroy.[0m
