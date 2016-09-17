@@ -88,7 +88,39 @@ KubeDNS is running at https://api.kops-dev.hillghost.com/api/v1/proxy/namespaces
 To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
 ```
 
+* Once the cluster is up and running, you can deploy addons:
+```
+kubectl create -f addons/dashboard-v1.4.0-beta1.yaml
+kubectl create -f addons/monitoring-standalone-v1.4.0-beta1.yaml
+kubectl create -f addons/elk.yaml
+```
 
+* Verify addons are running
+```
+kubectl get deployments --namespace=kube-system
+NAME                       DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+elasticsearch-logging-v1   2         2         2            2           4m
+heapster                   1         1         1            1           54m
+kibana-logging-v1          1         1         1            1           4m
+kubernetes-dashboard       1         1         1            1           55m
+```
+```
+kubectl get daemonsets --namespace=kube-system
+NAME                    DESIRED   CURRENT   NODE-SELECTOR   AGE
+fluentd-elasticsearch   3         3         <none>          5m
+```
+
+* Get Dashboard login credential
+```
+kops get secrets kube --type secret -oplaintext
+```
+
+* Access the dashboard by navigating to `https://api.<clustername>/ui`. username: `admin`
+
+* Access Kibana using same credentials as dashboard
+```
+https://api.ro.aws.getyodlr.com/api/v1/proxy/namespaces/kube-system/services/kibana-logging
+```
 
 ## Notes
 * Drop the def cooldown on the master ASG
