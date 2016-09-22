@@ -1,1 +1,8 @@
 ---
+##
+# Dependents not located in galaxy.ansible.com need to precede their parents
+##
+
+- src: git+ssh://git@github.com/reactiveops/ansible-get-vpc-facts
+  name: reactiveops.get-vpc-facts
+  version: 1.1.0
