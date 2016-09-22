@@ -1,46 +1,5 @@
 ---
 
-- name: Launch vpn instance
-  ec2:
-    vpc_subnet_id: "{{ public_az1 }}"
-    key_name: "{{ aws_key_name }}"
-    instance_profile_name: "{{env}}_vpn"
-    group_id: "{{ admin_vpn }}"
-    instance_type: t2.small
-    image: "{{ default_ami }}"
-    wait: true
-    region: "{{ aws_region }}"
-    assign_public_ip: yes
-    instance_tags:
-      Env: admin
-      Stack: vpn
-      Layer: vpn_primary
-      Name: vpn_primary
-    exact_count: 1
-    count_tag:
-      Env: admin
-      Stack: vpn
-      Layer: vpn_primary
-      Name: vpn_primary
-  register: ec2
-
-- set_fact:
-    openvpn_first_run: "{{ec2.changed}}"
-
-- name: Add instance to host group
-  add_host: hostname={{ item.public_ip }} group=tag_Layer_vpn_public_ip
-  with_items: "{{ ec2.tagged_instances }}"
-  changed_when: false
-
-- name: Wait for SSH to come up
-  wait_for: host={{ item.public_ip }} port=22
-  with_items: "{{ ec2.tagged_instances }}"
-
-- name: Set DNS record
-  route53:
-    command: create
-    record: "{{ openvpn_host }}"
-    zone: "{{ canonical_zone }}"
-    type: A
-    value: "{{ ec2.tagged_instances[0].public_ip }}"
-    overwrite: true
+- include: admin-security-group.yml
+- include: vpn-bucket.yml
+- include: create-instance.yml

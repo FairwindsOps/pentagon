@@ -60,7 +60,7 @@
     region: "{{ aws_region }}"
     state: present
     tags:
-      Source: "{{org_name}}"
+      Source: "{{vpc_tag_name}}"
       Name: "{{env}}_{{item.item.key}}"
       Env: "{{env}}"
   with_items: sgs.results
