@@ -1,0 +1,15 @@
+---
+org_name: "hillghost"
+canonical_zone: 'hillghost.com'
+
+aws_region: "us-west-2"
+vpc_tag_name: "kops-dev2.hillghost.com"
+aws_vpc_id: 'vpc-62270a06'
+
+aws_key_name: 'hillghost-20160718'
+
+# us-east-1 14.04 LTS hvm:ebs-ssd
+#default_ami: ami-db24d8b6
+
+# us-west-2 14.04 LTS hvm:ebs-ssd
+default_ami: ami-a24598c2
