@@ -1,5 +1,7 @@
 # Getting Started
 
+* Here are the basic instructions on setting up a pentagon project for the first time. It assumes that you have virtualenvwrapper setup as described [here](https://github.com/reactiveops/omnia/blob/master/docs/workstation.md).
+
 ```
 $ mkproject delme
 ...
