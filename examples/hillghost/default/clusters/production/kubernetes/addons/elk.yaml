@@ -5,7 +5,6 @@ metadata:
   namespace: kube-system
   labels:
     k8s-app: kibana-logging
-    kubernetes.io/cluster-service: "true"
     kubernetes.io/name: "Kibana"
 spec:
   ports:
@@ -22,7 +21,6 @@ metadata:
   namespace: kube-system
   labels:
     k8s-app: elasticsearch-logging
-    kubernetes.io/cluster-service: "true"
     kubernetes.io/name: "Elasticsearch"
 spec:
   ports:
@@ -40,7 +38,6 @@ metadata:
   labels:
     k8s-app: elasticsearch-logging
     version: v1
-    kubernetes.io/cluster-service: "true"
 spec:
   replicas: 2
   template:
@@ -48,7 +45,6 @@ spec:
       labels:
         k8s-app: elasticsearch-logging
         version: v1
-        kubernetes.io/cluster-service: "true"
     spec:
       containers:
       - image: gcr.io/google_containers/elasticsearch:1.9
@@ -81,7 +77,6 @@ metadata:
   labels:
     k8s-app: kibana-logging
     version: v1
-    kubernetes.io/cluster-service: "true"
 spec:
   replicas: 1
   template:
@@ -89,7 +84,6 @@ spec:
       labels:
         k8s-app: kibana-logging
         version: v1
-        kubernetes.io/cluster-service: "true"
     spec:
       containers:
       - name: kibana-logging
