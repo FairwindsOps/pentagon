@@ -15,6 +15,10 @@ working cluster:
     qa2
     dev  
 
+contexts are clusters + namespaces and with namespaces being unique, they uuniquely identify clusters as well
+such that:
+kubectl config set-context $branchname --cluster working --namespace $branchname
+
 
 clusters/
   working/
