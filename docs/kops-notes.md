@@ -26,6 +26,7 @@ source default/clusters/hillghost-prod/vars.sh
 
 
 ## in kubernetes.tf:
+1. comment out the aws_vpc, aws_vpc_dhcp_options, and aws_vpc_dhcp_options_association resources
 1. comment out the resource `"aws_internet_gateway"...` and the `resource "aws_vpc"` blocks
 2. replace the vpc_id occurrences. Via regexes:
     find:
@@ -44,7 +45,12 @@ source default/clusters/hillghost-prod/vars.sh
     nat_gateway_id = "${var.aws_nat_gateway_id}"
 5. Choose the CIDRs that the subnets will use. See the [spreadsheet](https://docs.google.com/spreadsheets/d/1w9PaEymkI-DE0QvSUQz-ExHhslDx7C0rLqpQY3sGW5w/edit) for help. There should be 3x `resource "aws_subnet"` sections that will need their CIDRs edited:
 
+Set the LC's volumes so that:
+volume_size = "${var.master_root_block_device_vol_size}"
+
 For example: `cidr_block = "172.20.128.0/21"`
+
+add reference from asg to elb
 
 # ELB
   1. ELB is created via `elb.tf`
