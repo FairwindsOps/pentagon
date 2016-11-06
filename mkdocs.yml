@@ -1,0 +1,48 @@
+site_name: Pentagon
+theme: readthedocs
+
+
+pages:
+  - Home: index.md
+  - What is Pentagon?: stub.md
+  - Terminology: terminology.md
+  - Features: stub.md
+  - The Pentagon Ecosystem: stub.md
+  - Infrastructure as Code Directory Layout: stub.md
+  - The Default Architecture: stub.md
+  - Getting Started: stub.md
+  - VPN: stub.md
+  - Networking and VPC Design: stub.md
+  - Workstation: stub.md
+  - Secrets Management: stub.md
+  - Continuous Integration: stub.md
+  - Monitoring and Alerting: stub.md
+  - Metrics: stub.md
+  - Centralized Logging: stub.md
+  - Development / Roadmap / Project Management: stub.md
+
+  # - 'Design Philosophy': 'design.md'
+  # - 'Environments': 'environments.md'
+  # - 'Managing Ansible Roles': 'ansible-requirements.md'
+  # - 'Workstation': 'workstation.md'
+  # - 'Users': 'users.md'
+  # - 'VPC': 'vpc.md'
+  # - 'Naming': 'naming.md'
+  # - 'VPN': 'vpn.md'
+  # - 'Security Groups': 'security-groups.md'
+  # - 'DNS': 'dns.md'
+  # - 'Monitoring & Alerting': 'monitoring.md'
+  # - 'Metrics': 'metrics.md'
+  # - 'Centralized Logging': 'logging.md'
+  # - 'Backups': 'backups.md'
+  # - 'Secrets Management': 'secrets.md'
+  # - 'Deployment': 'deployment.md'
+  # - 'The Administrative Environment': 'admin-services.md'
+  # - 'Tasks': 'tasks.md'
+  # - 'Software Development Lifecycle': 'lifecycle.md'
+  # - 'Other Third Party Tools': '3rdparty.md'
+  # - 'Control Layer': 'control.md'
+  # - "Omnia's Modules": 'modules.md'
+  # - 'Terminology': 'terminology.md'
+  # - 'Roadmap':
+  #   - 'v1': 'planning/v1.md'

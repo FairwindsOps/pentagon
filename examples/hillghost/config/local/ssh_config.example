@@ -2,11 +2,13 @@
 # circle
 Host 54.*
   IdentityFile ~/.ssh/id_rsa
+  StrictHostKeyChecking no
+  UserKnownHostsFile /dev/null
 
 Host 54.213.75.255
-  IdentityFile /Users/justin/Documents/work/reactive/workspace/projects/kubernetes-demo/dev-infra/config/private/hillghost-20160718.pem
+  IdentityFile ~/reactive/workspace/projects/kubernetes-demo/dev-infra/config/private/hillghost-20160718.pem
   User ubuntu
 
 Host 172.20.*
-  IdentityFile /Users/justin/Documents/work/reactive/workspace/projects/kubernetes-demo/dev-infra/config/private/devkey
+  IdentityFile ~/reactive/workspace/projects/kubernetes-demo/dev-infra/config/private/devkey
   User admin
