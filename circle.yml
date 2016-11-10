@@ -62,7 +62,8 @@ deployment:
     # tag: /release-.*/
     branch: docs
     commands:
-      # - docker-push -f deploy/production.config
+      # to be removed:
+      - docker-push -f deploy/production.config
       - ensure-kubectl
       - prepare-kubectl
       - kubectl config set-context production --user $CLUSTER_NICKNAME_PRODUCTION --cluster $CLUSTER_NICKNAME_PRODUCTION --namespace production
