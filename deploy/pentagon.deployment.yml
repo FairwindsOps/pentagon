@@ -12,7 +12,7 @@ spec:
     spec:
       containers:
       - name: pentagon
-        image: 246816220336.dkr.ecr.us-east-1.amazonaws.com/pentagon:latest
+        image: 246816220336.dkr.ecr.us-west-2.amazonaws.com/pentagon:latest
         command: ["/bin/bash","-c","service nginx start"]
         ports:
         - containerPort: 80
