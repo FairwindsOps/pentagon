@@ -1,7 +1,7 @@
 machine:
   environment:
     PATH: $PATH:node_modules/.bin
-    EXTERNAL_REGISTRY_BASE_DOMAIN: 246816220336.dkr.ecr.us-west-2.amazonaws.com/pentagon
+    EXTERNAL_REGISTRY_BASE_DOMAIN: 246816220336.dkr.ecr.us-west-2.amazonaws.com
     REPOSITORY_NAME: pentagon
     REGISTRY_EMAIL: none
     REGISTRY_USERNAME: AWS
