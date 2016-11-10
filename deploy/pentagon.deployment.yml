@@ -1,0 +1,18 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: pentagon
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: pentagon
+    spec:
+      containers:
+      - name: pentagon
+        image: 246816220336.dkr.ecr.us-east-1.amazonaws.com/pentagon:latest
+        command: ["/bin/bash","-c","service nginx start"]
+        ports:
+        - containerPort: 80

@@ -1,0 +1,16 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pentagon
+  labels:
+    app: pentagon
+spec:
+  type: LoadBalancer
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+  selector:
+    app: pentagon
