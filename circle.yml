@@ -1,0 +1,70 @@
+machine:
+  environment:
+    PATH: $PATH:node_modules/.bin
+    EXTERNAL_REGISTRY_BASE_DOMAIN: 246816220336.dkr.ecr.us-east-1.amazonaws.com/pentagon
+    REPOSITORY_NAME: pentagon
+    REGISTRY_EMAIL: none
+    REGISTRY_USERNAME: AWS
+
+    CI_SHA1: $CIRCLE_SHA1
+    CI_BRANCH: $CIRCLE_BRANCH
+    CI_BUILD_NUM: $CIRCLE_BUILD_NUM
+
+    DOCKERTAG: pentagon
+    SERVICENAME: pentagon
+
+    CLUSTER_NICKNAME_PRODUCTION: production-1.reactiveops.io
+    # CLUSTER_NICKNAME_WORKING: working-1.reactiveops.io #DNE yet
+
+  services:
+    - docker
+
+dependencies:
+  pre:
+    - npm install
+    - docker-pull
+    - docker build --rm=false -t ${DOCKERTAG}:latest .
+
+  override:
+    - echo "overriding inferred dependencies"
+
+database:
+  override:
+    - echo "overriding inferred dependencies"
+
+test:
+  override:
+    # - docker run $DOCKERTAG bundle exec rake test
+    - echo "implement some tests"
+
+deployment:
+  # development:
+  #   branch: /feature-.*/
+  #   commands:
+  #     - docker-push -f deploy/development.config
+  #     - ensure-kubectl
+  #     - prepare-kubectl
+  #     - kubectl config set-context development --user $CLUSTER_NICKNAME_WORKING --cluster $CLUSTER_NICKNAME_WORKING --namespace development
+  #     - kubectl config use-context development
+  #     - k8s-deploy -f deploy/development.config
+  #
+  # staging:
+  #   branch: master
+  #   commands:
+  #     - docker-push -f deploy/staging.config
+  #     - ensure-kubectl
+  #     - prepare-kubectl
+  #     - kubectl config set-context staging --user $CLUSTER_NICKNAME_WORKING --cluster $CLUSTER_NICKNAME_WORKING --namespace staging
+  #     - kubectl config use-context staging
+  #     - k8s-deploy -f deploy/staging.config
+
+  production:
+    # tag: /release-.*/
+    branch: docs
+    commands:
+      # - docker-push -f deploy/production.config
+      - ensure-kubectl
+      - prepare-kubectl
+      - kubectl config set-context production --user $CLUSTER_NICKNAME_PRODUCTION --cluster $CLUSTER_NICKNAME_PRODUCTION --namespace production
+      - kubectl config use-context production
+      - k8s-deploy -f deploy/production.config
