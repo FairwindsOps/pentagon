@@ -14,7 +14,7 @@ machine:
     SERVICENAME: pentagon
 
     CLUSTER_NICKNAME_PRODUCTION: production-1.reactiveops.io
-    # CLUSTER_NICKNAME_WORKING: working-1.reactiveops.io #DNE yet
+    CLUSTER_NICKNAME_WORKING: working-1.reactiveops.io
 
   services:
     - docker
