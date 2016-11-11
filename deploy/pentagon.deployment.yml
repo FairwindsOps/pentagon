@@ -10,9 +10,16 @@ spec:
       labels:
         app: pentagon
     spec:
+      volumes:
+       - name: htpasswd
+         secret:
+           secretName: htpasswd
       containers:
       - name: pentagon
         image: 246816220336.dkr.ecr.us-west-2.amazonaws.com/pentagon:latest
         command: ["/bin/bash","-c","service nginx start"]
         ports:
         - containerPort: 80
+        volumeMounts:
+        - mountPath: /etc/nginx/htpasswd
+          name: htpasswd
