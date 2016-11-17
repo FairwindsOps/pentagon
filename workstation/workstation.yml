@@ -60,3 +60,12 @@
         src: "{{ omnia_repo_path }}/cookiecutters"
         dest: ~/workspace/cookiecutters
         state: link
+
+    - name: ensure help script gets sourced
+      lineinfile: >
+        regexp='^source ~/.ro/omnia-helpers.sh'
+        line='source ~/.ro/omnia-helpers.sh'
+        state=present
+        dest=~/.bash_profile
+
+
