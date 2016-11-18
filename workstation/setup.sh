@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 arch=`uname`
 
@@ -6,7 +6,7 @@ if [ "$arch" == "Darwin" ]
 then
   echo 'Darwin detected, skipping python install.'
 else
-  aptitude install -yq python{,-dev}
+  sudo aptitude install -yq python{,-dev}
 fi
 
 pip install --user -r requirements.txt
