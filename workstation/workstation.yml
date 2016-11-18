@@ -12,6 +12,17 @@
   tasks:
     - include_vars: ~/.ro/workstation-vars.yml
 
+    - name: move out .aws config to backup
+      command: mv -v credentials{,.bak}
+      args:
+        chdir: ~/.aws
+ 
+ 
+    - name: move out .kube config to backup
+      command: mv -v config{,.bak}
+      args:
+        chdir: ~/.kube
+
     - name: Ensure ~/workspace doesn't exist as a directory
       stat: path='~/workspace'
       register: workspace
