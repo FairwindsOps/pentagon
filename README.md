@@ -4,7 +4,7 @@ Infrastructure to spin up ReactiveOps style Kubernetes clusters.
 
 ## Setup VirtualEnvWrapper
 
-* Clone this repo `git clone `git@github.com:reactiveops/pentagon.git`
+* Clone this repo `git clone git@github.com:reactiveops/pentagon.git`
 * Checkout `x-feature-em-docs` (soon to be `docs` and hopefully `master` branch)
 * `pushd workstation`
 * `./setup.sh`
