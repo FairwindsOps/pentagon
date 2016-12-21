@@ -1,12 +1,12 @@
 # Getting Started
 
-* Here are the basic instructions on setting up a pentagon project for the first time. It assumes that you have virtualenvwrapper setup as described [here](https://github.com/reactiveops/omnia/blob/master/docs/workstation.md).
+* Here are the basic instructions on setting up a pentagon project for the first time. It assumes that you have virtualenvwrapper setup as described [here](docs/virtualenv.md).
 
 ```
 $ mkproject delme
 ...
 Setting project for delme to /Users/justin/Documents/work/reactive/workspace/projects/delme
-$ pip install -e ../kubernetes-demo/pentagon # Using a local copy of this repo
+$ pip install -e <path-to-pentagon> # Using a local copy of this repo
 $ pentagon-startproject -n foo
 $ tree foo
 foo
@@ -62,3 +62,5 @@ foo
 
 22 directories, 27 files
 ```
+
+Next, take a look at the [kops instructions](docs/kops.md).
