@@ -7,9 +7,8 @@ provider "aws" {
 }
 
 module "vpc" {
-  source = "git::ssh://git@github.com/reactiveops/terraform-vpc.git?ref=1.0.1"
-  org_name = "${var.org_name}"
-
+  source = "git::ssh://git@github.com/reactiveops/terraform-vpc.git?ref=2.0.2"
+  aws_vpc_name = "${var.aws_vpc_name}"
   aws_access_key = "${var.aws_access_key}"
   aws_secret_key = "${var.aws_secret_key}"
   aws_region = "${var.aws_region}"
@@ -17,8 +16,5 @@ module "vpc" {
   az_count =  "${var.az_count}"
   aws_azs = "${var.aws_azs}"
 
-  network = "${var.vpc_cidr}"
-
-  nat_gateway_enabled = 1
-
+  vpc_cidr_base = "${var.vpc_cidr_base}"
 }
