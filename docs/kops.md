@@ -17,7 +17,7 @@
 * `pentagon-startproject -n <projectname>; cd <projectname>;`
 * Optionally, `git init` # and related version control steps
 
-* Create a VPC via `default/vpc`. See [docs/vpc](docs/vpc.md).
+* Create a VPC via `default/vpc`. See [docs/vpc](vpc.md).
 
 * Follow instructions in `config/local/vars` and fill in the necessary details.
 
@@ -25,4 +25,4 @@
   * `ssh-keygen` and save the file in `config/private/<cluster-type>` (production/working)
   ie: `export SSH_KEY_PATH="${HOME}/workspace/projects/<projectname>/<projectname>-infrastructure/config/private/production.pub`
 * Set the location that you would like to write your kube_config file to via `export KUBECONFIG=${INFRASTRUCTURE_REPO}/config/private/<clustertype>-kubeconfig`
-* Examine and complete steps in: `default/clusters/production/cluster-config/kops.sh`. 
+* Examine and complete steps in: `default/clusters/production/cluster-config/kops.sh`.

@@ -63,4 +63,4 @@ foo
 22 directories, 27 files
 ```
 
-Next, take a look at the [kops instructions](docs/kops.md).
+Next, take a look at the [kops instructions](kops.md).
