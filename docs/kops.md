@@ -25,4 +25,4 @@
   * `ssh-keygen` and save the file in `config/private/<cluster-type>` (production/working)
   ie: `export SSH_KEY_PATH="${HOME}/workspace/projects/<projectname>/<projectname>-infrastructure/config/private/production.pub`
 * Set the location that you would like to write your kube_config file to via `export KUBECONFIG=${INFRASTRUCTURE_REPO}/config/private/<clustertype>-kubeconfig`
-* Examine and complete steps in: `default/clusters/production/cluster-config/kops.sh`. 
+* Examine and complete steps in: `default/clusters/production/cluster-config/kops.sh`.
