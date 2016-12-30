@@ -17,7 +17,7 @@
 * `pentagon-startproject -n <projectname>; cd <projectname>;`
 * Optionally, `git init` # and related version control steps
 
-* Create a VPC via `default/vpc`. See [docs/vpc](docs/vpc.md).
+* Create a VPC via `default/vpc`. See [docs/vpc](vpc.md).
 
 * Follow instructions in `config/local/vars` and fill in the necessary details.
 
