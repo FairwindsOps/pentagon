@@ -13,3 +13,4 @@ pages:
   - Overview: overview.md
   - Terminology: terminology.md
   - Virtualenv: virtualenv.md
+  - Glossary: glossary.md
