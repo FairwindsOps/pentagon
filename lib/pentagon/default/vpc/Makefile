@@ -3,7 +3,7 @@
 all: plan apply provision
 
 plan:
-	terraform remote pull
+	terraform remote pull || ./terraform-remote.sh && terraform remote pull
 	terraform get -update
 	terraform plan -module-depth=-1 -var-file terraform.tfvars -out terraform.tfplan
 
@@ -19,4 +19,3 @@ clean:
 	rm -f terraform.tfplan
 	rm -f terraform.tfstate
 	rm -fR .terraform/
-

@@ -1,5 +1,0 @@
----
-
-- include: admin-security-group.yml
-- include: vpn-bucket.yml
-- include: create-instance.yml

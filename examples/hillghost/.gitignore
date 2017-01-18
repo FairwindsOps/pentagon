@@ -1,8 +1,0 @@
-.DS_Store
-.terraform
-*.tfstate*
-*.tfplan
-*.pyc
-*.pem
-*.pub
-*secret*.yml

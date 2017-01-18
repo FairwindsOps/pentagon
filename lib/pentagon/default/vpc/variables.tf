@@ -22,12 +22,13 @@ variable "aws_inventory_path" {
 variable "vpc_cidr" {
   default = "10.10"
 }
-variable "org_name" {}
 
+variable "aws_vpc_name" {}
 ###
 # VPC module specific variables
 ###
 
 variable "az_count" {
-  default = "3"
+  default = 3
 }
+variable "vpc_cidr_base" {}

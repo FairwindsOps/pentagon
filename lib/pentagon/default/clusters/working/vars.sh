@@ -1,7 +1,15 @@
-# export NAME=
-# export ZONES="us-west-2a,us-west-2b,us-west-2c"
-# export VPC_ID="vpc-"
+export CLUSTER_NAME="<PLACEHOLDER>"
+export ZONES="<PLACEHOLDER>"
+export VPC_ID="<PLACEHOLDER>"
 
 # the public key to be installed for the admin user
 # this should be set to be unique per cluster
-#export SSH_KEY_PATH="${HOME}/workspace/projects/PROJECTNAME.../config/private/production-cluster-key.pub"
+export SSH_KEY_PATH="${HOME}/workspace/projects/<projectname>/<projectname>-infrastructure/config/private/working.pub"
+
+export NODE_COUNT=<PLACEHOLDER>
+export MASTER_ZONES="<PLACEHOLDER>"
+export DNS_ZONE="<PLACEHOLDER>"
+export MASTER_SIZE="<PLACEHOLDER>"
+export NODE_SIZE="<PLACEHOLDER>"
+export V_LOG_LEVEL=<PLACEHOLDER>
+export NETWORK_CIDR="<PLACEHOLDER>"

@@ -1,3 +1,0 @@
----
-env: admin
-vpn_bucket: "{{ org_name|mandatory }}-vpn"
