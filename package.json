@@ -9,6 +9,6 @@
   "author": "ReactiveOps",
   "license": "MIT",
   "dependencies": {
-    "k8s-scripts": "git://github.com/reactiveops/k8s-scripts.git#jm/docker-pull-prev-commit"
+    "k8s-scripts": "git://github.com/reactiveops/k8s-scripts.git"
   }
 }
