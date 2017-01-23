@@ -33,8 +33,7 @@ kops create cluster \
 # This is how a 3-AZ subnet spec might look if you are installing on a fresh RO-style VPC created in 3-AZs.
 # The VPC CIDR is 172.20.0.0/16
 
-# For our situation, we should let kops create it's own private subnets and we will specify existing
-# public subnets that it can put public resources in.
+# For our situation, we should let kops create it's own private and public subnets.
 # In private topology, kops is going to put masters and workers in private subnets. The only
 # resources that will reside in what are called "utility" subnets below is the ELB that
 # points to the API.
@@ -45,8 +44,7 @@ kops create cluster \
  #    name: us-east-1a
  #    type: Private
  #    zone: us-east-1a
- #  - cidr: 172.32.32.0/21
- #    id: subnet-11111
+ #  - cidr: 172.32.160.0/21
  #    name: utility-us-east-1a
  #    type: Utility
  #    zone: us-east-1a
@@ -55,8 +53,7 @@ kops create cluster \
  #    name: us-east-1b
  #    type: Private
  #    zone: us-east-1b
- #  - cidr: 172.32.40.0/21
- #    id: subnet-22222
+ #  - cidr: 172.32.168.0/21
  #    name: utility-us-east-1b
  #    type: Utility
  #    zone: us-east-1b
@@ -65,8 +62,7 @@ kops create cluster \
  #    name: us-east-1b
  #    type: Private
  #    zone: us-east-1b
- #  - cidr: 172.32.48.0/21
- #    id: subnet-33333
+ #  - cidr: 172.32.176.0/21
  #    name: utility-us-east-1b
  #    type: Utility
  #    zone: us-east-1b
