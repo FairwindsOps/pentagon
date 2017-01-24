@@ -9,20 +9,17 @@
 
 ## Prerequisites
 
-* Install [kops](https://github.com/kubernetes/kops) v1.4.4 (as of Dec 20, 2016).
+* Install [kops](https://github.com/kubernetes/kops) v1.5.0-alpha4 (as of Jan 24, 2017).
 
 ## Steps
 
 * `pip install pentagon`
 * `pentagon-startproject -n <projectname>; cd <projectname>;`
-* Optionally, `git init` # and related version control steps
-
+* `git init`
 * Create a VPC via `default/vpc`. See [docs/vpc](vpc.md).
-
 * Follow instructions in `config/local/vars` and fill in the necessary details.
-
 * Generate an ssh key for the new cluster
   * `ssh-keygen` and save the file in `config/private/<cluster-type>` (production/working)
   ie: `export SSH_KEY_PATH="${HOME}/workspace/projects/<projectname>/<projectname>-infrastructure/config/private/production.pub`
-* Set the location that you would like to write your kube_config file to via `export KUBECONFIG=${INFRASTRUCTURE_REPO}/config/private/<clustertype>-kubeconfig`
+* Set the location that you would like to write your kube_config file to via `export KUBECONFIG=${INFRASTRUCTURE_REPO}/config/private/kubeconfig`
 * Examine and complete steps in: `default/clusters/production/cluster-config/kops.sh`.
