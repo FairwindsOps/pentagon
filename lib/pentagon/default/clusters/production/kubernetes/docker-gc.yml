@@ -1,0 +1,37 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: docker-gc
+  namespace: kube-system
+spec:
+  template:
+    metadata:
+      labels:
+        app: docker-gc
+      name: docker-gc
+    spec:
+      containers:
+      - image: quay.io/reactiveops/docker-gc:master
+        imagePullPolicy: Always
+        name: docker-gc
+        env:
+          - name: FREQUENCY
+            value: "7200"
+        volumeMounts:
+          - mountPath: /var/run/docker.sock
+            name: docker-socket
+          - mountPath: /etc
+            name: excludes
+      volumes:
+        - name: docker-socket
+          hostPath:
+            path: /var/run/docker.sock
+        - name: excludes
+          configMap:
+            name: docker-gc
+            items:
+              - key: image-excludes.file
+                path: docker-gc-exclude
+              - key: container-excludes.file
+                path: docker-gc-exclude-containers
+      dnsPolicy: Default
