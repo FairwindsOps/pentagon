@@ -9,6 +9,11 @@
 
 ## Prerequisites
 
+* Install `kubectl`. As of 25 Jan 2017, we assume kubectl version 1.5.2.
+	- On OSX, you can brew update && brew install kubectl.
+	- Otherwise, visit the [kubectl installation docs](https://kubernetes.io/docs/user-guide/prereqs/)
+	- You may find kubectl bash completion useful- the instructions are in the same link above.
+	- Related: AWS completion can also be very useful: [AWS completion instructions](http://docs.aws.amazon.com/cli/latest/userguide/cli-command-completion.html)
 * Install [kops](https://github.com/kubernetes/kops) v1.5.0-alpha4 (as of Jan 24, 2017).
 
 ## Steps
