@@ -1,0 +1,30 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: es-curator
+  name: es-curator
+  namespace: kube-system
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: es-curator
+      name: es-curator
+    spec:
+      containers:
+      - name: es-curator
+        image: quay.io/reactiveops/docker-curator:master
+        imagePullPolicy: Always
+        env:
+          - name: FREQUENCY
+            value: "86400"
+        volumeMounts:
+          - name: config-volume
+            mountPath: /etc/config
+      volumes:
+        - name: config-volume
+          configMap:
+            name: curator-config
+      restartPolicy: Always
