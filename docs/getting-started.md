@@ -1,6 +1,6 @@
 # Getting Started
 
-* Here are the basic instructions on setting up a pentagon project for the first time. It assumes that you have virtualenvwrapper setup as described [here](docs/virtualenv.md).
+* Here are the basic instructions on setting up a pentagon project for the first time. It assumes that you have virtualenvwrapper setup as described [here](virtualenv.md).
 
 ```
 $ mkproject delme
