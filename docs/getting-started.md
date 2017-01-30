@@ -1,24 +1,27 @@
+Pentagon is the way ReactiveOps does DevOps as a Service (DaaS).
+
+It is our curated ecosystem of container-based infrastructure based on Kubernetes.
+
 # Getting Started
 
-* Here are the basic instructions on setting up a pentagon project for the first time. It assumes that you have virtualenvwrapper setup as described [here](virtualenv.md).
+This assumes that you have `virtualenvwrapper` setup as described [here](virtualenv.md).
 
-```
-$ mkproject delme
-...
-Setting project for delme to /Users/justin/Documents/work/reactive/workspace/projects/delme
-$ pip install -e <path-to-pentagon> # Using a local copy of this repo
-$ pentagon-startproject -n foo
-$ tree foo
-foo
+* `mkproject delme`
+* `pip install -e git+https://github.com/reactiveops/pentagon#egg=Package`
+* `pentagon-startproject -n delme`
+
+When this is successful, the directory structure will look like this:
+```    
+$ tree delme
+delme
 ├── README.md
 ├── ansible-requirements.yml
 ├── config
 │   ├── local
-│   │   ├── ansible.cfg
 │   │   ├── ssh_config
-│   │   └── vars -> ../private/vars
+│   │   ├── vars -> ../private/vars
+│   │   └── vars-private.example
 │   ├── private
-│   │   └── vars
 │   └── requirements.txt
 ├── default
 │   ├── account
@@ -26,28 +29,39 @@ foo
 │   ├── clusters
 │   │   ├── production
 │   │   │   ├── cluster-config
+│   │   │   │   └── kops.sh
 │   │   │   ├── kubernetes
-│   │   │   │   └── namespaces.yml
+│   │   │   │   ├── elk.yaml
+│   │   │   │   ├── namespaces.yml
+│   │   │   │   └── readme.md
 │   │   │   ├── resources
-│   │   │   └── vars.sh
+│   │   │   │   └── readme.md
+│   │   │   ├── vars.sh
+│   │   │   └── vars.sh.example
 │   │   └── working
 │   │       ├── cluster-config
+│   │       │   └── kops.sh
 │   │       ├── kubernetes
-│   │       │   └── namespaces.yml
+│   │       │   ├── namespaces.yml
+│   │       │   └── readme.md
 │   │       ├── resources
-│   │       └── vars.sh
+│   │       │   └── readme.md
+│   │       ├── vars.sh
+│   │       └── vars.sh.example
 │   ├── resources
 │   │   ├── all.yml
 │   │   ├── env.yml
 │   │   ├── environment.yml
 │   │   ├── first_run.yml
+│   │   ├── readme.md
 │   │   └── vpn
 │   │       └── stack.yml
 │   └── vpc
 │       ├── Makefile
 │       ├── main.tf
-│       ├── terraform.tfplan
+│       ├── terraform-remote.sh
 │       ├── terraform.tfvars
+│       ├── terraform.tfvars.example
 │       └── variables.tf
 ├── docs
 │   └── readme.md
@@ -59,8 +73,7 @@ foo
 │       ├── ec2.ini
 │       └── ec2.py
 └── roles
-
-22 directories, 27 files
+22 directories, 37 files
 ```
 
 Next, take a look at the [kops instructions](kops.md).
