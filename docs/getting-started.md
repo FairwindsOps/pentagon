@@ -1,5 +1,6 @@
 # Getting Started
 
+* Clone the pentagon repo to a location on your workstation. Do not put it into a python project directory structure (such as the omnia workspace).
 * Here are the basic instructions on setting up a pentagon project for the first time. It assumes that you have virtualenvwrapper setup as described [here](virtualenv.md).
 
 ```

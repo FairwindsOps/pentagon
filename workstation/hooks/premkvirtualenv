@@ -1,0 +1,38 @@
+#!/bin/bash
+# This hook is run after a new virtualenv is created and before it is activated.
+# argument: name of new environment
+
+# Setup new project configuration pre-reqs
+# Done here because venvwrapper creates and activates venv before creating project
+
+PROJECT_NAME=$1
+PROJECT_COOKIECUTTER_PATH=$OMNIA_COOKIECUTTERS/project-config
+REQUIREMENTS_PATH="$(dirname $0)/requirements.txt"
+
+# Create project config from template if needed
+if [ -d $PROJECT_HOME/$PROJECT_NAME ]; then
+  echo "Project directory already exists..."
+else
+  # TODO: Pass project name through to cookiecutter to avoid retyping it
+  # cookiecutter $PROJECT_COOKIECUTTER_PATH -o $PROJECT_HOME
+  mkdir $PROJECT_HOME/$PROJECT_NAME
+fi
+
+# Create project repo from template if needed
+if [ -d $PROJECT_HOME/$PROJECT_NAME/${PROJECT_NAME}-infrastructure ]; then
+  echo "Project repo already exists..."
+else
+  echo "To initialize an infrastructure repo from the cookiecutter template, run:"
+  echo ""
+  echo "cookiecutter $OMNIA_COOKIECUTTERS/client-infrastructure -o $PROJECT_HOME/$PROJECT_NAME"
+  echo ""
+  echo "After initialization, source environment vars with:"
+  echo ""
+  echo "source $PROJECT_HOME/${PROJECT_NAME}/${PROJECT_NAME}-infrastructure/config/local/vars"
+  echo ""
+  echo "Pre-existing infrastructure repositories should be cloned at this stage."
+  # # TODO: Create from template or pull down from Github. For now just create empty repo.
+  # mkdir $PROJECT_HOME/$PROJECT_NAME/${PROJECT_NAME}-infrastructure
+  # cd $PROJECT_HOME/$PROJECT_NAME/${PROJECT_NAME}-infrastructure
+  # git init .
+fi

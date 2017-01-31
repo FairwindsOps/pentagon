@@ -1,8 +1,8 @@
 ## Setup VirtualEnvWrapper
 
-* Clone this repo `git clone git@github.com:reactiveops/pentagon.git`
+* Edit `workstation-vars-example.yaml` for your config and move it to `~/.ro/workstation-vars.yaml`
+
 * `cd pentagon`
-* `pushd workstation`
-* `./setup.sh`
+* `ansible-playbook -v -i inventory/localhost workstation.yml`
 * `source ~/.bash_profile`
-* `mkproject <projectname>` for an example, see [hillghost](https://github.com/reactiveops/hillghost-infrastructure)
+* Create a new tab in your terminal and if you can run `enable-virtualenvwrapper`, setup is successful.
