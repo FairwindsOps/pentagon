@@ -7,7 +7,7 @@ It is our curated ecosystem of container-based infrastructure based on Kubernete
 This assumes that you have `virtualenvwrapper` setup as described [here](virtualenv.md).
 
 * `mkproject delme`
-* `pip install -e git+https://github.com/reactiveops/pentagon#egg=Package`
+* `pip install -e git+ssh://git@github.com/reactiveops/pentagon#egg=pentagon`
 * `pentagon-startproject -n delme`
 
 When this is successful, the directory structure will look like this:
