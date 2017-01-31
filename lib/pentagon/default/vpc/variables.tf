@@ -11,10 +11,6 @@ variable "aws_azs" {
   default = "us-east-1a, us-east-1c, us-east-1d, us-east-1e"
 }
 
-variable "aws_inventory_path" {
-  default = "$INFRASTRUCTURE_REPO/plugins/inventory"
-}
-
 ###
 # Organization specific variables
 ###
@@ -32,3 +28,23 @@ variable "az_count" {
   default = 3
 }
 variable "vpc_cidr_base" {}
+
+variable "admin_subnet_parent_cidr" {}
+variable "admin_subnet_cidrs" {
+  default = {}
+}
+
+variable "public_subnet_parent_cidr" {}
+variable "public_subnet_cidrs" {
+  default = {}
+}
+
+variable "private_prod_subnet_parent_cidr" {}
+variable "private_prod_subnet_cidrs" {
+  default = {}
+}
+
+variable "private_working_subnet_parent_cidr" {}
+variable "private_working_subnet_cidrs" {
+  default = {}
+}

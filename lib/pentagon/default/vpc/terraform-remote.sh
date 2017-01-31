@@ -1,15 +1,8 @@
 #!/usr/bin/env  bash
 set -x
 
-# @Todo - 
-
-# change state-key to $module-name/$vpc-name/terraform.tfstate
-# kops and terraform state, should be in the same s3_bucket
-# loc: default/account/vars.sh
-
-
 export STATE_STORAGE=s3
-export STATE_BUCKET=${KOPS_STATE_STORE_BUCKET}
+export STATE_BUCKET=${KOPS_STATE_STORE}
 export STATE_KEY=${PROJECT_NAME}/${CLUSTER_NAME}/tfstate/
 export STATE_REGION=${AWS_DEFAULT_REGION}
 
