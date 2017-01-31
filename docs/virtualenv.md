@@ -1,7 +1,7 @@
 ## Setup VirtualEnvWrapper
 
 * Edit `workstation-vars-example.yaml` for your config and move it to `~/.ro/workstation-vars.yaml`
-
+* `pip install ansible`
 * `cd pentagon`
 * `ansible-playbook -v -i inventory/localhost workstation.yml`
 * `source ~/.bash_profile`
