@@ -1,5 +1,5 @@
 # Networking
-This document is the source of knowledge for pentagon style network configuration. We create a base VPC with [Terraform VPC (TF-VPC)](https://github.com/reactiveops/terraform-vpc) that allocates capacity for AWS-based resources that a client needs to host, including `kubernetes`. We then let `kops` work in the same VPC to carve out a dedicated space for itself so that `kubernetes` is self-contained and manageable. SPOF?
+This document is the source of knowledge for pentagon style network configuration. We create a base VPC with [terraform-vpc](https://github.com/reactiveops/terraform-vpc) that allocates capacity for AWS-based resources that a client needs to host, including `kubernetes`. We then let `kops` work in the same VPC to carve out a dedicated space for itself so that `kubernetes` is self-contained and manageable.
 
 ## Network overview diagram
 **TO COME**
@@ -8,22 +8,22 @@ This document is the source of knowledge for pentagon style network configuratio
 The VPC is created by Terraform VPC which sets up a standard RO-style network platform. `kops` is then used to configure and deploy `kubernetes` into this existing VPC.
 
 ## Subnets
-Per AZ, TF-VPC creates 4 subnets: 1 `admin`, 1 `public`, and 2 `private` (one `working` and one `production`). Use these subnets to deploy any resources other than those directly associated with `kubernetes`.
+Per AZ, terraform-vpc creates 4 subnets: 1 `admin`, 1 `public`, and 2 `private` (one `working` and one `production`). Use these subnets to deploy any resources other than those directly associated with `kubernetes`.
 
-Let `kubernetes` create dedicated public and private subnets that run in parallel to those created by TF-VPC. In `kops edit cluster`, allocate CIDRs of available address space.
+Let `kops` create dedicated public and private subnets that run in parallel to those created by terraform-vpc. In `kops edit cluster`, allocate CIDRs of available address space.
 
 ## NAT Gateways
-NAT Gateways are created by TF-VPC and one is needed for each AZ. You can share a NAT Gateway for use by `kubernetes` and your other AWS-based resources simultaneously. This is the only exception to the separation of `kops` and TF. During `kops edit cluster`, specify the NAT Gateway in the private subnet using the keyword `egress` as shown in the [kops Example networking spec](#kops-example-networking-spec).
+NAT Gateways are created by terraform-vpc and one is needed for each AZ. You can share a NAT Gateway for use by `kubernetes` and your other AWS-based resources simultaneously. This is the only exception to the separation of `kops` and TF. During `kops edit cluster`, specify the NAT Gateway in the private subnet using the keyword `egress` as shown in the [kops Example networking spec](#kops-example-networking-spec).
 
 ## Route tables
-TF-VPC sets up route tables for all of the standard subnets. The `private` subnets default route for external traffic is the NAT Gateway in that zone. The `public` subnets default route is through an Internet Gateway.
+terraform-vpc sets up route tables for all of the standard subnets. The `private` subnets default route for external traffic is the NAT Gateway in that zone. The `public` subnets default route is through an Internet Gateway.
 
-`kops` manages the subnets for your `kubernetes` resources so it also manages these route tables. Specifying the NAT Gateway that TF-VPC created in `egress` will configure the default routes for these subnets to its specified NAT Gateway.
+`kops` manages the subnets for your `kubernetes` resources so it also manages these route tables. Specifying the NAT Gateway that terraform-vpc created in `egress` will configure the default routes for these subnets to its specified NAT Gateway.
 
 Because NAT Gateways don't have tags on AWS, `kops` keeps track of this NAT Gateway by AWS-tagging the route table with K=V pair `AssociatedNatGateway=nat-05ee835341f099286`. This is for the delete logic in `kops` that likely wouldn't actually be able to delete the Gateway (because it would still be in use by other routes), but it would attempt to delete it as a "related resource".
 
 ## Tags
-TF-VPC tags all of the resources that it creates and manages as `Managed By=Terraform`. Likewise, `kops` tags the resources that it creates and manages with `KubernetesCluster=<clustername>`. By letting `kops` create its own subnets, `kops` related tags are all restricted to resources that are owned by `kops`, so TF-VPC doesn't ever need to know about `kops` and vice versa.
+terraform-vpc tags all of the resources that it creates and manages as `Managed By=Terraform`. Likewise, `kops` tags the resources that it creates and manages with `KubernetesCluster=<clustername>`. By letting `kops` create its own subnets, `kops` related tags are all restricted to resources that are owned by `kops`, so terraform-vpc doesn't ever need to know about `kops` and vice versa.
 
 ## kops Example networking spec
 
