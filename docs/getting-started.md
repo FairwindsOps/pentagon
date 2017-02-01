@@ -63,4 +63,9 @@ foo
 22 directories, 27 files
 ```
 
+# Setting up your configuration files and credentials
+
+* Customize `config/local/ansible.cfg` and `config/local/ssh_config`
+
+
 Next, take a look at the [kops instructions](kops.md).
