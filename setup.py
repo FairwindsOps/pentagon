@@ -18,7 +18,7 @@ setup(name='pentagon',
       description='Radically simple kubernetes',
       author=__author__,
       author_email='reactive@reactiveops.com',
-      url='http://reactiveps.com/',
+      url='http://reactiveops.com/',
       license='GPLv3',
       # Ansible will also make use of a system copy of python-six if installed but use a
       # Bundled copy if it's not.
