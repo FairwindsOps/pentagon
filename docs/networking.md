@@ -4,6 +4,47 @@ This document is the source of knowledge for pentagon style network configuratio
 ## Network overview diagram
 **TO COME**
 
+| **Subnet Name (abstracted)**     | **Example Name**                                         | **Private / Public** | **Created / Managed by** |
+| -------------------------------- | -------------------------------------------------------- | -------------------- | ------------------------ |
+| admin_az$n                       | admin_az1                                                | Private              | terraform-vpc            |
+| private_working_az$n             | private_working_az1                                      | Private              | terraform-vpc            |
+| private_prod_az$n                | private_prod_az1                                         | Private              | terraform-vpc            |
+| public_ax$n                      | public_az1                                               | Public               | terraform-vpc            |
+| az$n.$cluster_identifier         | us-east-1a.working-1.shareddev.dev.hillghost.com         | Private              | kops                     |
+| utility-az$n.$cluster_identifier | utility-us-east-1a.working-1.shareddev.dev.hillghost.com | Public               | kops                     |
+
+The above table, with 2 clusters, and CIDRs included. 4 AZs are allocated in the CIDR layout math (always-for future-expansion), even though only 3 AZs are configured.
+
+
+| **Subnet Name**                  | **AZ**                                                   | **CIDR**        |
+| -------------------------------- | -------------------------------------------------------- | --------------- |
+| admin_az1                        | us-east-1a                                               | 172.20.0.0/22   |
+| admin_az2                        | us-east-1b                                               | 172.20.4.0/22   |
+| admin_az3                        | us-east-1c                                               | 172.20.8.0/22   |
+| public_az1                       | us-east-1a                                               | 172.20.16.0/22  |
+| public_az2                       | us-east-1b                                               | 172.20.20.0/22  |
+| public_az3                       | us-east-1c                                               | 172.20.24.0/22  |
+| private_prod_az1                 | us-east-1a                                               | 172.20.32.0/22  |
+| private_prod_az2                 | us-east-1b                                               | 172.20.36.0/22  |
+| private_prod_az3                 | us-east-1c                                               | 172.20.40.0/22  |
+| private_working_az1              | us-east-1a                                               | 172.20.48.0/22  |
+| private_working_az2              | us-east-1b                                               | 172.20.52.0/22  |
+| private_working_az3              | us-east-1c                                               | 172.20.56.0/22  |
+| us-east-1a.working-1.shareddev.dev.hillghost.com | us-east-1a                               | 172.20.64.0/22  |
+| us-east-1b.working-1.shareddev.dev.hillghost.com | us-east-1b                               | 172.20.68.0/22  |
+| us-east-1c.working-1.shareddev.dev.hillghost.com | us-east-1c                               | 172.20.72.0/22  |
+| utility-us-east-1a.working-1.shareddev.dev.hillghost.com | us-east-1a                       | 172.20.80.0/22  |
+| utility-us-east-1b.working-1.shareddev.dev.hillghost.com | us-east-1b                       | 172.20.84.0/22  |
+| utility-us-east-1c.working-1.shareddev.dev.hillghost.com | us-east-1c                       | 172.20.88.0/22  |
+| us-east-1a.production-1.shareddev.dev.hillghost.com | us-east-1a                            | 172.20.96.0/22  |
+| us-east-1b.production-1.shareddev.dev.hillghost.com | us-east-1b                            | 172.20.100.0/22 |
+| us-east-1c.production-1.shareddev.dev.hillghost.com | us-east-1c                            | 172.20.104.0/22 |
+| utility-us-east-1a.production-1.shareddev.dev.hillghost.com | us-east-1a                    | 172.20.112.0/22 |
+| utility-us-east-1b.production-1.shareddev.dev.hillghost.com | us-east-1b                    | 172.20.116.0/22 |
+| utility-us-east-1c.production-1.shareddev.dev.hillghost.com | us-east-1c                    | 172.20.120.0/22 |
+
+
+
 ## VPC
 The VPC is created by Terraform VPC which sets up a standard RO-style network platform. `kops` is then used to configure and deploy `kubernetes` into this existing VPC.
 
