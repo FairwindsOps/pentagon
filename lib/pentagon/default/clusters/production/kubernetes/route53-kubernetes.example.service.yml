@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: app
+  labels:
+    app: app
+    dns: route53
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "<ARN>"
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
+    domainName: "app.example.com,app-dev.example.com"
+spec:
+  type: LoadBalancer
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 3000
+    - name: app
+      protocol: TCP
+      port: 443
+      targetPort: 3000
+  selector:
+    app: app
