@@ -53,7 +53,7 @@ Per AZ, terraform-vpc creates 4 subnets: 1 `admin`, 1 `public`, and 2 `private` 
 Let `kops` create dedicated public and private subnets that run in parallel to those created by terraform-vpc. Each AZ consists of a pair of kops-defined subnets- `public` and `private`. In `kops edit cluster`, allocate CIDRs of available address space.  
 
 ## NAT Gateways
-NAT Gateways are created by terraform-vpc and one is needed for each AZ. You can share a NAT Gateway for use by `kubernetes` and your other AWS-based resources simultaneously. This is the only exception to the separation of `kops` and TF. During `kops edit cluster`, specify the NAT Gateway in the private subnet using the keyword `egress` as shown in the [kops Example networking spec](#kops-example-networking-spec).
+NAT Gateways are created by terraform-vpc and one is needed for each AZ. You can share a NAT Gateway for use by `kubernetes` and your other AWS-based resources simultaneously. This is the only exception to the separation of `kops` and TF. During `kops edit cluster`, specify the NAT Gateway in the private subnet using the keyword `egress` as shown in the [kops Example networking spec](#kops-example-networking-spec). Egress is currently only useful if you are using private subnets as defined in kops. 
 
 ## Route tables
 terraform-vpc sets up route tables for all of the standard subnets. The `private` subnets default route for external traffic is the NAT Gateway in that zone. The `public` subnets default route is through an Internet Gateway.
