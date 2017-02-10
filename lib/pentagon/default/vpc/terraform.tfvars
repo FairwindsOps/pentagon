@@ -2,7 +2,9 @@ aws_vpc_name = "<PLACEHOLDER>"
 vpc_cidr_base = "172.20"
 aws_azs = "<PLACEHOLDER>"
 az_count = 3
-aws_inventory_path = "$INFRASTRUCTURE_REPO/plugins/inventory"
+# Substitute $INFRASTRUCTURE_REPO for your hardcoded path
+# aws_inventory_path = "$INFRASTRUCTURE_REPO/plugins/inventory"
+aws_inventory_path =  "<PLACEHOLDER>"
 aws_region = "<PLACEHOLDER>"
 
 admin_subnet_parent_cidr = ".0.0/22"
