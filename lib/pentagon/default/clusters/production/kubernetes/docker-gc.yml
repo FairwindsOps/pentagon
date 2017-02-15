@@ -17,10 +17,20 @@ spec:
         env:
           - name: FREQUENCY
             value: "7200"
+          - name: EXCLUDE_FROM_GC
+            valueFrom:
+              configMapKeyRef:
+                name: docker-gc
+                key: exclude-from-gc
+          - name: EXCLUDE_CONTAINERS_FROM_GC
+            valueFrom:
+              configMapKeyRef:
+                name: docker-gc
+                key: exclude-containers-from-gc
         volumeMounts:
           - mountPath: /var/run/docker.sock
             name: docker-socket
-          - mountPath: /etc
+          - mountPath: /etc/config
             name: excludes
       volumes:
         - name: docker-socket
