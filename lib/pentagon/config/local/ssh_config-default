@@ -1,0 +1,20 @@
+# for the kube / kops instances
+Host 172.20.*
+User admin
+IdentityFile __INFRA_REPO_PATH__/config/private/working_kube_aws_rsa
+StrictHostKeyChecking no
+UserKnownHostsFile=/dev/null
+
+# access to github
+# Host github.com
+#  HostName github.com
+#  #IdentityFile __INFRA_REPO_PATH__/config/private/koombea-rops-github
+#  User git
+#
+
+#  ubuntu based instances
+# Host *
+#   User ubuntu
+#   IdentityFile __INFRA_REPO_PATH__/config/private/default-private-key
+#   StrictHostKeyChecking no
+#   UserKnownHostsFile=/dev/null
