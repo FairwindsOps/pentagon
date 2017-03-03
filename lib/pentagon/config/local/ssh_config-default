@@ -1,18 +1,46 @@
-# for the kube / kops instances
-Host 172.20.*
-User admin
-IdentityFile __INFRA_REPO_PATH__/config/private/working_kube_aws_rsa
-StrictHostKeyChecking no
-UserKnownHostsFile=/dev/null
+# for the kube / kops working instances
+Host 172.20.64.* 172.20.65.* 172.20.66.* 172.20.67.* 172.20.68.* 172.20.69.* 172.20.70.* 172.20.71.* 172.20.72.* 172.20.73.* 172.20.74.* 172.20.75.*
+  User admin
+  IdentityFile __INFRA_REPO_PATH__/config/private/working_kube_aws_rsa
+  StrictHostKeyChecking no
+  UserKnownHostsFile=/dev/null
+
+# for the kube / kops prod instances
+Host 172.20.96.* 172.20.97.* 172.20.98.* 172.20.99.* 172.20.100.* 172.20.101.* 172.20.102.* 172.20.103.* 172.20.104.* 172.20.105.* 172.20.106.* 172.20.107.*
+  User admin
+  IdentityFile __INFRA_REPO_PATH__/config/private/prod_kube_aws_rsa
+  StrictHostKeyChecking no
+  UserKnownHostsFile=/dev/null
+
+# for instances in private_working
+Host 172.20.48.* 172.20.49.* 172.20.50.* 172.20.51.* 172.20.52.* 172.20.53.* 172.20.54.* 172.20.55.* 172.20.56.* 172.20.57.* 172.20.58.* 172.20.59.*
+  User ubuntu
+  IdentityFile __INFRA_REPO_PATH__/config/private/private_working_aws_rsa
+  StrictHostKeyChecking no
+  UserKnownHostsFile=/dev/null
+
+# for instances in private_prod
+Host 172.20.32.* 172.20.33.* 172.20.34.* 172.20.35.* 172.20.36.* 172.20.37.* 172.20.38.* 172.20.39.* 172.20.40.* 172.20.41.* 172.20.42.* 172.20.43.*
+  User ubuntu
+  IdentityFile __INFRA_REPO_PATH__/config/private/private_prod_aws_rsa
+  StrictHostKeyChecking no
+  UserKnownHostsFile=/dev/null
+
+# for instances in admin
+Host 172.20.0.* 172.20.1.* 172.20.2.* 172.20.3.* 172.20.4.* 172.20.5.* 172.20.6.* 172.20.7.* 172.20.8.* 172.20.9.* 172.20.10.* 172.20.11.*
+  User ubuntu
+  IdentityFile __INFRA_REPO_PATH__/config/private/admin_aws_rsa
+  StrictHostKeyChecking no
+  UserKnownHostsFile=/dev/null
 
 # access to github
 # Host github.com
 #  HostName github.com
-#  #IdentityFile __INFRA_REPO_PATH__/config/private/koombea-rops-github
+#  #IdentityFile __INFRA_REPO_PATH__/config/private/rops-github
 #  User git
 #
 
-#  ubuntu based instances
+# ubuntu based instances
 # Host *
 #   User ubuntu
 #   IdentityFile __INFRA_REPO_PATH__/config/private/default-private-key
