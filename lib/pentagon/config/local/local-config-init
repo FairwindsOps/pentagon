@@ -1,4 +1,4 @@
-#!env bash
+#!/usr/bin/env bash
 
 # this script creates personalized copies of *-default files
 # the scripts primary purpose is to create config files which
