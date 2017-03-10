@@ -13,7 +13,7 @@
 
 - src: git+ssh://git@github.com/reactiveops/ansible-vpn-stack
   name: reactiveops.vpn-stack
-  version: origin/develop
+  version: origin/master
 
 - src: "https://github.com/Stouts/Stouts.users.git"
   version: origin/master
@@ -27,10 +27,10 @@
   version: origin/additional-policies
   name: reactiveops.iam-role
 
-- src: "git+ssh://git@github.com/reactiveops/ansible-acm.git"
-  version: 1.0.1
-  name: reactiveops.acm
-
-- src: git+ssh://git@github.com/reactiveops/ansible-manage-elb
-  version: origin/advanced-options
-  name: reactiveops.manage-elb
+# - src: "git+ssh://git@github.com/reactiveops/ansible-acm.git"
+#   version: 1.0.1
+#   name: reactiveops.acm
+#
+# - src: git+ssh://git@github.com/reactiveops/ansible-manage-elb
+#   version: origin/advanced-options
+#   name: reactiveops.manage-elb
