@@ -1,10 +1,10 @@
 # Example vpc_tag_name: "20170131"
-vpc_tag_name: "<Placeholder"
+vpc_tag_name: "<PLACEHOLDER>"
 
 # org_name: "shareddev"
-org_name: "<Placeholder>"
+org_name: "<PLACEHOLDER>"
 org: "{{ org_name }}"
 
 # canonical_zone: "shareddev.dev.hillghost.com"
-canonical_zone: "<Placeholder"
+canonical_zone: "<PLACEHOLDER>"
 #vpn_bucket: "{{ org_name }}-vpn"
