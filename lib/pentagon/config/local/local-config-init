@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+# this script creates personalized copies of *-default files
+# the scripts primary purpose is to create config files which
+# populate paths for items which do not leverage the
+# $INFRASTRUCTURE_REPO environment
+# The script basically replaces all instances of the string
+# __INFRA_REPO_PATH__ with the contents of $INFRASTRUCTURE_REPO
+# and stores the output in the real config files (which are .gitignored)
+
+if [ -z "${INFRASTRUCTURE_REPO}" ]; then
+  echo "INFRASTRUCTURE_REPO environment variable must be set"
+  exit 1
+elif [ ! -d "${INFRASTRUCTURE_REPO}" ]; then
+  echo "${INFRASTRUCTURE_REPO} doesn't exist or isn't a directory"
+  exit 1
+fi
+
+cd "${INFRASTRUCTURE_REPO}/config/local" || exit 1
+
+for default_file in *-default; do
+  out_file="${default_file//-default}"
+  echo -n "${default_file} -> ${out_file} "
+  if [ -e "${out_file}" ]; then
+    echo "already exists. skipping."
+    continue
+  else
+    cat "${default_file}" | sed -e "s@__INFRA_REPO_PATH__@$INFRASTRUCTURE_REPO@g" > "${out_file}"
+    echo "created."
+  fi
+done
