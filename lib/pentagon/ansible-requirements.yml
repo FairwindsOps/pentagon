@@ -13,7 +13,7 @@
 
 - src: git+ssh://git@github.com/reactiveops/ansible-vpn-stack
   name: reactiveops.vpn-stack
-  version: origin/develop
+  version: origin/master
 
 - src: "https://github.com/Stouts/Stouts.users.git"
   version: origin/master
