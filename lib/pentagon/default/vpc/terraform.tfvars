@@ -1,9 +1,9 @@
-aws_vpc_name = "<PLACEHOLDER>"
-vpc_cidr_base = "172.20"
-aws_azs = "<PLACEHOLDER>"
-az_count = 3
+aws_vpc_name  = "{{ vpc_name }}"
+vpc_cidr_base = "{{ vpc_cidr_base }}}"
+aws_azs = "{{ aws_availability_zones }}
+az_count = "{{ aws_availability_zone_count }}"
 aws_inventory_path = "$INFRASTRUCTURE_REPO/plugins/inventory"
-aws_region = "<PLACEHOLDER>"
+aws_region = "{{ aws_region }}"
 
 admin_subnet_parent_cidr = ".0.0/20"
 admin_subnet_cidrs = {

@@ -1,3 +1,327 @@
-#!/bin/bash -ex
+#!/usr/bin/env python
 
-echo "hello world"
+import os
+import pentagon
+import sys
+import click
+import subprocess
+import jinja2
+import datetime
+import shutil
+import string
+import logging
+
+from git import Repo, Git
+from shutil import copytree, ignore_patterns
+from Crypto.PublicKey import RSA
+from sultan.api import Sultan
+
+
+class PentagonException(Exception):
+    """Exception raised for errors in the input.
+    Attributes:
+        expr -- input expression in which the error occurred
+        msg  -- explanation of the error
+    """
+    def __init__(self, expr=None, msg=None):
+        self.expr = expr
+        self.msg = msg
+
+
+class PentagonException(Exception):
+    def __init__(self, value=None):
+        self.value = value
+
+    def __str__(self):
+        return repr(self.value)
+
+
+class PentagonProject():
+
+    availability_zone_designations = list(string.ascii_lowercase)
+
+    def __init__(self, name, args):
+        self._repository_name = args.get("repository_name") if args.get("repository_name") else "{}-infrastructure".format(name)
+
+        self._workspace_directory = os.path.expanduser(args.get('workspace_directory'))
+        self._project_directory = "{}/projects".format(self._workspace_directory)
+        self._venv_directory = "{}/venvs".format(self._workspace_directory)
+
+        self._project_source = os.path.dirname(pentagon.__file__)
+        self._name = name
+        self._force = args.get('force')
+        self._repository_path = "{}/{}/{}".format(
+            self._project_directory,
+            self._name,
+            self._repository_name)
+
+        self._configure_project = args.get('configure')
+
+        self._aws_access_key = args.get('aws_access_key') if args.get('aws_access_key') else '<aws-access-key>'
+        self._aws_secret_key = args.get('aws_secret_key') if args.get('aws_secret_key') else '<aws-secret-key>'
+
+        if args.get('aws_default_region'):
+            self._aws_default_region = args.get('aws_default_region')
+            self._aws_availability_zone_count = int(args.get('aws_availability_zone_count')) if args.get('aws_availability_zone_count') else 3
+            self._aws_availability_zones = args.get('aws_availability_zones') if args.get('availability_zones') else self.__default_aws_availability_zones()
+        else:
+            self._aws_default_region = '<aws-default-region>'
+            self._aws_availability_zone_count = args.get('aws_availability_zone_count') if args.get('aws_availability_zone_count') else '<aws_availability_zone_count>'
+            self._aws_availability_zones = args.get('aws_availability_zones') if args.get('availability_zones') else '<aws_availability_zones>'
+
+        self._kops_state_store_bucket = args.get('kops_state_store_bucket') if args.get('kops_state_store_bucket') else self._repository_name
+        self._git_repo = args.get('git_repo')
+        self._create_keys = args.get('create_keys')
+
+        self._vpc_name = args.get('vpc_name') if args.get('vpc_name') else '<vpc_name>'
+        self._vpc_cidr_base = args.get('vpc_cidr_base') if args.get('vpc_cidr_base') else '<vpc_cidr_base>'
+
+    def __default_aws_availability_zones(self):
+        azs = []
+        logging.info("Creating default AWS AZs")
+        for i in range(0, self._aws_availability_zone_count):
+            azs += ["{}{}".format(self._aws_default_region, self.availability_zone_designations[i])]
+
+        return (", ").join(azs)
+
+    def __project_path_exists(self):
+        if os.path.isdir(self._repository_path):
+            return True
+        return False
+
+    def __delete(self):
+            try:
+                shutil.rmtree(self._venv_directory+"/"+self._name)
+            except OSError, e:
+                logging.warn(e)
+            try:
+                shutil.rmtree(self._project_directory+"/"+self._name)
+            except OSError, e:
+                logging.warn(e)
+
+    def __git_init(self):
+        """ Initialize git repository in the project infrastructure path """
+        if self._git_repo:
+            return Git().clone(self._git_repo, self._repository_path)
+        else:
+            return Repo.init(self._repository_path)
+
+    def __set_virtualenv_env(self, s):
+        s.export('WORKON_HOME={}'.format(self._venv_directory))
+        os.environ['WORKON_HOME'] = self._venv_directory
+
+        s.export('PROJECT_HOME={}'.format(self._project_directory))
+        os.environ['PROJECT_HOME'] = self._project_directory
+
+        s.export('VIRTUALENVWRAPPER_HOOK_DIR={}/hooks'.format(self._workspace_directory))
+        os.environ['VIRTUALENVWRAPPER_HOOK_DIR'] = "{}/hooks".format(self._workspace_directory)
+
+        s.export('OMNIA_COOKIECUTTERS={}/cookiecutters'.format(self._workspace_directory))
+        os.environ['OMNIA_COOKIECUTTERS'] = "{}/cookiecutters".format(self._workspace_directory)
+
+    def __initialize_virtualenv(self):
+        s = Sultan()
+        self.__set_virtualenv_env(s)
+        s.source("/usr/local/bin/virtualenvwrapper.sh").and_().mkproject(self._name)
+        output = s.run()
+        logging.debug(output)
+
+    def __virtual_env_pip_install(self):
+        s = Sultan()
+        self.__set_virtualenv_env(s)
+        s.source("/usr/local/bin/virtualenvwrapper.sh").and_().workon(self._name).and_().pip("install -r {}/config/requirements.txt".format(self._repository_path))
+        output = s.run()
+        logging.debug(output)
+
+    def __render_template(self, template_name, template_path, target, context):
+
+        if os.path.isfile(target):
+            logging.warn("Cowardly refusing to overwrite existing file {}".format(target))
+            return False
+
+        template = jinja2.Environment(loader=jinja2.FileSystemLoader(template_path)).get_template(template_name)
+        with open(target, 'w+') as vars_file:
+            if vars_file.write(template.render(context)):
+                os.remove("{}/{}".format(template_path, template_name))
+
+    def __prepare_private_vars(self):
+        template_name = "vars.jinja"
+        template_path = "{}/config/local".format(self._repository_path)
+        target = "{}/config/private/vars".format(self._repository_path)
+        context = {'AWS_ACCESS_KEY': self._aws_access_key,
+                   'AWS_SECRET_KEY': self._aws_secret_key,
+                   'AWS_DEFAULT_REGION': self._aws_default_region}
+        return self.__render_template(template_name, template_path, target, context)
+
+    def __prepare_account_vars(self):
+        template_name = "vars.sh.jinja"
+        template_path = "{}/default/account".format(self._repository_path)
+        target = "{}/default/account/vars.sh".format(self._repository_path)
+        context = {'KOPS_STATE_STORE_BUCKET': self._kops_state_store_bucket}
+        return self.__render_template(template_name, template_path, target, context)
+
+    def __prepare_tf_vars(self):
+
+        template_name = "terraform.tfvars.jinja"
+        template_path = "{}/default/vpc".format(self._repository_path)
+        target = "{}/default/vpc/terraform.tfvars".format(self._repository_path)
+        context = {
+            'vpc_name': self._vpc_name,
+            'vpc_cidr_base': self._vpc_cidr_base,
+            'aws_availability_zones': self._aws_availability_zones,
+            'aws_availability_zone_count': self._aws_availability_zone_count,
+            'aws_region': self._aws_default_region
+        }
+        return self.__render_template(template_name, template_path, target, context)
+
+    def __create_key(self, name, path, bits=2048):
+        key = RSA.generate(bits)
+
+        private_key = "{}{}".format(path, name)
+        public_key = "{}{}.pub".format(path, name)
+
+        with open(private_key, 'w') as content_file:
+            os.chmod(private_key, 0600)
+            content_file.write(key.exportKey('PEM'))
+
+        pubkey = key.publickey()
+        with open(public_key, 'w') as content_file:
+            content_file.write(pubkey.exportKey('OpenSSH'))
+
+    def start(self):
+
+        if not self.__project_path_exists() or self._force:
+            self.__initialize_virtualenv()
+            if not self._git_repo:
+                logging.info("Copying project files...")
+                self.__copy_project_tree()
+
+            if self._configure_project:
+                self.__configure_project()
+        else:
+            raise PentagonException('Project path exists.')
+
+    def initialize_virtualenv(self):
+        self.__initialize_virtualenv()
+
+    def configure_project(self):
+        self.__configure_project()
+
+    def delete(self):
+        self.__delete()
+
+    def __configure_project(self):
+        self.__git_init()
+        self.__virtual_env_pip_install()
+
+        if not self._git_repo:
+            self.__prepare_private_vars()
+            self.__prepare_account_vars()
+
+            if self._create_keys:
+                self.__create_keys()
+
+        self.__prepare_tf_vars()
+
+    def __create_keys(self):
+            key_path = "{}/config/private/".format(self._repository_path)
+            yyyymmdd = datetime.datetime.today().strftime('%Y%m%d')
+            keys = ["working-kube",
+                    "production-kube",
+                    "working-ec2",
+                    "production-ec2"]
+
+            for key in keys:
+                key_name = "{}-{}".format(key, yyyymmdd)
+                if not os.path.isfile("{}{}".format(key_path, key_name)):
+                    self.__create_key(key_name, key_path)
+                else:
+                    logging.warn("Key {}{} exits!".format(key_path, key_name))
+
+    def __copy_project_tree(self):
+        logging.info(self._project_source)
+        logging.info(self._repository_path)
+        copytree(self._project_source, self._repository_path, symlinks=True, ignore=ignore_patterns('__init__.py', '*.pyc', 'release.py'))
+
+
+@click.group()
+def cli():
+    pass
+
+
+@click.command()
+@click.argument('name')
+@click.option('--workspace-directory', default='~/workspace', help='Directory to place new project, defaults to ~/workspace/')
+@click.option('--repository-name', help='Name of the folder to initialize the infrastructure repository')
+def initialize_virtualenv(name, **kwargs):
+    project = PentagonProject(name, kwargs)
+    project.initialize_virtualenv()
+
+
+@click.command()
+@click.argument('name')
+@click.option('--workspace-directory', default='~/workspace', help='Directory to place new project, defaults to ~/workspace/')
+@click.option('--repository-name', help='Name of the folder to initialize the infrastructure repository')
+@click.option('--configure', default=True, help='Configure project with default settings')
+@click.option('--force/--no-force', default=False, help="Ignore existing directories and copy project")
+@click.option('--aws-access-key', help="AWS access key")
+@click.option('--aws-secret-key', help="AWS secret key")
+@click.option('--aws-default-region', help="AWS default region")
+@click.option('--aws-availability-zones', default=None, help="AWS availability zones as a comma delimited with spaces. Default to region a, region b, ... region z")
+@click.option('--aws-availability-zone-count', help="Number of availability zones to use")
+@click.option('--kops-state-store-bucket', help="Name of S3 Bucket to store kops state")
+@click.option('--git-repo', default=None, help="Existing git repository to clone")
+@click.option('--create-keys/--no-create-keys', default=True, help="Ignore existing directories and copy project")
+@click.option('--vpc-name', default=datetime.datetime.today().strftime('%Y%m%d'), help="Name of VPC to create")
+@click.option('--vpc-cidr-base', default="172.20", help="First two octets of the VPC ip space")
+@click.option('--log-level', default="INFO", help="Log Level DEBUG,INFO,WARN,ERROR")
+def start_project(name, **kwargs):
+    logging.basicConfig(level=kwargs.get('log_level'))
+    project = PentagonProject(name, kwargs)
+    project.start()
+
+
+@click.command()
+@click.argument('name')
+@click.option('--workspace-directory', default='~/workspace', help='Directory to place new project, defaults to ~/workspace/')
+@click.option('--log-level', default="INFO", help="Log Level DEBUG,INFO,WARN,ERROR")
+def delete_project(name, **kwargs):
+    logging.basicConfig(level=kwargs.get('log_level'))
+    project = PentagonProject(name, kwargs)
+    project.delete()
+
+
+@click.command()
+@click.argument('name')
+@click.option('--workspace-directory', default='~/workspace', help='Directory to place new project, defaults to ~/workspace/')
+@click.option('--repository-name', help='Name of the folder to initialize the infrastructure repository')
+@click.option('--aws-access-key', help="AWS access key")
+@click.option('--aws-secret-key', help="AWS secret key")
+@click.option('--aws-default-region', help="AWS default region")
+@click.option('--aws-availability-zones', help="AWS availability zones as a comma delimited with spacesDefault to region a, region b, ... region z")
+@click.option('--aws-availability-zone-count', help="Number of availability zones to use")
+@click.option('--kops-state-store-bucket', help="Name of S3 Bucket to store kops state")
+@click.option('--git-repo', default=None, help="Existing git repository to clone")
+@click.option('--create-keys/--no-create-keys', default=True, help="Ignore existing directories and copy project")
+@click.option('--vpc-name', default=datetime.datetime.today().strftime('%Y%m%d'), help="Name of VPC to create")
+@click.option('--vpc-cidr-base', default="172.20", help="First two octets of the VPC ip space")
+@click.option('--log-level', default="INFO", help="Log Level DEBUG,INFO,WARN,ERROR")
+def configure_project(name, **kwargs):
+    logging.basicConfig(level=kwargs.get('log_level'))
+    project = PentagonProject(name, kwargs)
+    project.configure_project()
+
+
+@click.command()
+def vpn():
+    print "vpn"
+    click.echo("VPN")
+
+cli.add_command(start_project, "start-project")
+cli.add_command(initialize_virtualenv, "initialize-virtualenv")
+cli.add_command(configure_project, "configure-project")
+cli.add_command(delete_project, "delete-project")
+cli.add_command(vpn)
+
+if __name__ == '__main__':
+    cli()

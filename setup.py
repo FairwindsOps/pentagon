@@ -9,8 +9,8 @@ try:
     from setuptools import setup, find_packages
 except ImportError:
     print("Ansible now needs setuptools in order to build. Install it using"
-            " your package manager (usually python-setuptools) or via pip (pip"
-            " install setuptools).")
+          " your package manager (usually python-setuptools) or via pip (pip"
+          " install setuptools).")
     sys.exit(1)
 
 setup(name='pentagon',
@@ -22,12 +22,19 @@ setup(name='pentagon',
       license='GPLv3',
       # Ansible will also make use of a system copy of python-six if installed but use a
       # Bundled copy if it's not.
-    #   install_requires=['paramiko', 'jinja2', "PyYAML", 'setuptools', 'pycrypto >= 2.6'],
-      package_dir={ '': 'lib' },
+      #   install_requires=['paramiko', 'jinja2', "PyYAML", 'setuptools', 'pycrypto >= 2.6'],
+      install_requires=[
+        "click==6.7",
+        "GitPython==2.1.3",
+        "Jinja2==2.9.5",
+        "pycrypto=2.6.1",
+        "sultan==0.2.4"
+      ],
+      package_dir={'': 'lib'},
       packages=find_packages('lib'),
-    #   package_data={
-    #      '': ['module_utils/*.ps1', 'modules/core/windows/*.ps1', 'modules/extras/windows/*.ps1', 'galaxy/data/*'],
-    #   },
+      # package_data={
+      #   '': ['module_utils/*.ps1', 'modules/core/windows/*.ps1', 'modules/extras/windows/*.ps1', 'galaxy/data/*'],
+      # },
       classifiers=[
           'Development Status :: 5 - Production/Stable',
           'Environment :: Console',
@@ -45,7 +52,6 @@ setup(name='pentagon',
       ],
       scripts=[
          'bin/pentagon',
-         'bin/pentagon-startproject',
          ],
       data_files=[],
-)
+      )
