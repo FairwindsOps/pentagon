@@ -2,19 +2,110 @@ Pentagon is the way ReactiveOps does DevOps as a Service (DaaS).
 
 It is our curated ecosystem of container-based infrastructure based on Kubernetes.
 
+
 # Getting Started
 
-* Clone the pentagon repo to a location on your workstation. Do not put it into a python project directory structure (such as the omnia workspace).
-* Here are the basic instructions on setting up a pentagon project for the first time. It assumes that you have virtualenvwrapper setup as described [here](virtualenv.md).
+Commands:
+  configure-project
+  delete-project
+  start-project
 
-* `mkproject delme`
-* `pip install -e git+ssh://git@github.com/reactiveops/pentagon#egg=pentagon`
-* `pentagon-startproject -n delme`
+```
+
+```
+# pentagon start-project --help
+Usage: pentagon start-project [OPTIONS] NAME
+
+Options:
+  --workspace-directory TEXT      Directory to place new project, defaults to
+                                  ~/workspace/
+  --repository-name TEXT          Name of the folder to initialize the
+                                  infrastructure repository
+  --configure / --no-configure    Configure project with default settings
+  --force / --no-force            Ignore existing directories and copy project
+  --aws-access-key TEXT           AWS access key
+  --aws-secret-key TEXT           AWS secret key
+  --aws-default-region TEXT       AWS default region
+  --aws-availability-zones TEXT   AWS availability zones as a comma delimited
+                                  with spaces. Default to region a, region b,
+                                  ... region z
+  --aws-availability-zone-count TEXT
+                                  Number of availability zones to use
+  --state-store-bucket TEXT       Name of S3 Bucket to store state
+  --git-repo TEXT                 Existing git repository to clone
+  --create-keys / --no-create-keys
+                                  Ignore existing directories and copy project
+  --admin-vpn-key TEXT            Name of the ssh key for the admin user of
+                                  the VPN instance
+  --working-kube-key TEXT         Name of the ssh key for the working
+                                  kubernetes cluster
+  --production-kube-key TEXT      Name of the ssh key for the production
+                                  kubernetes cluster
+  --working-private-key TEXT      Name of the ssh key for the working non
+                                  kubernetes instances
+  --production-private-key TEXT   Name of the ssh key for the production non
+                                  kubernetes instances
+  --vpc-name TEXT                 Name of VPC to create
+  --vpc-cidr-base TEXT            First two octets of the VPC ip space
+  --log-level TEXT                Log Level DEBUG,INFO,WARN,ERROR
+  --help                          Show this message and exit.
+```
+```
+# pentagon configure-project --help
+Usage: pentagon configure-project [OPTIONS] NAME
+
+Options:
+  --workspace-directory TEXT      Directory to place new project, defaults to
+                                  ~/workspace/
+  --repository-name TEXT          Name of the folder to initialize the
+                                  infrastructure repository
+  --aws-access-key TEXT           AWS access key
+  --aws-secret-key TEXT           AWS secret key
+  --aws-default-region TEXT       AWS default region
+  --aws-availability-zones TEXT   AWS availability zones as a comma delimited
+                                  with spacesDefault to region a, region b,
+                                  ... region z
+  --aws-availability-zone-count TEXT
+                                  Number of availability zones to use
+  --state-store-bucket TEXT       Name of S3 Bucket to store state
+  --git-repo TEXT                 Existing git repository to clone
+  --create-keys / --no-create-keys
+                                  Ignore existing directories and copy project
+  --admin-vpn-key TEXT            Name of the ssh key for the admin user of
+                                  the VPN instance
+  --working-kube-key TEXT         Name of the ssh key for the working
+                                  kubernetes cluster
+  --production-kube-key TEXT      Name of the ssh key for the production
+                                  kubernetes cluster
+  --working-private-key TEXT      Name of the ssh key for the working non
+                                  kubernetes instances
+  --production-private-key TEXT   Name of the ssh key for the production non
+                                  kubernetes instances
+  --vpc-name TEXT                 Name of VPC to create
+  --vpc-cidr-base TEXT            First two octets of the VPC ip space
+  --log-level TEXT                Log Level DEBUG,INFO,WARN,ERROR
+  --help                          Show this message and exit.
+```
+```
+# pentagon delete-project --help
+Usage: pentagon delete-project [OPTIONS] NAME
+
+Options:
+  --workspace-directory TEXT  Directory to place new project, defaults to
+                              ~/workspace/
+  --log-level TEXT            Log Level DEBUG,INFO,WARN,ERROR
+  --help                      Show this message and exit.
+```
+
+
+## Example
+* The following command shows the minimal argumets to creat a project without any extra configuration. Without aws-default-region, aws-secret-key, aws-access-key further configuration is required.
+    * `pentagon start-project test --log-level DEBUG  --aws-default-region us-west-2 --aws-secret-key=<aws-secret-key> --aws-access-key=<aws-access-key>`
 
 When this is successful, the directory structure will look like this:
 ```    
-$ tree delme
-delme
+$ tree test
+test
 ├── README.md
 ├── ansible-requirements.yml
 ├── config
@@ -76,10 +167,5 @@ delme
 └── roles
 22 directories, 37 files
 ```
-
-# Setting up your configuration files and credentials
-
-* Customize `config/local/ansible.cfg` and `config/local/ssh_config`
-
 
 Next, take a look at the [kops instructions](kops.md).

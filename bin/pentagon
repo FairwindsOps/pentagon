@@ -303,7 +303,7 @@ def initialize_virtualenv(name, **kwargs):
 @click.argument('name')
 @click.option('--workspace-directory', default='~/workspace', help='Directory to place new project, defaults to ~/workspace/')
 @click.option('--repository-name', help='Name of the folder to initialize the infrastructure repository')
-@click.option('--configure', default=True, help='Configure project with default settings')
+@click.option('--configure/--no-configure', default=True, help='Configure project with default settings')
 @click.option('--force/--no-force', default=False, help="Ignore existing directories and copy project")
 @click.option('--aws-access-key', help="AWS access key")
 @click.option('--aws-secret-key', help="AWS secret key")
