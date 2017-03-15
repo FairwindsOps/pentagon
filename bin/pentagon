@@ -69,7 +69,7 @@ class PentagonProject():
             self._aws_availability_zone_count = args.get('aws_availability_zone_count') if args.get('aws_availability_zone_count') else '<aws_availability_zone_count>'
             self._aws_availability_zones = args.get('aws_availability_zones') if args.get('availability_zones') else '<aws_availability_zones>'
 
-        self._kops_state_store_bucket = args.get('kops_state_store_bucket') if args.get('kops_state_store_bucket') else self._repository_name
+        self._state_store_bucket = args.get('state_store_bucket') if args.get('state_store_bucket') else self._repository_name
         self._git_repo = args.get('git_repo')
 
         self._create_keys = args.get('create_keys')
@@ -172,7 +172,7 @@ class PentagonProject():
         template_name = "vars.sh.jinja"
         template_path = "{}/default/account".format(self._repository_path)
         target = "{}/default/account/vars.sh".format(self._repository_path)
-        context = {'KOPS_STATE_STORE_BUCKET': self._kops_state_store_bucket}
+        context = {'KOPS_STATE_STORE_BUCKET': self._state_store_bucket}
         return self.__render_template(template_name, template_path, target, context)
 
     def __prepare_account_vars_yml(self):
@@ -310,7 +310,7 @@ def initialize_virtualenv(name, **kwargs):
 @click.option('--aws-default-region', help="AWS default region")
 @click.option('--aws-availability-zones', default=None, help="AWS availability zones as a comma delimited with spaces. Default to region a, region b, ... region z")
 @click.option('--aws-availability-zone-count', help="Number of availability zones to use")
-@click.option('--kops-state-store-bucket', help="Name of S3 Bucket to store kops state")
+@click.option('--state-store-bucket', help="Name of S3 Bucket to store state")
 @click.option('--git-repo', default=None, help="Existing git repository to clone")
 @click.option('--create-keys/--no-create-keys', default=True, help="Ignore existing directories and copy project")
 @click.option('--admin-vpn-key', default='admin-vpn', help="Name of the ssh key for the admin user of the VPN instance")
@@ -347,7 +347,7 @@ def delete_project(name, **kwargs):
 @click.option('--aws-default-region', help="AWS default region")
 @click.option('--aws-availability-zones', help="AWS availability zones as a comma delimited with spacesDefault to region a, region b, ... region z")
 @click.option('--aws-availability-zone-count', help="Number of availability zones to use")
-@click.option('--kops-state-store-bucket', help="Name of S3 Bucket to store kops state")
+@click.option('--state-store-bucket', help="Name of S3 Bucket to store state")
 @click.option('--git-repo', default=None, help="Existing git repository to clone")
 @click.option('--create-keys/--no-create-keys', default=True, help="Ignore existing directories and copy project")
 @click.option('--admin-vpn-key', default='admin-vpn', help="Name of the ssh key for the admin user of the VPN instance")
@@ -378,9 +378,11 @@ cli.add_command(vpn)
 
 def next_steps():
     steps = """
-cd default/vpc
+workon test
+cd test-infrastructure/default/vpc
+source ../account/vars.sh
 make plan
-make apply
+#make apply
 """
     return steps
 
