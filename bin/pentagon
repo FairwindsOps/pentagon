@@ -28,14 +28,6 @@ class PentagonException(Exception):
         self.msg = msg
 
 
-class PentagonException(Exception):
-    def __init__(self, value=None):
-        self.value = value
-
-    def __str__(self):
-        return repr(self.value)
-
-
 class PentagonProject():
 
     availability_zone_designations = list(string.ascii_lowercase)
