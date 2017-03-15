@@ -14,7 +14,6 @@ import logging
 from git import Repo, Git
 from shutil import copytree, ignore_patterns
 from Crypto.PublicKey import RSA
-from sultan.api import Sultan
 
 
 class PentagonException(Exception):
