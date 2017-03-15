@@ -28,7 +28,7 @@ setup(name='pentagon',
         "GitPython==2.1.3",
         "Jinja2==2.9.5",
         "pycrypto=2.6.1",
-        "sultan==0.2.4"
+        "virtualenvwrapper==4.7.2"
       ],
       package_dir={'': 'lib'},
       packages=find_packages('lib'),

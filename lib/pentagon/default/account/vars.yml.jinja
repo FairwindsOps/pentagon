@@ -1,8 +1,8 @@
-vpc_tag_name: "{{ VPC_NAME }}"
-org_name: "{{ ORG_NAME }}"
-{%- raw -%}
-org: "{{org_name}}"
-{%- endraw -%}
+vpc_tag_name: "{{ vpc_name }}"
+org_name: "{{ org_name }}"
+{% raw -%}
+org: "{{ org_name }}" 
+{%- endraw %}
 canonical_zone: "{{org_name}}.com"
 vpn_bucket: "{{org_name}}-vpn"
 secrets_bucket: "{{org_name}}-secrets"

@@ -71,7 +71,15 @@ class PentagonProject():
 
         self._kops_state_store_bucket = args.get('kops_state_store_bucket') if args.get('kops_state_store_bucket') else self._repository_name
         self._git_repo = args.get('git_repo')
+
         self._create_keys = args.get('create_keys')
+        self._ssh_keys = {
+                          'admin_vpn': args.get('admin_vpn_key', 'admin-vpn'),
+                          'working_kube': args.get('working_kube_key', 'working-kube'),
+                          'production_kube': args.get('production_kube_key', 'production-kube'),
+                          'working_private': args.get('working_private_key', 'working-private'),
+                          'production_private': args.get('production_private_key', 'working-private'),
+                         }
 
         self._vpc_name = args.get('vpc_name') if args.get('vpc_name') else '<vpc_name>'
         self._vpc_cidr_base = args.get('vpc_cidr_base') if args.get('vpc_cidr_base') else '<vpc_cidr_base>'
@@ -106,43 +114,50 @@ class PentagonProject():
         else:
             return Repo.init(self._repository_path)
 
-    def __set_virtualenv_env(self, s):
-        s.export('WORKON_HOME={}'.format(self._venv_directory))
+    def __run_commands(self, commands):
+        logging.debug(commands)
+        stdout, stderr = subprocess.Popen(commands,
+                                          shell=True,
+                                          stdin=subprocess.PIPE,
+                                          stdout=subprocess.PIPE,
+                                          stderr=subprocess.PIPE).communicate()
+        logging.info(stdout)
+        logging.error(stderr)
+        return (stdout, stderr)
+
+    def __set_virtualenv_env(self):
         os.environ['WORKON_HOME'] = self._venv_directory
-
-        s.export('PROJECT_HOME={}'.format(self._project_directory))
         os.environ['PROJECT_HOME'] = self._project_directory
-
-        s.export('VIRTUALENVWRAPPER_HOOK_DIR={}/hooks'.format(self._workspace_directory))
         os.environ['VIRTUALENVWRAPPER_HOOK_DIR'] = "{}/hooks".format(self._workspace_directory)
-
-        s.export('OMNIA_COOKIECUTTERS={}/cookiecutters'.format(self._workspace_directory))
         os.environ['OMNIA_COOKIECUTTERS'] = "{}/cookiecutters".format(self._workspace_directory)
 
     def __initialize_virtualenv(self):
-        s = Sultan()
-        self.__set_virtualenv_env(s)
-        s.source("/usr/local/bin/virtualenvwrapper.sh").and_().mkproject(self._name)
-        output = s.run()
-        logging.debug(output)
+        self.__set_virtualenv_env()
+        commands = "source /usr/local/bin/virtualenvwrapper.sh; mkproject {}".format(self._name)
+        self.__run_commands(commands)
 
     def __virtual_env_pip_install(self):
-        s = Sultan()
-        self.__set_virtualenv_env(s)
-        s.source("/usr/local/bin/virtualenvwrapper.sh").and_().workon(self._name).and_().pip("install -r {}/config/requirements.txt".format(self._repository_path))
-        output = s.run()
-        logging.debug(output)
+        self.__set_virtualenv_env()
+        commands = "source /usr/local/bin/virtualenvwrapper.sh; workon {}; pip install -r {}/config/requirements.txt".format(self._name, self._repository_path)
+        self.__run_commands(commands)
 
     def __render_template(self, template_name, template_path, target, context):
-
+        logging.info("Writing {}".format(target))
+        logging.debug("Template Context: {}".format(context))
         if os.path.isfile(target):
             logging.warn("Cowardly refusing to overwrite existing file {}".format(target))
             return False
 
-        template = jinja2.Environment(loader=jinja2.FileSystemLoader(template_path)).get_template(template_name)
         with open(target, 'w+') as vars_file:
-            if vars_file.write(template.render(context)):
-                os.remove("{}/{}".format(template_path, template_name))
+            try:
+                template = jinja2.Environment(loader=jinja2.FileSystemLoader(template_path)).get_template(template_name)
+                vars_file.write(template.render(context))
+            except Exception:
+                logging.error("Error writing {}. {}".format(target, sys.exc_info()[0]))
+                return False
+
+        logging.debug("Removing {}/{}".format(template_path, template_name))
+        os.remove("{}/{}".format(template_path, template_name))
 
     def __prepare_private_vars(self):
         template_name = "vars.jinja"
@@ -153,15 +168,21 @@ class PentagonProject():
                    'AWS_DEFAULT_REGION': self._aws_default_region}
         return self.__render_template(template_name, template_path, target, context)
 
-    def __prepare_account_vars(self):
+    def __prepare_account_vars_sh(self):
         template_name = "vars.sh.jinja"
         template_path = "{}/default/account".format(self._repository_path)
         target = "{}/default/account/vars.sh".format(self._repository_path)
         context = {'KOPS_STATE_STORE_BUCKET': self._kops_state_store_bucket}
         return self.__render_template(template_name, template_path, target, context)
 
-    def __prepare_tf_vars(self):
+    def __prepare_account_vars_yml(self):
+        template_name = "vars.yml.jinja"
+        template_path = "{}/default/account".format(self._repository_path)
+        target = "{}/default/account/vars.yml".format(self._repository_path)
+        context = {'org_name': self._name, 'vpc_name': self._vpc_name}
+        return self.__render_template(template_name, template_path, target, context)
 
+    def __prepare_tf_vars(self):
         template_name = "terraform.tfvars.jinja"
         template_path = "{}/default/vpc".format(self._repository_path)
         target = "{}/default/vpc/terraform.tfvars".format(self._repository_path)
@@ -171,6 +192,29 @@ class PentagonProject():
             'aws_availability_zones': self._aws_availability_zones,
             'aws_availability_zone_count': self._aws_availability_zone_count,
             'aws_region': self._aws_default_region
+        }
+        return self.__render_template(template_name, template_path, target, context)
+
+    def __prepare_ssh_config_vars(self):
+        template_name = "ssh_config.jinja"
+        template_path = "{}/config/local".format(self._repository_path)
+        target = "{}/config/local/ssh_config".format(self._repository_path)
+        context = {
+            'infrastructure_repository': self._repository_path,
+            'production_kube_key': self._ssh_keys['production_kube'],
+            'working_kube_key': self._ssh_keys['working_kube'],
+            'production_private_key': self._ssh_keys['production_private'],
+            'working_private_key': self._ssh_keys['working_private'],
+            'admin_vpn_key': self._ssh_keys['admin_vpn'],
+        }
+        return self.__render_template(template_name, template_path, target, context)
+
+    def __prepare_ansible_cfg_vars(self):
+        template_name = "ansible.cfg.jinja"
+        template_path = "{}/config/local".format(self._repository_path)
+        target = "{}/config/local/ansible.cfg".format(self._repository_path)
+        context = {
+            'infrastructure_repository': self._repository_path,
         }
         return self.__render_template(template_name, template_path, target, context)
 
@@ -216,7 +260,10 @@ class PentagonProject():
 
         if not self._git_repo:
             self.__prepare_private_vars()
-            self.__prepare_account_vars()
+            self.__prepare_account_vars_sh()
+            self.__prepare_account_vars_yml()
+            self.__prepare_ssh_config_vars()
+            self.__prepare_ansible_cfg_vars()
 
             if self._create_keys:
                 self.__create_keys()
@@ -225,14 +272,8 @@ class PentagonProject():
 
     def __create_keys(self):
             key_path = "{}/config/private/".format(self._repository_path)
-            yyyymmdd = datetime.datetime.today().strftime('%Y%m%d')
-            keys = ["working-kube",
-                    "production-kube",
-                    "working-ec2",
-                    "production-ec2"]
-
-            for key in keys:
-                key_name = "{}-{}".format(key, yyyymmdd)
+            for key in self._ssh_keys:
+                key_name = "{}".format(self._ssh_keys[key])
                 if not os.path.isfile("{}{}".format(key_path, key_name)):
                     self.__create_key(key_name, key_path)
                 else:
@@ -272,6 +313,11 @@ def initialize_virtualenv(name, **kwargs):
 @click.option('--kops-state-store-bucket', help="Name of S3 Bucket to store kops state")
 @click.option('--git-repo', default=None, help="Existing git repository to clone")
 @click.option('--create-keys/--no-create-keys', default=True, help="Ignore existing directories and copy project")
+@click.option('--admin-vpn-key', default='admin-vpn', help="Name of the ssh key for the admin user of the VPN instance")
+@click.option('--working-kube-key', default='working-kube', help="Name of the ssh key for the working kubernetes cluster")
+@click.option('--production-kube-key', default='production-kube', help="Name of the ssh key for the production kubernetes cluster")
+@click.option('--working-private-key', default='working-private', help="Name of the ssh key for the working non kubernetes instances")
+@click.option('--production-private-key', default='production-private', help="Name of the ssh key for the production non kubernetes instances")
 @click.option('--vpc-name', default=datetime.datetime.today().strftime('%Y%m%d'), help="Name of VPC to create")
 @click.option('--vpc-cidr-base', default="172.20", help="First two octets of the VPC ip space")
 @click.option('--log-level', default="INFO", help="Log Level DEBUG,INFO,WARN,ERROR")
@@ -279,6 +325,7 @@ def start_project(name, **kwargs):
     logging.basicConfig(level=kwargs.get('log_level'))
     project = PentagonProject(name, kwargs)
     project.start()
+    print next_steps()
 
 
 @click.command()
@@ -303,6 +350,11 @@ def delete_project(name, **kwargs):
 @click.option('--kops-state-store-bucket', help="Name of S3 Bucket to store kops state")
 @click.option('--git-repo', default=None, help="Existing git repository to clone")
 @click.option('--create-keys/--no-create-keys', default=True, help="Ignore existing directories and copy project")
+@click.option('--admin-vpn-key', default='admin-vpn', help="Name of the ssh key for the admin user of the VPN instance")
+@click.option('--working-kube-key', default='working-kube', help="Name of the ssh key for the working kubernetes cluster")
+@click.option('--production-kube-key', default='production-kube', help="Name of the ssh key for the production kubernetes cluster")
+@click.option('--working-private-key', default='working-private', help="Name of the ssh key for the working non kubernetes instances")
+@click.option('--production-private-key', default='production-private', help="Name of the ssh key for the production non kubernetes instances")
 @click.option('--vpc-name', default=datetime.datetime.today().strftime('%Y%m%d'), help="Name of VPC to create")
 @click.option('--vpc-cidr-base', default="172.20", help="First two octets of the VPC ip space")
 @click.option('--log-level', default="INFO", help="Log Level DEBUG,INFO,WARN,ERROR")
@@ -322,6 +374,15 @@ cli.add_command(initialize_virtualenv, "initialize-virtualenv")
 cli.add_command(configure_project, "configure-project")
 cli.add_command(delete_project, "delete-project")
 cli.add_command(vpn)
+
+
+def next_steps():
+    steps = """
+cd default/vpc
+make plan
+make apply
+"""
+    return steps
 
 if __name__ == '__main__':
     cli()
