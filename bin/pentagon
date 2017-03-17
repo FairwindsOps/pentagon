@@ -72,8 +72,30 @@ class PentagonProject():
                           'production_private': args.get('production_private_key', 'working-private'),
                          }
 
+        self._working_kubernetes_cluster_name = args.get('working_kubernetes_cluster_name', 'working-1.{}.com'.format(self._name))
+        self._working_kubernetes_node_count = args.get('working_kubernetes_node_count', 3)
+        self._working_kubernetes_master_aws_zone = args.get('working_kubernetes_master_aws_zone', self._aws_availability_zones[0])
+        self._working_kubernetes_master_node_type = args.get('working_kubernetes_master_node_type', 't2.medium')
+        self._working_kubernetes_worker_node_type = args.get('working_kubernetes_worker_node_type', 't2.medium')
+        self._working_kubernetes_dns_zone = args.get('working_kubernetes_dns_zone', 'working.{}.com'.format(self._name))
+        self._working_kubernetes_v_log_level = args.get('working_kubernetes_v_log_level', 10)
+        self._working_kubernetes_network_cidr = args.get('working_kubernetes_network_cidr', "172.20.0.0/16")
+
+        self._working_kubernetes_cluster_name = args.get('working_kubernetes_cluster_name', 'production-1.{}.com'.format(self._name))
+        self._production_kubernetes_node_count = args.get('production_kubernetes_node_count', 3)
+        self._production_kubernetes_master_aws_zone = args.get('production_kubernetes_master_aws_zone', self._aws_availability_zones[0])
+        self._production_kubernetes_master_node_type = args.get('production_kubernetes_master_node_type', 't2.medium')
+        self._production_kubernetes_worker_node_type = args.get('production_kubernetes_worker_node_type', 't2.medium')
+        self._production_kubernetes_dns_zone = args.get('production_kubernetes_dns_zone', 'production.{}.com'.format(self._name))
+        self._production_kubernetes_v_log_level = args.get('production_kubernetes_v_log_level', 10)
+        self._production_kubernetes_network_cidr = args.get('production_kubernetes_network_cidr', "172.20.0.0/16")
+
+        self._working_kubernetes_cluster_name = args.get('working_kubernetes_cluster_name', 'production-1.{}.com'.format(self._name))
+        self._production_kubernetes_cluster_name = args.get('production_kubernetes_cluster_name', 'working-1.{}.com'.format(self._name))
+
         self._vpc_name = args.get('vpc_name') if args.get('vpc_name') else '<vpc_name>'
         self._vpc_cidr_base = args.get('vpc_cidr_base') if args.get('vpc_cidr_base') else '<vpc_cidr_base>'
+        self._vpc_id = args.get('vpc_id') if args.get('vpc_id') else '<vpc_id>'
 
     def __default_aws_availability_zones(self):
         azs = []
@@ -186,6 +208,25 @@ class PentagonProject():
         }
         return self.__render_template(template_name, template_path, target, context)
 
+    def __prepare_working_kops_vars_sh(self):
+        template_name = "vars.sh.jinja"
+        template_path = "{}/default/clusters/working/".format(self._repository_path)
+        target = "{}/default/clusters/working/vars.sh".format(self._repository_path)
+        context = {
+            'kubernetes_cluster_name': self._working_kubernetes_cluster_name,
+            'aws_availability_zones': re.sub(" ", "", self._aws_availability_zones),
+            'vpc_id': self._vpc_id,
+            'ssh_key_path': "{}/config/private/{}".format(self._repository_path, self._ssh_keys['working_kube']),
+            'kubernetes_node_count': self._working_kubernetes_node_count,
+            'kubernetes_master_aws_zone': self._working_kubernetes_master_aws_zone,
+            'kubernetes_master_node_type': self._working_kubernetes_master_node_type,
+            'kubernetes_worker_node_type': self._working_kubernetes_worker_node_type,
+            'kubernetes_dns_zone': self._working_kubernetes_dns_zone,
+            'kubernetes_v_log_level': self._working_kubernetes_v_log_level,
+            'kubernetes_network_cidr': self._working_kubernetes_network_cidr
+        }
+        return self.__render_template(template_name, template_path, target, context)
+
     def __prepare_ssh_config_vars(self):
         template_name = "ssh_config.jinja"
         template_path = "{}/config/local".format(self._repository_path)
@@ -295,14 +336,14 @@ def initialize_virtualenv(name, **kwargs):
 @click.option('--workspace-directory', default='~/workspace', help='Directory to place new project, defaults to ~/workspace/')
 @click.option('--repository-name', help='Name of the folder to initialize the infrastructure repository')
 @click.option('--configure/--no-configure', default=True, help='Configure project with default settings')
-@click.option('--force/--no-force', default=False, help="Ignore existing directories and copy project")
+@click.option('--force/--no-force', help="Ignore existing directories and copy project")
 @click.option('--aws-access-key', help="AWS access key")
 @click.option('--aws-secret-key', help="AWS secret key")
 @click.option('--aws-default-region', help="AWS default region")
-@click.option('--aws-availability-zones', default=None, help="AWS availability zones as a comma delimited with spaces. Default to region a, region b, ... region z")
+@click.option('--aws-availability-zones', help="AWS availability zones as a comma delimited with spaces. Default to region a, region b, ... region z")
 @click.option('--aws-availability-zone-count', help="Number of availability zones to use")
 @click.option('--state-store-bucket', help="Name of S3 Bucket to store state")
-@click.option('--git-repo', default=None, help="Existing git repository to clone")
+@click.option('--git-repo', help="Existing git repository to clone")
 @click.option('--create-keys/--no-create-keys', default=True, help="Ignore existing directories and copy project")
 @click.option('--admin-vpn-key', default='admin-vpn', help="Name of the ssh key for the admin user of the VPN instance")
 @click.option('--working-kube-key', default='working-kube', help="Name of the ssh key for the working kubernetes cluster")
@@ -311,6 +352,24 @@ def initialize_virtualenv(name, **kwargs):
 @click.option('--production-private-key', default='production-private', help="Name of the ssh key for the production non kubernetes instances")
 @click.option('--vpc-name', default=datetime.datetime.today().strftime('%Y%m%d'), help="Name of VPC to create")
 @click.option('--vpc-cidr-base', default="172.20", help="First two octets of the VPC ip space")
+@click.option('--vpc-id', default=None, help="AWS VPC id to create the kubernetes clusters in")
+@click.option('--working-kubernetes-cluster-name', help="Name of the working kubernetes cluster nodes")
+@click.option('--working-kubernetes-node-count', help="Name of the working kubernetes cluster nodes")
+
+        # self._working_kubernetes_node_count = args.get('working_kubernetes_node_count', 3)
+        # self._working_kubernetes_master_aws_zone = args.get('working_kubernetes_master_aws_zone', self._aws_availability_zones[0])
+        # self._working_kubernetes_master_node_type = args.get('working_kubernetes_master_node_type', 't2.medium')
+        # self._working_kubernetes_worker_node_type = args.get('working_kubernetes_worker_node_type', 't2.medium')
+        # self._working_kubernetes_dns_zone = args.get('working_kubernetes_dns_zone', 'working.{}.com'.format(self._name))
+        # self._working_kubernetes_v_log_level = args.get('working_kubernetes_v_log_level', 10)
+        # self._working_kubernetes_network_cidr = args.get('working_kubernetes_network_cidr', "172.20.0.0/16")
+
+
+@click.option('--production-kubernetes-cluster-name', default=None, help="Name of the production kubernetes cluster nodes")
+
+@click.option('--vpc-cidr-base', default="172.20", help="First two octets of the VPC ip space")
+@click.option('--vpc-cidr-base', default="172.20", help="First two octets of the VPC ip space")
+
 @click.option('--log-level', default="INFO", help="Log Level DEBUG,INFO,WARN,ERROR")
 def start_project(name, **kwargs):
     logging.basicConfig(level=kwargs.get('log_level'))
@@ -339,7 +398,7 @@ def delete_project(name, **kwargs):
 @click.option('--aws-availability-zones', help="AWS availability zones as a comma delimited with spacesDefault to region a, region b, ... region z")
 @click.option('--aws-availability-zone-count', help="Number of availability zones to use")
 @click.option('--state-store-bucket', help="Name of S3 Bucket to store state")
-@click.option('--git-repo', default=None, help="Existing git repository to clone")
+@click.option('--git-repo', help="Existing git repository to clone")
 @click.option('--create-keys/--no-create-keys', default=True, help="Ignore existing directories and copy project")
 @click.option('--admin-vpn-key', default='admin-vpn', help="Name of the ssh key for the admin user of the VPN instance")
 @click.option('--working-kube-key', default='working-kube', help="Name of the ssh key for the working kubernetes cluster")
@@ -369,7 +428,7 @@ cli.add_command(vpn)
 
 def next_steps():
     steps = """
-workon test
+workon <project_name>
 cd test-infrastructure/default/vpc
 source ../account/vars.sh
 make plan
