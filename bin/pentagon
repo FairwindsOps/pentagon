@@ -11,6 +11,7 @@ import shutil
 import string
 import logging
 import re
+import yaml
 
 from git import Repo, Git
 from shutil import copytree, ignore_patterns
@@ -24,6 +25,8 @@ class PentagonException(Exception):
         msg  -- explanation of the error
     """
     def __init__(self, expr=None, msg=None):
+        print expr
+        print msg
         self.expr = expr
         self.msg = msg
 
@@ -122,6 +125,10 @@ class PentagonProject():
         # Does the git repo already exist
         self._git_repo = args.get('git_repo')
 
+        self._config_file = self.get_arg("config_file")
+        if self._config_file is not None:
+            self._args = self.__read_config_file()
+
         # Setting local path info
         self._repository_name = os.path.expanduser(self.get_arg("repository_name", "{}-infrastructure".format(name)))
         self._workspace_directory = os.path.expanduser(self.get_arg('workspace_directory', '~/workspace'))
@@ -183,6 +190,19 @@ class PentagonProject():
                           'working_private': self.get_arg('working_private_key', self.default_ssh_keys.get('working_private_key')),
                           'production_private': self.get_arg('production_private_key', self.default_ssh_keys.get('production_private_key')),
                          }
+
+    def __read_config_file(self):
+        logging.info("Reading config file: {}".format(self._config_file))
+        try:
+            with open(self._config_file) as cf:
+                config = yaml.load(cf.read())
+                logging.debug("Config values: {}".format(config))
+                return config
+        except Exception, e:
+            logging.error(e)
+            sys.exit(1)
+
+        return {}
 
     def __default_aws_availability_zones(self):
         azs = []
@@ -439,6 +459,7 @@ def initialize_virtualenv(name, **kwargs):
 
 @click.command()
 @click.argument('name')
+@click.option('-f', '--config-file', help='File to read configuration options from. File supercedes command line options.')
 @click.option('--workspace-directory', help='Directory to place new project, defaults to ~/workspace/')
 @click.option('--repository-name', help='Name of the folder to initialize the infrastructure repository')
 @click.option('--configure/--no-configure', default=True, help='Configure project with default settings')
@@ -477,13 +498,10 @@ def initialize_virtualenv(name, **kwargs):
 @click.option('--production-kubernetes-network-cidr', help="Network cidr of the kubernetes working cluster")
 @click.option('--log-level', default="INFO", help="Log Level DEBUG,INFO,WARN,ERROR")
 def start_project(name, **kwargs):
-    try:
-        logging.basicConfig(level=kwargs.get('log_level'))
-        project = PentagonProject(name, kwargs)
-        project.start()
-        print next_steps()
-    except Exception, e:
-        logging.error(e)
+    logging.basicConfig(level=kwargs.get('log_level'))
+    project = PentagonProject(name, kwargs)
+    project.start()
+#    print next_steps()
 
 
 @click.command()
