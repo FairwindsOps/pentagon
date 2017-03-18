@@ -191,14 +191,24 @@ class PentagonProject():
                           'production_private': self.get_arg('production_private_key', self.default_ssh_keys.get('production_private_key')),
                          }
 
+    def __write_config_file(self, file="pentagon.yml"):
+        logging.info("Writing argumets to file for Posterity: {}".format(file))
+        try:
+            with open(file, "w") as f:
+                return yaml.dump(self._args, f, default_flow_style=False)
+        except Exception as e:
+            logging.error("Failed to write arguments to file")
+            logging.error(e)
+
     def __read_config_file(self):
         logging.info("Reading config file: {}".format(self._config_file))
         try:
-            with open(self._config_file) as cf:
+            with open(self._config_file, "r") as cf:
                 config = yaml.load(cf.read())
                 logging.debug("Config values: {}".format(config))
                 return config
         except Exception, e:
+            logging.info("Failed to read arguments from file")
             logging.error(e)
             sys.exit(1)
 
@@ -404,6 +414,7 @@ class PentagonProject():
                 self.__render_templates()
                 if self._create_keys:
                     self.__create_keys()
+                self.__write_config_file()
         else:
             raise PentagonException('Project path exists.')
 
