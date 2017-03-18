@@ -13,22 +13,3 @@ export MASTER_SIZE="{{ kubernetes_master_node_type }}"
 export NODE_SIZE="{{ kubernetes_worker_node_type }}"
 export V_LOG_LEVEL={{ v_log_level }}
 export NETWORK_CIDR="{{ kubernetes_network_cidr }}"
-
-
-
-
-export CLUSTER_NAME="production-1.shareddev.dev.hillghost.com"
-export ZONES="us-east-1a,us-east-1b"
-export VPC_ID="vpc-5328b835"
-
-# the public key to be installed for the admin user
-# this should be set to be unique per cluster
-export SSH_KEY_PATH="${HOME}/workspace/projects/$PROJECT_NAME/${PROJECT_NAME}-infrastructure/config/private/working.pub"
-
-export NODE_COUNT=2
-export MASTER_ZONES="us-east-1a"
-export DNS_ZONE="shareddev.dev.hillghost.com"
-export MASTER_SIZE="t2.medium"
-export NODE_SIZE="t2.micro"
-export V_LOG_LEVEL=10
-export NETWORK_CIDR="172.20.0.0/16"
