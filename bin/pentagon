@@ -116,7 +116,7 @@ class PentagonProject():
     def __init__(self, name, args):
         self._args = args
         self._name = name
-
+        logging.debug(self._args)
         # Set booleans
         self._force = args.get('force')
         self._configure_project = args.get('configure')
@@ -124,6 +124,9 @@ class PentagonProject():
 
         # Does the git repo already exist
         self._git_repo = args.get('git_repo')
+
+        # Set this before it gets overridden by the config file
+        self._outfile = self.get_arg('output_file')
 
         self._config_file = self.get_arg("config_file")
         if self._config_file is not None:
@@ -191,11 +194,15 @@ class PentagonProject():
                           'production_private': self.get_arg('production_private_key', self.default_ssh_keys.get('production_private_key')),
                          }
 
-    def __write_config_file(self, file="pentagon.yml"):
+    def __write_config_file(self):
         logging.info("Writing argumets to file for Posterity: {}".format(file))
+        config = self._args
+        if 'output_file' in config:
+            config.pop('output_file')
+
         try:
-            with open(file, "w") as f:
-                return yaml.dump(self._args, f, default_flow_style=False)
+            with open(self._outfile, "w") as f:
+                return yaml.dump(config, f, default_flow_style=False)
         except Exception as e:
             logging.error("Failed to write arguments to file")
             logging.error(e)
@@ -414,7 +421,8 @@ class PentagonProject():
                 self.__render_templates()
                 if self._create_keys:
                     self.__create_keys()
-                self.__write_config_file()
+                if self._outfile is not None:
+                    self.__write_config_file()
         else:
             raise PentagonException('Project path exists.')
 
@@ -471,6 +479,7 @@ def initialize_virtualenv(name, **kwargs):
 @click.command()
 @click.argument('name')
 @click.option('-f', '--config-file', help='File to read configuration options from. File supercedes command line options.')
+@click.option('-o', '--output-file', help='File to write options to after completion')
 @click.option('--workspace-directory', help='Directory to place new project, defaults to ~/workspace/')
 @click.option('--repository-name', help='Name of the folder to initialize the infrastructure repository')
 @click.option('--configure/--no-configure', default=True, help='Configure project with default settings')
