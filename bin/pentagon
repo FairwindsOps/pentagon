@@ -25,7 +25,7 @@ def cli():
 @click.option('--aws-availability-zone-count', help="Number of availability zones to use")
 @click.option('--state-store-bucket', help="Name of S3 Bucket to store state")
 @click.option('--git-repo', help="Existing git repository to clone")
-@click.option('--create-keys/--no-create-keys', default=True, help="Ignore existing directories and copy project")
+@click.option('--create-keys/--no-create-keys', default=True, help="Create ssh keys or not")
 @click.option('--admin-vpn-key', help="Name of the ssh key for the admin user of the VPN instance")
 @click.option('--working-kube-key', help="Name of the ssh key for the working kubernetes cluster")
 @click.option('--production-kube-key', help="Name of the ssh key for the production kubernetes cluster")
