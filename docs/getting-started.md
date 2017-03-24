@@ -4,7 +4,8 @@ It is our curated ecosystem of container-based infrastructure based on Kubernete
 
 # Getting Started
 
-This assumes that you have `virtualenvwrapper` setup as described [here](virtualenv.md).
+* Clone the pentagon repo to a location on your workstation. Do not put it into a python project directory structure (such as the omnia workspace).
+* Here are the basic instructions on setting up a pentagon project for the first time. It assumes that you have virtualenvwrapper setup as described [here](virtualenv.md).
 
 * `mkproject delme`
 * `pip install -e git+ssh://git@github.com/reactiveops/pentagon#egg=pentagon`

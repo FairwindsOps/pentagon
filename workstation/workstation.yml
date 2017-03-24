@@ -4,36 +4,13 @@
   connection: local
   gather_facts: False
 
-  # Customize variables under ~/.ro/workstation-vars.yaml
-  # Expected variables with example values:
-  # workspace_dir: /Users/jane/work/workspace/
-  # omnia_repo_path: /Users/jane/work/omnia/
-
   tasks:
     - include_vars: ~/.ro/workstation-vars.yml
-
-    - name: move out .aws config to backup
-      command: mv -v credentials{,.bak}
-      args:
-        chdir: ~/.aws
- 
- 
-    - name: move out .kube config to backup
-      command: mv -v config{,.bak}
-      args:
-        chdir: ~/.kube
 
     - name: Ensure ~/workspace doesn't exist as a directory
       stat: path='~/workspace'
       register: workspace
       failed_when: (workspace.stat.exists == True) and (workspace.stat.isdir is defined and workspace.stat.isdir == True)
-
-#    - name: Ensure ~/workspace
-#      file:
-#         src: "{{ workspace_dir }}"
-#         dest: ~/workspace
-#         state: link
-#      when: (workspace.stat.exists == False) or (workspace.stat.islnk is defined and workspace.stat.islnk == True)
 
     - name: Ensure ~/workspace/projects
       file:
@@ -42,40 +19,25 @@
 
     - name: Place shell helper script
       copy:
-        src: files/omnia-helpers.sh
-        dest: ~/.ro/omnia-helpers.sh
+        src: files/pentagon-helpers.sh
+        dest: ~/.ro/pentagon-helpers.sh
         force: no
 
-    - name: Clone down omnia repo
-      git: >
-        repo='git@github.com:reactiveops/omnia.git'
-        dest={{ omnia_repo_path }}/
-        accept_hostkey=yes
-        version=master
-        update=yes
-
-    # Assumes pip is installed
     - name: Install Python bits
       pip:
-        requirements: "{{ omnia_repo_path }}/requirements.txt"
+        requirements: "{{ pentagon_repo_path }}/requirements.txt"
         extra_args: "--user"
 
     - name: symlink to hooks
       file:
-        src: "{{ omnia_repo_path }}/hooks"
+        src: "{{ pentagon_repo_path }}/workstation/hooks"
         dest: ~/workspace/hooks
-        state: link
-
-    - name: symlink to cookiecutter templates
-      file:
-        src: "{{ omnia_repo_path }}/cookiecutters"
-        dest: ~/workspace/cookiecutters
         state: link
 
     - name: ensure help script gets sourced
       lineinfile: >
-        regexp='^source ~/.ro/omnia-helpers.sh'
-        line='source ~/.ro/omnia-helpers.sh'
+        regexp='^source ~/.ro/pentagon-helpers.sh'
+        line='source ~/.ro/pentagon-helpers.sh'
         state=present
         dest=~/.bash_profile
 
