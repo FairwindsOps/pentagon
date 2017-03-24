@@ -7,10 +7,12 @@ pages:
   - Getting Started: getting-started.md
   - Kops Walkthrough: kops.md
   - VPC: vpc.md
+  - VPN: vpn.md
   - Examples: examples.md
   - Namespaces: namespaces.md
   - Open Questions: open-questions.md
   - Overview: overview.md
   - Terminology: terminology.md
   - Virtualenv: virtualenv.md
+  - Monitoring: monitoring.md
   - Glossary: glossary.md

@@ -1,0 +1,10 @@
+# set in vars.sh
+vpc_tag_name:   "{{ lookup('env','DEFAULT_VPC_TAG') }}"
+
+# org_name: "shareddev"
+org_name: "<PLACEHOLDER>"
+org: "{{ org_name }}"
+
+# canonical_zone: "shareddev.dev.hillghost.com"
+canonical_zone: "<PLACEHOLDER>"
+#vpn_bucket: "{{ org_name }}-vpn"

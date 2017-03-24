@@ -7,12 +7,12 @@
   pre_tasks:
     - include_vars: "{{ item }}"
       with_items:
-        - ../../../account/vars.yml
-        - ../env.yml
+        - ../../account/vars.yml
+        - env.yml
       tags: always
 
   roles:
-    - vpn-stack
+    - reactiveops.vpn-stack
 
 - name: configure vpn instance
   hosts: tag_Layer_vpn_public_ip
@@ -22,8 +22,8 @@
   pre_tasks:
     - include_vars: "{{ item }}"
       with_items:
-        - ../../../account/vars.yml
-        - ../env.yml
+        - ../../account/vars.yml
+        - env.yml
 
   roles:
     - role: Stouts.openvpn-master
