@@ -76,9 +76,12 @@ cli.add_command(delete_project, "delete-project")
 
 def next_steps():
     steps = """
+
+# S3 buckets will need to be created
+
 # Execute the following steps to create VPC
 workon <project_name>
-cd test-infrastructure/default/vpc
+cd <project_name>-infrastructure/default/vpc
 source ../account/vars.sh
 make plan
 make apply

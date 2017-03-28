@@ -12,7 +12,7 @@ It is our curated ecosystem of container-based infrastructure based on Kubernete
 
 ## Usage
 ### QUICK START
-* `pentagon start-project <project-name> --aws-access-key <aws-access-key> --aws-secret-key <aws-secret-key> --aws-defaut-region <aws-default-region>`
+* `pentagon start-project <project-name> --aws-access-key <aws-access-key> --aws-secret-key <aws-secret-key> --aws-default-region <aws-default-region>`
   * With the above basic options set, all default will be set for you and unless values need to be updated you should be able to run terraform after createing the aws-infrastructure-bucket
 
 ### Start new project
