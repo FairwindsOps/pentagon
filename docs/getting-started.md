@@ -174,11 +174,46 @@ It is our curated ecosystem of container-based infrastructure based on Kubernete
   * **--help**:
     * Show help message and exit.
 
-## Example
-* The following command shows the minimal argumets to creat a project without any extra configuration. Without aws-default-region, aws-secret-key, aws-access-key further configuration is required.
+## Example Usage
+* The following command shows the minimal arguments to create a project without any extra configuration. Without aws-default-region, aws-secret-key, aws-access-key further configuration is required.
     * `pentagon start-project test --log-level DEBUG  --aws-default-region us-west-2 --aws-secret-key=<aws-secret-key> --aws-access-key=<aws-access-key>`
+* In action: (actual output is more verbose, truncated output indicated by "...")
 
-When this is successful, the directory structure will look like this:
+```
+$ mkproject testinit5
+New python executable in /Users/myuser/Documents/work/reactive/workspace/venvs/testinit5/bin/python
+...
+(testinit5) 702 myuser:testinit5$ pip install -e ../reactiveops/pentagon/
+Obtaining file:///Users/myuser/Documents/work/reactive/workspace/projects/reactiveops/pentagon
+...
+Successfully installed GitPython-2.1.3 Jinja2-2.9.5 MarkupSafe-1.0 PyYAML-3.12 click-6.7 gitdb2-2.0.0 pbr-2.0.0 pentagon pycrypto-2.6.1 six-1.10.0 smmap2-2.0.1 stevedore-1.21.0 virtualenv-15.1.0 virtualenv-clone-0.2.6 virtualenvwrapper-4.7.2
+(testinit5) 705 myuser:testinit5$ pentagon start-project hillghost1 --aws-access-key PPP --aws-secret-key QQQ --aws-default-region us-east-1
+INFO:root:Creating default AWS AZs
+...
+
+# S3 buckets will need to be created
+
+# Execute the following steps to create VPC
+workon <project_name>
+cd <project_name>-infrastructure/default/vpc
+source ../account/vars.sh
+make plan
+make apply
+
+# VPN still requires configuration
+
+# Get VPCID and add it to default/clusters/<production|working>/vars.sh before running default/clusters/<production|working>/cluster-config/kops.sh
+
+(testinit5) 706 myuser:testinit5$ workon hillghost1
+(hillghost1) 707 myuser:hillghost1$ ls
+hillghost1-infrastructure
+(hillghost1) 710 myuser:hillghost1$ echo $AWS_ACCESS_KEY
+PPP
+(hillghost1) 711 myuser:hillghost1$ echo $ANSIBLE_CONFIG
+/Users/myuser/Documents/work/reactive/workspace/projects/hillghost1/hillghost1-infrastructure/config/local/ansible.cfg
+```
+
+* When this is successful, the directory structure will look like this:
 ```    
 .
 └── test-infrastructure
