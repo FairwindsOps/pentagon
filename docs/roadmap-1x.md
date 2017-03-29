@@ -24,7 +24,7 @@
     - Just needs to be added to the addons in #29, IAM permissions, and documented
 - Provable, testable **HA multi-master**: A master should be a member of a herd and not a cat [Pets vs. Cattle](https://www.slideshare.net/randybias/the-history-of-pets-vs-cattle-and-using-it-properly). In other words, a cluster should gracefully recover from a master outage in a multi-master setup. [#54](https://github.com/reactiveops/pentagon/issues/54)
     - Documented recovery procedures, research, pointers to relevant documentation- what should be known by us.
-- **Documentation for the future of the pentagon CLI** tool [#140]: what should it do, what should it not do
+- **Documentation for the future of the pentagon CLI** tool [#140](https://github.com/reactiveops/pentagon/issues/140) : what should it do, what should it not do
     - A method for including "components"- ie. `pentagon install-component elasticsearch` should do foo and bar.
     - Add a design doc- list future planned features without necessarily coding them. For example, mimicking the kops `create/update` behavior
 - **Docs for kubernetes upgrades via kops**, ie- the way it is done in Pentagon. Linking to docs and a human-scriptable test of current-1 to current.
