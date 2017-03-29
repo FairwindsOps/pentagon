@@ -1,0 +1,7 @@
+aws-access-key: PPP
+aws-secret-key: QQQ
+aws-default-region: us-east-1
+repository-name: stubdirname
+state-store-bucket: stubbucketname
+create-keys: False
+vpc-name: Zeus
