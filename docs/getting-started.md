@@ -84,7 +84,9 @@ It is our curated ecosystem of container-based infrastructure based on Kubernete
       * `admin_vpn`: key for the vpn instances
       * `working_kube`: key for working kubernetes instances
       * `production_kube`: key for production kubernetes instance
-    * ***Keys are not uploaded to AWS, when needed, this will need to be done manually***
+      * `working_private`: key for non-kubernetes resources in the working private subnets
+      * `production_private`: key for non-kubernetes resources in the production private subnets
+    * ***Keys are not uploaded to AWS. When needed, this will need to be done manually***
   * **--admin-vpn-key**:
     * Name of the ssh key for the admin user of the VPN instance
     * Defaults to 'admin_vpn'
@@ -94,6 +96,12 @@ It is our curated ecosystem of container-based infrastructure based on Kubernete
   * **--production-kube-key**:
     * Name of the ssh key for the production kubernetes cluster
     * Defaults to 'production_kube'
+  * **--working-private-key**:
+    * Name of the ssh key for the working non-kubernetes instances
+    * Defaults to 'working_private'
+  * **--production-private-key**:
+    * Name of the ssh key for the production non-kubernetes instances
+    * Defaults to 'production_private'
   * **--vpc-name**:
     * Name of VPC to create
     * Defaults to date string in the format `<YYYYMMDD>`
@@ -113,8 +121,8 @@ It is our curated ecosystem of container-based infrastructure based on Kubernete
     * AWS instance type of the kube master node in the working cluster
     * Defaults to t2.medium
   * **--working-kubernetes-worker-node-type**:
-  * AWS instance type of the kube worker nodes in the working cluster
-  * Defaults to t2.medium
+    * AWS instance type of the kube worker nodes in the working cluster
+    * Defaults to t2.medium
   * **--working-kubernetes-dns-zone**:
     * DNS Zone of the kubernetes working cluster
     * Defaults to `working.<project-name>.com`
@@ -137,7 +145,7 @@ It is our curated ecosystem of container-based infrastructure based on Kubernete
     * AWS instance type of the kube master node in the production cluster
     * Defaults to t2.medium
   * **--production-kubernetes-worker-node-type**:
-    * AWS instance type of the kube workder nodes in the production cluster
+    * AWS instance type of the kube worker nodes in the production cluster
     * Defaults to t2.medium
   * **--production-kubernetes-dns-zone**:
     * DNS Zone of the kubernetes production cluster
@@ -149,7 +157,7 @@ It is our curated ecosystem of container-based infrastructure based on Kubernete
     * Network cidr of the kubernetes production cluster
     * Defaults to `172.20.0.0/16`
   * **--log-level**:
-    * Log Level. Accepts DEBUG,INFO,WARN,ERROR
+    * Pentagon CLI Log Level. Accepts DEBUG,INFO,WARN,ERROR
     * Defaults to INFO
   * **--help**:
     * Show help message and exit.
@@ -161,7 +169,7 @@ It is our curated ecosystem of container-based infrastructure based on Kubernete
    * Directory to place new project
    * Defaults to `~/workspace/`
   * **--log-level**:
-    * Log Level. Accepts DEBUG,INFO,WARN,ERROR
+    * Pentagon CLI Log Level. Accepts DEBUG,INFO,WARN,ERROR
     * Defaults to INFO
   * **--help**:
     * Show help message and exit.
