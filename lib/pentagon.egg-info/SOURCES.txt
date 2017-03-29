@@ -1,0 +1,8 @@
+bin/pentagon
+lib/pentagon/__init__.py
+lib/pentagon/release.py
+lib/pentagon.egg-info/PKG-INFO
+lib/pentagon.egg-info/SOURCES.txt
+lib/pentagon.egg-info/dependency_links.txt
+lib/pentagon.egg-info/requires.txt
+lib/pentagon.egg-info/top_level.txt

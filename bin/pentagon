@@ -1,3 +1,96 @@
-#!/bin/bash -ex
+#!/usr/bin/env python
+import pentagon
+import sys
+import click
+import logging
 
-echo "hello world"
+
+@click.group()
+def cli():
+    pass
+
+
+@click.command()
+@click.argument('name')
+@click.option('-f', '--config-file', help='File to read configuration options from. File supercedes command line options.')
+@click.option('-o', '--output-file', help='File to write options to after completion')
+@click.option('--workspace-directory', help='Directory to place new project, defaults to ~/workspace/')
+@click.option('--repository-name', help='Name of the folder to initialize the infrastructure repository')
+@click.option('--configure/--no-configure', default=True, help='Configure project with default settings')
+@click.option('--force/--no-force', help="Ignore existing directories and copy project")
+@click.option('--aws-access-key', help="AWS access key")
+@click.option('--aws-secret-key', help="AWS secret key")
+@click.option('--aws-default-region', help="AWS default region")
+@click.option('--aws-availability-zones', help="AWS availability zones as a comma delimited with spaces. Default to region a, region b, ... region z")
+@click.option('--aws-availability-zone-count', help="Number of availability zones to use")
+@click.option('--state-store-bucket', help="Name of S3 Bucket to store state")
+@click.option('--git-repo', help="Existing git repository to clone")
+@click.option('--create-keys/--no-create-keys', default=True, help="Create ssh keys or not")
+@click.option('--admin-vpn-key', help="Name of the ssh key for the admin user of the VPN instance")
+@click.option('--working-kube-key', help="Name of the ssh key for the working kubernetes cluster")
+@click.option('--production-kube-key', help="Name of the ssh key for the production kubernetes cluster")
+@click.option('--working-private-key', help="Name of the ssh key for the working non kubernetes instances")
+@click.option('--production-private-key', help="Name of the ssh key for the production non kubernetes instances")
+@click.option('--vpc-name', help="Name of VPC to create")
+@click.option('--vpc-cidr-base', help="First two octets of the VPC ip space")
+@click.option('--vpc-id', help="AWS VPC id to create the kubernetes clusters in")
+@click.option('--working-kubernetes-cluster-name', help="Name of the working kubernetes cluster nodes")
+@click.option('--working-kubernetes-node-count', help="Name of the working kubernetes cluster nodes")
+@click.option('--working-kubernetes-master-aws-zone', help="Availability zone to place the kube master in")
+@click.option('--working-kubernetes-master-node-type', help="Node type of the kube master")
+@click.option('--working-kubernetes-worker-node-type', help="Node type of the kube workers")
+@click.option('--working-kubernetes-dns-zone', help="DNS Zone of the kubernetes working cluster")
+@click.option('--working-kubernetes-v-log-level', help="V Log Level kubernetes working cluster")
+@click.option('--working-kubernetes-network-cidr', help="Network cidr of the kubernetes working cluster")
+@click.option('--production-kubernetes-cluster-name', help="Name of the production kubernetes cluster nodes")
+@click.option('--production-kubernetes-node-count', help="Name of the production kubernetes cluster nodes")
+@click.option('--production-kubernetes-master-aws-zone', help="Availability zone to place the kube master in")
+@click.option('--production-kubernetes-master-node-type', help="Node type of the kube master")
+@click.option('--production-kubernetes-worker-node-type', help="Node type of the kube workers")
+@click.option('--production-kubernetes-dns-zone', help="DNS Zone of the kubernetes production cluster")
+@click.option('--production-kubernetes-v-log-level', help="V Log Level kubernetes production cluster")
+@click.option('--production-kubernetes-network-cidr', help="Network cidr of the kubernetes working cluster")
+@click.option('--log-level', default="INFO", help="Log Level DEBUG,INFO,WARN,ERROR")
+def start_project(name, **kwargs):
+    try:
+        logging.basicConfig(level=kwargs.get('log_level'))
+        project = pentagon.PentagonProject(name, kwargs)
+        project.start()
+        print next_steps()
+    except Exception as e:
+        logging.error(e)
+
+
+@click.command()
+@click.argument('name')
+@click.option('--workspace-directory', default='~/workspace', help='Directory to place new project, defaults to ~/workspace/')
+@click.option('--log-level', default="INFO", help="Log Level DEBUG,INFO,WARN,ERROR")
+def delete_project(name, **kwargs):
+    logging.basicConfig(level=kwargs.get('log_level'))
+    project = pentagon.PentagonProject(name, kwargs)
+    project.delete()
+
+cli.add_command(start_project, "start-project")
+cli.add_command(delete_project, "delete-project")
+
+
+def next_steps():
+    steps = """
+
+# S3 buckets will need to be created
+
+# Execute the following steps to create VPC
+workon <project_name>
+cd <project_name>-infrastructure/default/vpc
+source ../account/vars.sh
+make plan
+make apply
+
+# VPN still requires configuration
+
+# Get VPCID and add it to default/clusters/<production|working>/vars.sh before running default/clusters/<production|working>/cluster-config/kops.sh
+"""
+    return steps
+
+if __name__ == '__main__':
+    cli()

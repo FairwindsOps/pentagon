@@ -7,4 +7,4 @@ hash_behavior = merge
 
 [ssh_connection]
 # this needs the path defined wihtout the use of ENV variables
-ssh_args = -F __INFRA_REPO_PATH__/config/local/ssh_config
+ssh_args = -F {{ infrastructure_repository }}/config/local/ssh_config
