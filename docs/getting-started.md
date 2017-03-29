@@ -13,37 +13,39 @@ It is our curated ecosystem of container-based infrastructure based on Kubernete
 ## Usage
 ### QUICK START
 * `pentagon start-project <project-name> --aws-access-key <aws-access-key> --aws-secret-key <aws-secret-key> --aws-default-region <aws-default-region>`
-  * With the above basic options set, all default will be set for you and unless values need to be updated you should be able to run terraform after createing the aws-infrastructure-bucket
+  * With the above basic options set, all defaults will be set for you and unless values need to be updated, you should be able to run terraform after creating the S3 Bucket to store state (`state-store-bucket`).
 
 ### Start new project
 * `pentagon start-project <project-name> <options>`
+
 ### Clone existing project
 * `pentagon start-project <project-name> --git-repo <repository-of-existing-project> <options>`
 
 ### Available commands
-* delete-project
-* start-project
+* `pentagon delete-project`
+* `pentagon start-project`
 
 ### _start-project_
 
- `pentagon start-project` creates a new project in your workspace directory and creates a matching virutalenv for you. Most values have defaults that should get you up and running very quickily with a new pentagon project. You may also clone an existing pentagon project if one exists
- #### options
+ `pentagon start-project` creates a new project in your workspace directory and creates a matching virutalenv for you. Most values have defaults that should get you up and running very quickly with a new pentagon project. You may also clone an existing pentagon project if one exists.
+
+ #### Options
   * **-f, --config-file**:
     * File to read configuration options from.
     * No default
     * ***File supercedes command line options.***
-  * **-o, --output-file**: 
+  * **-o, --output-file**:
     * No default
-  * **--workspace-directory**: 
+  * **--workspace-directory**:
    * Directory to place new project
-   * Defaults to ~/workspace/
+   * Defaults to `~/workspace/`
   * **--repository-name**:
-   * Name of the folder to initialize the infrastructure repository 
-   * Defaults to \<project-name>-infrastructure
+   * Name of the folder to initialize the infrastructure repository
+   * Defaults to `<project-name>-infrastructure`
   * **--configure / --no-configure:**:
    * Configure project with default settings
    * Default to True
-   * If you choose --no-configure, placeholder values will be used in stead of defaults and you will have to manually edit the configuration files
+   * If you choose `--no-configure`, placeholder values will be used in stead of defaults and you will have to manually edit the configuration files
   * **--force / --no-force**:
     * Ignore existing directories and copy project anyway
     * Defaults to False
@@ -56,53 +58,45 @@ It is our curated ecosystem of container-based infrastructure based on Kubernete
   * **--aws-default-region**:        
     * AWS default region
     * No Default
-    * If the --aws-default-region option is set it will allow default to be set for --aws-availability-zones and --aws-availability-zone-count
+    * If the --aws-default-region option is set it will allow the default to be set for `--aws-availability-zones` and `--aws-availability-zone-count`
   * **--aws-availability-zone-count**
     * Number of availability zones to use
-    * Defaults to 3 when a default recion is entered. Otherwise, placeholder string is used
+    * Defaults to 3 when a default region is entered. Otherwise, a placeholder string is used
   * **--aws-availability-zones**:
-    * AWS availability zones as a comma delimited list. 
-    * Defaults to \<aws-default-region>a, \<aws-default-region>b, ... \<aws-default-region>z when --aws-default-region is set calculated using the --aws-available-zone-count value. Otherwise a placeholder string is used.
+    * AWS availability zones as a comma delimited list.
+    * Defaults to `<aws-default-region>a`, `<aws-default-region>b`, ... `<aws-default-region>z` when `--aws-default-region` is set calculated using the `--aws-available-zone-count` value. Otherwise, a placeholder string is used.
   * **--aws-availability-zone-count**:
     * Number of availability zones to use
-    * Defaults to 3 when a default recion is entered. Otherwise, placeholder string is used
+    * Defaults to 3 when a default recion is entered. Otherwise, a placeholder string is used
   * **--state-store-bucket**:
     * Name of S3 Bucket to store state
-    * Defaults to \<project-name>-infrastructure
+    * Defaults to `<project-name>-infrastructure`
     * pentagon start-project does not create this bucket and it will need to be created
   * **--git-repo**:
-  * Existing git repository to clone
-  * No Default
-  * ***When --git-repo is set, no configuration actions are taken. Pentagon will setup the virutualenv and clone the repository only***
+    * Existing git repository to clone
+    * No Default
+    * ***When --git-repo is set, no configuration actions are taken. Pentagon will setup the virutualenv and clone the repository only***
   * **--create-keys / --no-create-keys**:
-  * Create ssh keys or not
-  * Defaults to True
-  * Keys are saved to `<workspace>/<repsitory-name>/config/private`
-  * 5 keys will be created:
-    * admin_vpn: key for the vpn instances
-    * working_kube: key for working kubernetes instances
-    * production_kube: key for production kubernetes instance
-    * working_private: key for working non-kubernetes 'private' instances
-    * production_private: key for production non-kubernetes 'private' instances
+    * Create ssh keys or not
+    * Defaults to True
+    * Keys are saved to `<workspace>/<repsitory-name>/config/private`
+    * 5 keys will be created:
+      * `admin_vpn`: key for the vpn instances
+      * `working_kube`: key for working kubernetes instances
+      * `production_kube`: key for production kubernetes instance
     * ***Keys are not uploaded to AWS, when needed, this will need to be done manually***
   * **--admin-vpn-key**:
-  * Name of the ssh key for the admin user of the VPN instance
-  * Defaults to 'admin_vpn'
+    * Name of the ssh key for the admin user of the VPN instance
+    * Defaults to 'admin_vpn'
   * **--working-kube-key**:
     * Name of the ssh key for the working kubernetes cluster
     * Defaults to 'working_kube'
   * **--production-kube-key**:
     * Name of the ssh key for the production kubernetes cluster
     * Defaults to 'production_kube'
-  * **--working-private-key**:
-    * Name of the ssh key for the working non-kubernetes instances
-    * Defaults to 'working_private'
-  * **--production-private-key**:
-    * Name of the ssh key for the production nonkubernetes instances
-    * Defaults to 'production_private'
-  * **--vpc-name**: 
+  * **--vpc-name**:
     * Name of VPC to create
-    * Defaults to date string in the format \<YYYYMMDD>
+    * Defaults to date string in the format `<YYYYMMDD>`
   * **--vpc-cidr-base**
     * First two octets of the VPC ip space
     * Defaults to '172.20'
@@ -119,7 +113,7 @@ It is our curated ecosystem of container-based infrastructure based on Kubernete
     * AWS instance type of the kube master node in the working cluster
     * Defaults to t2.medium
   * **--working-kubernetes-worker-node-type**:
-  * AWS instance type of the kube workder nodes in the working cluster
+  * AWS instance type of the kube worker nodes in the working cluster
   * Defaults to t2.medium
   * **--working-kubernetes-dns-zone**:
     * DNS Zone of the kubernetes working cluster
@@ -163,9 +157,9 @@ It is our curated ecosystem of container-based infrastructure based on Kubernete
 
 `pentagon delete-project <project-name>` removes the project directory in your workspace and the matching virtualenv of the same name. ***Use with caution, there is no confirmation prompt.***
 #### Options
-  * **--workspace-directory**: 
+  * **--workspace-directory**:
    * Directory to place new project
-   * Defaults to ~/workspace/
+   * Defaults to `~/workspace/`
   * **--log-level**:
     * Log Level. Accepts DEBUG,INFO,WARN,ERROR
     * Defaults to INFO
