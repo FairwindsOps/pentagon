@@ -59,15 +59,12 @@ It is our curated ecosystem of container-based infrastructure based on Kubernete
     * AWS default region
     * No Default
     * If the --aws-default-region option is set it will allow the default to be set for `--aws-availability-zones` and `--aws-availability-zone-count`
-  * **--aws-availability-zone-count**
-    * Number of availability zones to use
-    * Defaults to 3 when a default region is entered. Otherwise, a placeholder string is used
   * **--aws-availability-zones**:
     * AWS availability zones as a comma delimited list.
     * Defaults to `<aws-default-region>a`, `<aws-default-region>b`, ... `<aws-default-region>z` when `--aws-default-region` is set calculated using the `--aws-available-zone-count` value. Otherwise, a placeholder string is used.
   * **--aws-availability-zone-count**:
     * Number of availability zones to use
-    * Defaults to 3 when a default recion is entered. Otherwise, a placeholder string is used
+    * Defaults to 3 when a default region is entered. Otherwise, a placeholder string is used
   * **--state-store-bucket**:
     * Name of S3 Bucket to store state
     * Defaults to `<project-name>-infrastructure`
