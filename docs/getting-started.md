@@ -215,8 +215,9 @@ PPP
 
 * When this is successful, the directory structure will look like this:
 ```    
+(hillghost1) 708 myuser:hillghost1$ tree
 .
-└── test-infrastructure
+└── hillghost1-infrastructure
     ├── README.md
     ├── ansible-requirements.yml
     ├── config
@@ -247,9 +248,16 @@ PPP
     │   │   │   ├── cluster-config
     │   │   │   │   └── kops.sh
     │   │   │   ├── kubernetes
+    │   │   │   │   ├── docker-gc-configmap.yml
+    │   │   │   │   ├── docker-gc.yml
     │   │   │   │   ├── elk.yaml
+    │   │   │   │   ├── es-curator-config.yml
+    │   │   │   │   ├── es-curator.yml
     │   │   │   │   ├── namespaces.yml
-    │   │   │   │   └── readme.md
+    │   │   │   │   ├── readme.md
+    │   │   │   │   ├── route53-kubernetes.example.service.yml
+    │   │   │   │   ├── route53-kubernetes.policy
+    │   │   │   │   └── route53-kubernetes.yml
     │   │   │   ├── resources
     │   │   │   │   └── readme.md
     │   │   │   └── vars.sh
