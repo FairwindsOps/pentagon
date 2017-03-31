@@ -13,25 +13,25 @@
 - All additional (dashboard, heapster, etc.) resources (Deployments, etc.) in the `kube-system` namespace are defined, and have a uniform method of application.
     - `default/clusters/working/kubernetes`  and `default/clusters/production/kubernetes` are not identical, and probably need to moved out of `default/clusters/xxx`
     - one possibility would be `pentagon initialize-cluster $clustername` which would drop in `default/clusters/$clustername/kubernetes`  and then the next step would be `kubectl apply -f default/clusters/$clustername/kubernetes` [#29](https://github.com/reactiveops/pentagon/issues/29)
-- **Centralized Logging**, minimally of kube-system logs, optionally all pods' logs to an EL/FK stack, via AWS ES, fluentd, and Kibana (likely in a Deployment with nginx, not AWS' default Kibana- enabling locking down via VPN) #14, #41
+- **Centralized Logging**, minimally of kube-system logs, optionally all pods' logs to an EL/FK stack, via AWS ES, fluentd, and Kibana (likely in a Deployment with nginx, not AWS' default Kibana- enabling locking down via VPN) [#14](https://github.com/reactiveops/pentagon/issues/14), [#41](https://github.com/reactiveops/pentagon/issues/41)
 - Define the base set of IAM permissions
-- Hosted, browsable docs (via `mkdocs`).
+- Hosted, browsable docs (via `mkdocs`). [#145](https://github.com/reactiveops/pentagon/issues/145)
 
 ## [1.1](https://github.com/reactiveops/pentagon/milestone/3)
 - **Improved Secrets Management** via something more structured than "Secrets are kept in S3" or "Secrets are kept in an encrypted vault (1password)." A very likely candidate is implementing Hashicorp Vault (free) for all clients by default, and optionally adding Pro for the clients that request it [#76](https://github.com/reactiveops/pentagon/issues/76)
-- **Integration tests**: scripted tests that pass and fail as features and bugs are fixed
+- **Integration tests**: scripted tests that pass and fail as features and bugs are fixed [#146](https://github.com/reactiveops/pentagon/issues/146)
 - **DNS integration with applications** (via wearemolecule/r53)
-    - Just needs to be added to the addons in #29, IAM permissions, and documented
+    - Just needs to be added to the addons in [#29](https://github.com/reactiveops/pentagon/issues/29), IAM permissions, and documented
 - Provable, testable **HA multi-master**: A master should be a member of a herd and not a cat [Pets vs. Cattle](https://www.slideshare.net/randybias/the-history-of-pets-vs-cattle-and-using-it-properly). In other words, a cluster should gracefully recover from a master outage in a multi-master setup. [#54](https://github.com/reactiveops/pentagon/issues/54)
     - Documented recovery procedures, research, pointers to relevant documentation- what should be known by us.
 - **Documentation for the future of the pentagon CLI** tool [#140](https://github.com/reactiveops/pentagon/issues/140) : what should it do, what should it not do
     - A method for including "components"- ie. `pentagon install-component elasticsearch` should do foo and bar.
     - Add a design doc- list future planned features without necessarily coding them. For example, mimicking the kops `create/update` behavior
-- **Docs for kubernetes upgrades via kops**, ie- the way it is done in Pentagon. Linking to docs and a human-scriptable test of current-1 to current.
+- **Docs for kubernetes upgrades via kops**, ie- the way it is done in Pentagon. Linking to docs and a human-scriptable test of current-1 to current. [#147](https://github.com/reactiveops/pentagon/issues/147)
 
 ## [1.2](https://github.com/reactiveops/pentagon/milestone/6)
 - Pentagon
-    - **Default $client-infra repos' docs** should include references to some basic AWS things, like the personal health dashboard, cloudwatch metrics, Budget configuration
+    - **Default $client-infra repos' docs** should include references to some basic AWS things, like the personal health dashboard, cloudwatch metrics, AWS Budget configuration [$149](https://github.com/reactiveops/pentagon/issues/149)
     - **Every infrastructural resource built via pentagon should have a defined monitoring method**. infrastructure-side monitored. Meaning, if AWS ES is enabled, than that ES cluster should be monitored. Likewise all the `kube-system` resources, Vault, etc. The AWS personal health dashboard, or other alarms (cloudwatch perhaps) should be accessible as well, typically via Hydra
 - Outside Pentagon
     - k8s-scripts should support CircleCI 2.0.
@@ -45,13 +45,13 @@
 
 ## [1.4](https://github.com/reactiveops/pentagon/milestone/8)
 - Investigate **Canary and other** [**deployment strategies**](https://kubernetes.io/docs/user-guide/deployments/#strategy)
-    - canary deployments perhaps tied to app metrics
-- Application Deployments to Ephemeral Environments
-- **Deployment manager**. For example, airware/vili
+    - canary deployments perhaps tied to app metrics [#151](https://github.com/reactiveops/pentagon/issues/151)
+- **Deployment Manager**. For example, airware/vili, Hygeia, Harrow. See [Deployment Manager Design ](https://paper.dropbox.com/doc/Deployment-Manager-Design-Ideas-J8Yy45gm3JI6pH4BVYKdr) and [#150](https://github.com/reactiveops/pentagon/issues/150)
+    - Application Deployments to Ephemeral Environments
 
 ## [1.5](https://github.com/reactiveops/pentagon/milestone/9)
 - Outside Pentagon
-    - Public Demo
+    - Public Demo [#152](https://github.com/reactiveops/pentagon/issues/152)
 
 ## [1.6](https://github.com/reactiveops/pentagon/milestone/10)
 - **CI inside the cluster via Drone or Jenkins**
