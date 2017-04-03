@@ -35,7 +35,7 @@
     - **Every infrastructural resource built via pentagon should have a defined monitoring method**. infrastructure-side monitored. Meaning, if AWS ES is enabled, than that ES cluster should be monitored. Likewise all the `kube-system` resources, Vault, etc. The AWS personal health dashboard, or other alarms (cloudwatch perhaps) should be accessible as well, typically via Hydra
 - Outside Pentagon
     - k8s-scripts should support CircleCI 2.0.
-    - A defined set of pre-tasks for setting up applications how is a registry created?  Access defined?
+    - A defined set of pre-tasks for setting up applications how is a registry created?  Access defined? [#155](https://github.com/reactiveops/pentagon/issues/155)
 
 ## [1.3](https://github.com/reactiveops/pentagon/milestone/7)
 - Pentagon
