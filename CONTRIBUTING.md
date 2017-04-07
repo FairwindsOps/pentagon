@@ -5,16 +5,6 @@ get things working in your environment. There are a few guidelines that we
 need contributors to follow so that we can have a chance of keeping on
 top of things.
 
----
-## Pentagon Core and Modules
-
-If you are unsure of whether your contribution should be implemented as a
-module or part of Puppet Core, you may visit
-[#puppet-dev on Freenode IRC](https://freenode.net) or ask on the
-[puppet-dev mailing list](https://groups.google.com/forum/#!forum/puppet-dev)
-for advice.
----
-
 ## Getting Started
 
 * Submit a ticket for your issue, assuming one does not already exist.
