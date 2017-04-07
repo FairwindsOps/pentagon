@@ -36,13 +36,6 @@ always necessary to create a new issue in GitHub. In these cases, a branch with 
 * Update the issue with the `PR-available` label to mark that you have submitted code and are ready for it to be reviewed, and include a link to the pull request in the ticket.
 
 
-Code of Conduct
-===============
-
-As a contributor, you have a part in encouraging each other.
-Please read and follow our [Code of Conduct](https://www.djangoproject.com/conduct/).
-
-
 Attribution
 ===========
 Portions of this text are copied from the [Puppet Contributing](https://github.com/puppetlabs/puppet/blob/master/CONTRIBUTING.md) documentation.
