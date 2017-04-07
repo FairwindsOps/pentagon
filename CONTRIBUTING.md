@@ -1,0 +1,58 @@
+# How to contribute
+
+Issues, whether bugs, tasks, or feature requests are essential for keeping Pentagon (and ReactiveOps in general) great. We believe it should be as easy as possible to contribute changes that
+get things working in your environment. There are a few guidelines that we
+need contributors to follow so that we can have a chance of keeping on
+top of things.
+
+---
+## Pentagon Core and Modules
+
+If you are unsure of whether your contribution should be implemented as a
+module or part of Puppet Core, you may visit
+[#puppet-dev on Freenode IRC](https://freenode.net) or ask on the
+[puppet-dev mailing list](https://groups.google.com/forum/#!forum/puppet-dev)
+for advice.
+---
+
+## Getting Started
+
+* Submit a ticket for your issue, assuming one does not already exist.
+  * Clearly describe the issue including steps to reproduce when it is a bug.
+  * Apply the appropriate labels, whether it is bug, feature, or task.
+
+## Making Changes
+
+* Create a feature branch from where you want to base your work.
+  * This is usually the master branch.
+  * To quickly create a topic branch based on master; `git checkout -b
+    feature master`. Please avoid working directly on the
+    `master` branch.
+* Try to make commits of logical units.
+* Make sure you have added the necessary tests for your changes (coming soon).
+* Make sure you have added any required documentation changes.
+
+## Making Trivial Changes
+
+### Documentation
+
+For changes of a trivial nature to comments and documentation, it is not
+always necessary to create a new issue in GitHub. In these cases, a branch with pull request is sufficient.
+
+## Submitting Changes
+
+* Push your changes to a topic branch.
+* Submit a pull request.
+* Update the issue with the `PR-available` label to mark that you have submitted code and are ready for it to be reviewed, and include a link to the pull request in the ticket.
+
+
+Code of Conduct
+===============
+
+As a contributor, you have a part in encouraging each other.
+Please read and follow our [Code of Conduct](https://www.djangoproject.com/conduct/).
+
+
+Attribution
+===========
+Portions of this text are copied from the [Puppet Contributing](https://github.com/puppetlabs/puppet/blob/master/CONTRIBUTING.md) documentation.
