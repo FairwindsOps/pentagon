@@ -248,6 +248,7 @@ class PentagonProject():
         logging.debug(commands)
         stdout, stderr = subprocess.Popen(commands,
                                           shell=True,
+                                          executable='/bin/bash',
                                           stdin=subprocess.PIPE,
                                           stdout=subprocess.PIPE,
                                           stderr=subprocess.PIPE).communicate()
@@ -264,12 +265,12 @@ class PentagonProject():
 
     def __initialize_virtualenv(self):
         self.__set_virtualenv_env()
-        commands = "source /usr/local/bin/virtualenvwrapper.sh; mkproject {}".format(self._name)
+        commands = "source `which virtualenvwrapper.sh`; mkproject {}".format(self._name)
         self.__run_commands(commands)
 
     def __virtual_env_pip_install(self):
         self.__set_virtualenv_env()
-        commands = "source /usr/local/bin/virtualenvwrapper.sh; workon {}; pip install -r {}/config/requirements.txt".format(self._name, self._repository_path)
+        commands = "source `which virtualenvwrapper.sh`; workon {}; pip install -r {}/config/requirements.txt".format(self._name, self._repository_path)
         self.__run_commands(commands)
 
     def __render_template(self, template_name, template_path, target, context):
