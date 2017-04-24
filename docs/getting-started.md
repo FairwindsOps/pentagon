@@ -37,15 +37,15 @@ It is our curated ecosystem of container-based infrastructure based on Kubernete
   * **-o, --output-file**:
     * No default
   * **--workspace-directory**:
-   * Directory to place new project
-   * Defaults to `~/workspace/`
+    * Directory to place new project
+    * Defaults to `~/workspace/`
   * **--repository-name**:
-   * Name of the folder to initialize the infrastructure repository
-   * Defaults to `<project-name>-infrastructure`
+    * Name of the folder to initialize the infrastructure repository
+    * Defaults to `<project-name>-infrastructure`
   * **--configure / --no-configure:**:
-   * Configure project with default settings
-   * Default to True
-   * If you choose `--no-configure`, placeholder values will be used in stead of defaults and you will have to manually edit the configuration files
+    * Configure project with default settings
+    * Default to True
+    * If you choose `--no-configure`, placeholder values will be used in stead of defaults and you will have to manually edit the configuration files
   * **--force / --no-force**:
     * Ignore existing directories and copy project anyway
     * Defaults to False
@@ -58,7 +58,7 @@ It is our curated ecosystem of container-based infrastructure based on Kubernete
   * **--aws-default-region**:        
     * AWS default region
     * No Default
-    * If the --aws-default-region option is set it will allow the default to be set for `--aws-availability-zones` and `--aws-availability-zone-count`
+    * If the `--aws-default-region` option is set it will allow the default to be set for `--aws-availability-zones` and `--aws-availability-zone-count`
   * **--aws-availability-zones**:
     * AWS availability zones as a comma delimited list.
     * Defaults to `<aws-default-region>a`, `<aws-default-region>b`, ... `<aws-default-region>z` when `--aws-default-region` is set calculated using the `--aws-available-zone-count` value. Otherwise, a placeholder string is used.
