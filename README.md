@@ -25,7 +25,7 @@ Upcoming on the [1.x Roadmap](docs/roadmap-1x.md):
 
 ## Vision
 
-As Pentagon exists to enable:
+Pentagon exists to enable:
 - Building world class cloud infrastructure quicker
 - Feature-full infrastructure to be more widely available
 - Small teams have access to the collective knowledge of a team of very senior infrastructure architect's opinions on best practices.
