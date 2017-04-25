@@ -8,7 +8,7 @@ It is our curated ecosystem of container-based infrastructure based on Kubernete
 ## Requirements
 * python >= 2.7
 * pip install -e git+ssh://git@github.com/reactiveops/pentagon#egg=pentagon
-
+* [terraform 0.8.8](https://releases.hashicorp.com/terraform/0.8.8/)
 
 ## Usage
 ### QUICK START
