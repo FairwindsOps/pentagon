@@ -2,15 +2,17 @@
 
 import os
 import sys
+from setuptools import setup, find_packages
 
-sys.path.insert(0, os.path.abspath('lib'))
-from pentagon.release import __version__, __author__
+# read in the variables defined in lib/release as global
+# to be used below
+execfile('lib/pentagon/release.py')
+
 try:
     from setuptools import setup, find_packages
 except ImportError:
-    print("Ansible now needs setuptools in order to build. Install it using"
-            " your package manager (usually python-setuptools) or via pip (pip"
-            " install setuptools).")
+    print("setup tools required. Please run: "
+          "pip install setuptools).")
     sys.exit(1)
 
 setup(name='pentagon',
@@ -20,14 +22,16 @@ setup(name='pentagon',
       author_email='reactive@reactiveops.com',
       url='http://reactiveops.com/',
       license='GPLv3',
-      # Ansible will also make use of a system copy of python-six if installed but use a
-      # Bundled copy if it's not.
-    #   install_requires=['paramiko', 'jinja2', "PyYAML", 'setuptools', 'pycrypto >= 2.6'],
-      package_dir={ '': 'lib' },
+      install_requires=[
+        "click==6.7",
+        "GitPython==2.1.3",
+        "Jinja2==2.9.5",
+        "pycrypto==2.6.1",
+        "virtualenvwrapper==4.7.2",
+        "PyYAML==3.12"
+      ],
+      package_dir={'': 'lib'},
       packages=find_packages('lib'),
-    #   package_data={
-    #      '': ['module_utils/*.ps1', 'modules/core/windows/*.ps1', 'modules/extras/windows/*.ps1', 'galaxy/data/*'],
-    #   },
       classifiers=[
           'Development Status :: 5 - Production/Stable',
           'Environment :: Console',
@@ -45,7 +49,23 @@ setup(name='pentagon',
       ],
       scripts=[
          'bin/pentagon',
-         'bin/pentagon-startproject',
          ],
       data_files=[],
-)
+      )
+
+# backports-abc==0.4
+# certifi==2016.9.26
+# cffi==1.7.0
+# enum34==1.1.6
+# idna==2.1
+# ipaddress==1.0.16
+# livereload==2.4.1
+# Markdown==2.6.7
+# MarkupSafe==0.23
+# mkdocs==0.16.0
+# paramiko==2.0.1
+# pyasn1==0.1.9
+# pycparser==2.14
+# singledispatch==3.4.0.3
+# six==1.10.0
+# tornado==4.4.2

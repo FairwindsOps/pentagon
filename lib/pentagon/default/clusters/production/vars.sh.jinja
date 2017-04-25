@@ -1,0 +1,15 @@
+export CLUSTER_NAME="{{ kubernetes_cluster_name }}"
+export ZONES="{{ aws_availability_zones }}"
+export VPC_ID="{{ vpc_id }}"
+
+# the public key to be installed for the admin user
+# this should be set to be unique per cluster
+export SSH_KEY_PATH="{{ ssh_key_path }}"
+
+export NODE_COUNT={{ kubernetes_node_count }}
+export MASTER_ZONES="{{ kubernetes_master_aws_zone }}"
+export DNS_ZONE="{{ kubernetes_dns_zone }}"
+export MASTER_SIZE="{{ kubernetes_master_node_type }}"
+export NODE_SIZE="{{ kubernetes_worker_node_type }}"
+export V_LOG_LEVEL={{ kubernetes_v_log_level }}
+export NETWORK_CIDR="{{ kubernetes_network_cidr }}"
