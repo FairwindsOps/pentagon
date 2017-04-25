@@ -25,11 +25,12 @@ Upcoming on the [1.x Roadmap](docs/roadmap-1x.md):
 
 ## Vision
 
-As Pentagon improves, we will be able to:
-* increase the speed to which a client becomes DaaS-ready
-* make it easier to maintain greater scales of clients on DaaS
+Pentagon exists to enable:
+- Building world class cloud infrastructure quicker
+- Feature-full infrastructure to be more widely available
+- Small teams have access to the collective knowledge of a team of very senior infrastructure architect's opinions on best practices.
 
-If it does not work to accomplish these goals, it is not consistent with the vision of Pentagon.
+If contributed work does not work to accomplish these goals, it is not consistent with the vision of Pentagon.
 
 
 Take a look at [Getting Started](docs/getting-started.md) to begin.
