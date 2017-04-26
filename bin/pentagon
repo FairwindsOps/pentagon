@@ -70,8 +70,16 @@ def delete_project(name, **kwargs):
     project = pentagon.PentagonProject(name, kwargs)
     project.delete()
 
+from subprocess import call
+@click.command()
+@click.option('--name', help="Component name")
+def install_component(name):
+    call("pentagon-proposal-wc/components/" + name + "/install.sh")
+
+
 cli.add_command(start_project, "start-project")
 cli.add_command(delete_project, "delete-project")
+cli.add_command(install_component, "install-component")
 
 
 def next_steps():
