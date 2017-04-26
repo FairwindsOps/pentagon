@@ -4,7 +4,6 @@ Pentagon is a framework for repeatable, containerized, cloud-based infrastructur
 
 Pentagon defines an ecosystem composed of core (this repository), and other compatible modules, including dependencies such as terraform-vpc, Ansible roles like the ones defined in [ansible-requirements](lib/pentagon/ansible-requirements.txt), and [rok8s-scripts](https://github.com/reactiveops/rok8s-scripts).
 
-
 It is “batteries included”- not only does one get a network with a cluster, but the defaults include these commonly desired features:
 
 - At the core, powered by Kubernetes. Configured to be highly-available: masters and nodes are clustered
@@ -23,6 +22,8 @@ Upcoming on the [1.x Roadmap](docs/roadmap-1x.md):
 - Metrics
 - Deployment management
 
+Take a look at [Getting Started](docs/getting-started.md) to begin.
+
 ## Vision
 
 Pentagon exists to enable:
@@ -31,6 +32,3 @@ Pentagon exists to enable:
 - Small teams have access to the collective knowledge of a team of very senior infrastructure architect's opinions on best practices.
 
 If contributed work does not work to accomplish these goals, it is not consistent with the vision of Pentagon.
-
-
-Take a look at [Getting Started](docs/getting-started.md) to begin.
