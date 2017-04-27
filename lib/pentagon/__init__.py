@@ -126,15 +126,15 @@ class PentagonProject():
         # Setting local path info
         self._repository_name = os.path.expanduser(self.get_arg("repository_name", "{}-infrastructure".format(name)))
         self._workspace_directory = os.path.expanduser(self.get_arg('workspace_directory', '~/workspace'))
-        self._project_directory = os.path.expanduser('{}/projects'.format(self._workspace_directory))
+        self._projects_directory = os.path.expanduser('{}/projects'.format(self._workspace_directory))
+        self._project_directory = os.path.expanduser('{}/projects/{}'.format(self._workspace_directory, self._name))
         self._venv_directory = os.path.expanduser('{}/venvs'.format(self._workspace_directory))
-
-        self._repository_path = "{}/{}/{}".format(
+        self._repository_directory = "{}/{}/{}".format(
             self._project_directory,
             self._name,
             self._repository_name)
 
-        self._private_path = "{}/config/private/".format(self._repository_path)
+        self._private_path = "{}/config/private/".format(self._repository_directory)
 
         if self._configure_project:
             # AWS Specific Stuff
@@ -220,29 +220,36 @@ class PentagonProject():
 
         return (", ").join(azs)
 
-    def __project_path_exists(self):
-        if os.path.isdir(self._repository_path):
+    def __workspace_directory_exists(self):
+        logging.debug("Verifying {}".format(self._workspace_directory))
+        if os.path.isdir(self._workspace_directory):
             return True
         return False
 
-    def __delete(self):
-            try:
-                logging.debug('Deleting {}'.format(self._venv_directory))
-                shutil.rmtree(self._venv_directory+"/"+self._name)
-            except OSError, e:
-                logging.warn(e)
-            try:
-                logging.debug('Deleting {}'.format(self._project_directory))
-                shutil.rmtree(self._project_directory+"/"+self._name)
-            except OSError, e:
-                logging.warn(e)
+    def __repository_directory_exists(self):
+        logging.debug("Verifying {}".format(self._repository_directory))
+        if os.path.isdir(self._repository_directory):
+            return True
+        return False
+
+    def __projects_directory_exists(self):
+        logging.debug("Verifying {}".format(self._projects_directory))
+        if os.path.isdir(self._projects_directory):
+            return True
+        return False
+
+    def __project_directory_exists(self):
+        logging.debug("Verifying {}".format(self._project_directory))
+        if os.path.isdir(self._project_directory):
+            return True
+        return False
 
     def __git_init(self):
         """ Initialize git repository in the project infrastructure path """
         if self._git_repo:
-            return Git().clone(self._git_repo, self._repository_path)
+            return Git().clone(self._git_repo, self._repository_directory)
         else:
-            return Repo.init(self._repository_path)
+            return Repo.init(self._repository_directory)
 
     def __run_commands(self, commands):
         logging.debug(commands)
@@ -256,22 +263,6 @@ class PentagonProject():
         if stderr != '':
             logging.error(stderr)
         return (stdout, stderr)
-
-    def __set_virtualenv_env(self):
-        os.environ['WORKON_HOME'] = self._venv_directory
-        os.environ['PROJECT_HOME'] = self._project_directory
-        os.environ['VIRTUALENVWRAPPER_HOOK_DIR'] = "{}/hooks".format(self._workspace_directory)
-        os.environ['OMNIA_COOKIECUTTERS'] = "{}/cookiecutters".format(self._workspace_directory)
-
-    def __initialize_virtualenv(self):
-        self.__set_virtualenv_env()
-        commands = "source `which virtualenvwrapper.sh`; mkproject {}".format(self._name)
-        self.__run_commands(commands)
-
-    def __virtual_env_pip_install(self):
-        self.__set_virtualenv_env()
-        commands = "source `which virtualenvwrapper.sh`; workon {}; pip install -r {}/config/requirements.txt".format(self._name, self._repository_path)
-        self.__run_commands(commands)
 
     def __render_template(self, template_name, template_path, target, context):
         logging.info("Writing {}".format(target))
@@ -402,24 +393,31 @@ class PentagonProject():
         with open(public_key, 'w') as content_file:
             content_file.write(pubkey.exportKey('OpenSSH'))
 
+    def __directory_check(self):
+        if not self.__workspace_directory_exists():
+            raise PentagonException("Workspace directory does not exist. Have you set up your workstation?")
+
+        if not self.__projects_directory_exists():
+            raise PentagonException("Projects directory does not exist. Have you set up your workstation?")
+
+        if not self.__project_directory_exists():
+            raise PentagonException("Project path does not exist. Have you created your project yet?")
+
     def start(self):
-        if not self.__project_path_exists() or self._force:
-            self.__initialize_virtualenv()
+        self.__directory_check()
+
+        if not self.__repository_directory_exists() or self._force:
             if not self._git_repo:
                 logging.info("Copying project files...")
                 self.__copy_project_tree()
                 self.__git_init()
-                self.__virtual_env_pip_install()
                 self.__render_templates()
                 if self._create_keys:
                     self.__create_keys()
                 if self._outfile is not None:
                     self.__write_config_file()
         else:
-            raise PentagonException('Project path exists.')
-
-    def initialize_virtualenv(self):
-        self.__initialize_virtualenv()
+            raise PentagonException('Project path exists. Cowardly refusing to overwrite existing project.')
 
     def configure_project(self):
         self.__configure_project()
