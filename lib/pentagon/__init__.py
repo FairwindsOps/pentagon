@@ -129,9 +129,8 @@ class PentagonProject():
         self._projects_directory = os.path.expanduser('{}/projects'.format(self._workspace_directory))
         self._project_directory = os.path.expanduser('{}/projects/{}'.format(self._workspace_directory, self._name))
         self._venv_directory = os.path.expanduser('{}/venvs'.format(self._workspace_directory))
-        self._repository_directory = "{}/{}/{}".format(
+        self._repository_directory = "{}/{}".format(
             self._project_directory,
-            self._name,
             self._repository_name)
 
         self._private_path = "{}/config/private/".format(self._repository_directory)
@@ -221,25 +220,25 @@ class PentagonProject():
         return (", ").join(azs)
 
     def __workspace_directory_exists(self):
-        logging.debug("Verifying {}".format(self._workspace_directory))
+        logging.debug("Verifying workspace {}".format(self._workspace_directory))
         if os.path.isdir(self._workspace_directory):
             return True
         return False
 
     def __repository_directory_exists(self):
-        logging.debug("Verifying {}".format(self._repository_directory))
+        logging.debug("Verifying repository {}".format(self._repository_directory))
         if os.path.isdir(self._repository_directory):
             return True
         return False
 
     def __projects_directory_exists(self):
-        logging.debug("Verifying {}".format(self._projects_directory))
+        logging.debug("Verifying projects{}".format(self._projects_directory))
         if os.path.isdir(self._projects_directory):
             return True
         return False
 
     def __project_directory_exists(self):
-        logging.debug("Verifying {}".format(self._project_directory))
+        logging.debug("Verifying project {}".format(self._project_directory))
         if os.path.isdir(self._project_directory):
             return True
         return False
@@ -284,8 +283,8 @@ class PentagonProject():
 
     def __prepare_private_vars(self):
         template_name = "vars.jinja"
-        template_path = "{}/config/local".format(self._repository_path)
-        target = "{}/config/private/vars".format(self._repository_path)
+        template_path = "{}/config/local".format(self._repository_directory)
+        target = "{}/config/private/vars".format(self._repository_directory)
         context = {'AWS_ACCESS_KEY': self._aws_access_key,
                    'AWS_SECRET_KEY': self._aws_secret_key,
                    'AWS_DEFAULT_REGION': self._aws_default_region}
@@ -293,22 +292,22 @@ class PentagonProject():
 
     def __prepare_account_vars_sh(self):
         template_name = "vars.sh.jinja"
-        template_path = "{}/default/account".format(self._repository_path)
-        target = "{}/default/account/vars.sh".format(self._repository_path)
+        template_path = "{}/default/account".format(self._repository_directory)
+        target = "{}/default/account/vars.sh".format(self._repository_directory)
         context = {'KOPS_STATE_STORE_BUCKET': self._state_store_bucket}
         return self.__render_template(template_name, template_path, target, context)
 
     def __prepare_account_vars_yml(self):
         template_name = "vars.yml.jinja"
-        template_path = "{}/default/account".format(self._repository_path)
-        target = "{}/default/account/vars.yml".format(self._repository_path)
+        template_path = "{}/default/account".format(self._repository_directory)
+        target = "{}/default/account/vars.yml".format(self._repository_directory)
         context = {'org_name': self._name, 'vpc_name': self._vpc_name}
         return self.__render_template(template_name, template_path, target, context)
 
     def __prepare_tf_vars(self):
         template_name = "terraform.tfvars.jinja"
-        template_path = "{}/default/vpc".format(self._repository_path)
-        target = "{}/default/vpc/terraform.tfvars".format(self._repository_path)
+        template_path = "{}/default/vpc".format(self._repository_directory)
+        target = "{}/default/vpc/terraform.tfvars".format(self._repository_directory)
         context = {
             'vpc_name': self._vpc_name,
             'vpc_cidr_base': self._vpc_cidr_base,
@@ -320,8 +319,8 @@ class PentagonProject():
 
     def __prepare_working_kops_vars_sh(self):
         template_name = "vars.sh.jinja"
-        template_path = "{}/default/clusters/working/".format(self._repository_path)
-        target = "{}/default/clusters/working/vars.sh".format(self._repository_path)
+        template_path = "{}/default/clusters/working/".format(self._repository_directory)
+        target = "{}/default/clusters/working/vars.sh".format(self._repository_directory)
         context = {
             'kubernetes_cluster_name': self._working_kubernetes_cluster_name,
             'aws_availability_zones': re.sub(" ", "", self._aws_availability_zones),
@@ -339,8 +338,8 @@ class PentagonProject():
 
     def __prepare_production_kops_vars_sh(self):
         template_name = "vars.sh.jinja"
-        template_path = "{}/default/clusters/production/".format(self._repository_path)
-        target = "{}/default/clusters/production/vars.sh".format(self._repository_path)
+        template_path = "{}/default/clusters/production/".format(self._repository_directory)
+        target = "{}/default/clusters/production/vars.sh".format(self._repository_directory)
         context = {
             'kubernetes_cluster_name': self._production_kubernetes_cluster_name,
             'aws_availability_zones': re.sub(" ", "", self._aws_availability_zones),
@@ -358,10 +357,10 @@ class PentagonProject():
 
     def __prepare_ssh_config_vars(self):
         template_name = "ssh_config.jinja"
-        template_path = "{}/config/local".format(self._repository_path)
-        target = "{}/config/local/ssh_config".format(self._repository_path)
+        template_path = "{}/config/local".format(self._repository_directory)
+        target = "{}/config/local/ssh_config".format(self._repository_directory)
         context = {
-            'infrastructure_repository': self._repository_path,
+            'infrastructure_repository': self._repository_directory,
             'production_kube_key': self._ssh_keys['production_kube'],
             'working_kube_key': self._ssh_keys['working_kube'],
             'production_private_key': self._ssh_keys['production_private'],
@@ -372,10 +371,10 @@ class PentagonProject():
 
     def __prepare_ansible_cfg_vars(self):
         template_name = "ansible.cfg.jinja"
-        template_path = "{}/config/local".format(self._repository_path)
-        target = "{}/config/local/ansible.cfg".format(self._repository_path)
+        template_path = "{}/config/local".format(self._repository_directory)
+        target = "{}/config/local/ansible.cfg".format(self._repository_directory)
         context = {
-            'infrastructure_repository': self._repository_path,
+            'infrastructure_repository': self._repository_directory,
         }
         return self.__render_template(template_name, template_path, target, context)
 
@@ -448,5 +447,5 @@ class PentagonProject():
 
     def __copy_project_tree(self):
         logging.info(self._project_source)
-        logging.info(self._repository_path)
-        copytree(self._project_source, self._repository_path, symlinks=True, ignore=ignore_patterns('__init__.py', '*.pyc', 'release.py'))
+        logging.info(self._repository_directory)
+        copytree(self._project_source, self._repository_directory, symlinks=True, ignore=ignore_patterns('__init__.py', '*.pyc', 'release.py'))

@@ -3,6 +3,7 @@ import pentagon
 import sys
 import click
 import logging
+import traceback
 
 
 @click.group()
@@ -59,6 +60,7 @@ def start_project(name, **kwargs):
         print next_steps()
     except Exception as e:
         logging.error(e)
+        logging.debug(traceback.print_exc(e))
 
 
 cli.add_command(start_project, "start-project")
