@@ -22,7 +22,6 @@ It is our curated ecosystem of container-based infrastructure based on Kubernete
 * `pentagon start-project <project-name> --git-repo <repository-of-existing-project> <options>`
 
 ### Available commands
-* `pentagon delete-project`
 * `pentagon start-project`
 
 ### _start-project_
@@ -153,18 +152,6 @@ It is our curated ecosystem of container-based infrastructure based on Kubernete
   * **--production-kubernetes-network-cidr**:
     * Network cidr of the kubernetes production cluster
     * Defaults to `172.20.0.0/16`
-  * **--log-level**:
-    * Pentagon CLI Log Level. Accepts DEBUG,INFO,WARN,ERROR
-    * Defaults to INFO
-  * **--help**:
-    * Show help message and exit.
-### _delete-project_
-
-`pentagon delete-project <project-name>` removes the project directory in your workspace and the matching virtualenv of the same name. ***Use with caution, there is no confirmation prompt.***
-#### Options
-  * **--workspace-directory**:
-   * Directory to place new project
-   * Defaults to `~/workspace/`
   * **--log-level**:
     * Pentagon CLI Log Level. Accepts DEBUG,INFO,WARN,ERROR
     * Defaults to INFO

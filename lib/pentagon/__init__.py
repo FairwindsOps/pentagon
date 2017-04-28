@@ -126,15 +126,14 @@ class PentagonProject():
         # Setting local path info
         self._repository_name = os.path.expanduser(self.get_arg("repository_name", "{}-infrastructure".format(name)))
         self._workspace_directory = os.path.expanduser(self.get_arg('workspace_directory', '~/workspace'))
-        self._project_directory = os.path.expanduser('{}/projects'.format(self._workspace_directory))
+        self._projects_directory = os.path.expanduser('{}/projects'.format(self._workspace_directory))
+        self._project_directory = os.path.expanduser('{}/projects/{}'.format(self._workspace_directory, self._name))
         self._venv_directory = os.path.expanduser('{}/venvs'.format(self._workspace_directory))
-
-        self._repository_path = "{}/{}/{}".format(
+        self._repository_directory = "{}/{}".format(
             self._project_directory,
-            self._name,
             self._repository_name)
 
-        self._private_path = "{}/config/private/".format(self._repository_path)
+        self._private_path = "{}/config/private/".format(self._repository_directory)
 
         if self._configure_project:
             # AWS Specific Stuff
@@ -220,29 +219,36 @@ class PentagonProject():
 
         return (", ").join(azs)
 
-    def __project_path_exists(self):
-        if os.path.isdir(self._repository_path):
+    def __workspace_directory_exists(self):
+        logging.debug("Verifying workspace {}".format(self._workspace_directory))
+        if os.path.isdir(self._workspace_directory):
             return True
         return False
 
-    def __delete(self):
-            try:
-                logging.debug('Deleting {}'.format(self._venv_directory))
-                shutil.rmtree(self._venv_directory+"/"+self._name)
-            except OSError, e:
-                logging.warn(e)
-            try:
-                logging.debug('Deleting {}'.format(self._project_directory))
-                shutil.rmtree(self._project_directory+"/"+self._name)
-            except OSError, e:
-                logging.warn(e)
+    def __repository_directory_exists(self):
+        logging.debug("Verifying repository {}".format(self._repository_directory))
+        if os.path.isdir(self._repository_directory):
+            return True
+        return False
+
+    def __projects_directory_exists(self):
+        logging.debug("Verifying projects{}".format(self._projects_directory))
+        if os.path.isdir(self._projects_directory):
+            return True
+        return False
+
+    def __project_directory_exists(self):
+        logging.debug("Verifying project {}".format(self._project_directory))
+        if os.path.isdir(self._project_directory):
+            return True
+        return False
 
     def __git_init(self):
         """ Initialize git repository in the project infrastructure path """
         if self._git_repo:
-            return Git().clone(self._git_repo, self._repository_path)
+            return Git().clone(self._git_repo, self._repository_directory)
         else:
-            return Repo.init(self._repository_path)
+            return Repo.init(self._repository_directory)
 
     def __run_commands(self, commands):
         logging.debug(commands)
@@ -256,22 +262,6 @@ class PentagonProject():
         if stderr != '':
             logging.error(stderr)
         return (stdout, stderr)
-
-    def __set_virtualenv_env(self):
-        os.environ['WORKON_HOME'] = self._venv_directory
-        os.environ['PROJECT_HOME'] = self._project_directory
-        os.environ['VIRTUALENVWRAPPER_HOOK_DIR'] = "{}/hooks".format(self._workspace_directory)
-        os.environ['OMNIA_COOKIECUTTERS'] = "{}/cookiecutters".format(self._workspace_directory)
-
-    def __initialize_virtualenv(self):
-        self.__set_virtualenv_env()
-        commands = "source `which virtualenvwrapper.sh`; mkproject {}".format(self._name)
-        self.__run_commands(commands)
-
-    def __virtual_env_pip_install(self):
-        self.__set_virtualenv_env()
-        commands = "source `which virtualenvwrapper.sh`; workon {}; pip install -r {}/config/requirements.txt".format(self._name, self._repository_path)
-        self.__run_commands(commands)
 
     def __render_template(self, template_name, template_path, target, context):
         logging.info("Writing {}".format(target))
@@ -293,8 +283,8 @@ class PentagonProject():
 
     def __prepare_private_vars(self):
         template_name = "vars.jinja"
-        template_path = "{}/config/local".format(self._repository_path)
-        target = "{}/config/private/vars".format(self._repository_path)
+        template_path = "{}/config/local".format(self._repository_directory)
+        target = "{}/config/private/vars".format(self._repository_directory)
         context = {'AWS_ACCESS_KEY': self._aws_access_key,
                    'AWS_SECRET_KEY': self._aws_secret_key,
                    'AWS_DEFAULT_REGION': self._aws_default_region}
@@ -302,22 +292,22 @@ class PentagonProject():
 
     def __prepare_account_vars_sh(self):
         template_name = "vars.sh.jinja"
-        template_path = "{}/default/account".format(self._repository_path)
-        target = "{}/default/account/vars.sh".format(self._repository_path)
+        template_path = "{}/default/account".format(self._repository_directory)
+        target = "{}/default/account/vars.sh".format(self._repository_directory)
         context = {'KOPS_STATE_STORE_BUCKET': self._state_store_bucket}
         return self.__render_template(template_name, template_path, target, context)
 
     def __prepare_account_vars_yml(self):
         template_name = "vars.yml.jinja"
-        template_path = "{}/default/account".format(self._repository_path)
-        target = "{}/default/account/vars.yml".format(self._repository_path)
+        template_path = "{}/default/account".format(self._repository_directory)
+        target = "{}/default/account/vars.yml".format(self._repository_directory)
         context = {'org_name': self._name, 'vpc_name': self._vpc_name}
         return self.__render_template(template_name, template_path, target, context)
 
     def __prepare_tf_vars(self):
         template_name = "terraform.tfvars.jinja"
-        template_path = "{}/default/vpc".format(self._repository_path)
-        target = "{}/default/vpc/terraform.tfvars".format(self._repository_path)
+        template_path = "{}/default/vpc".format(self._repository_directory)
+        target = "{}/default/vpc/terraform.tfvars".format(self._repository_directory)
         context = {
             'vpc_name': self._vpc_name,
             'vpc_cidr_base': self._vpc_cidr_base,
@@ -329,8 +319,8 @@ class PentagonProject():
 
     def __prepare_working_kops_vars_sh(self):
         template_name = "vars.sh.jinja"
-        template_path = "{}/default/clusters/working/".format(self._repository_path)
-        target = "{}/default/clusters/working/vars.sh".format(self._repository_path)
+        template_path = "{}/default/clusters/working/".format(self._repository_directory)
+        target = "{}/default/clusters/working/vars.sh".format(self._repository_directory)
         context = {
             'kubernetes_cluster_name': self._working_kubernetes_cluster_name,
             'aws_availability_zones': re.sub(" ", "", self._aws_availability_zones),
@@ -348,8 +338,8 @@ class PentagonProject():
 
     def __prepare_production_kops_vars_sh(self):
         template_name = "vars.sh.jinja"
-        template_path = "{}/default/clusters/production/".format(self._repository_path)
-        target = "{}/default/clusters/production/vars.sh".format(self._repository_path)
+        template_path = "{}/default/clusters/production/".format(self._repository_directory)
+        target = "{}/default/clusters/production/vars.sh".format(self._repository_directory)
         context = {
             'kubernetes_cluster_name': self._production_kubernetes_cluster_name,
             'aws_availability_zones': re.sub(" ", "", self._aws_availability_zones),
@@ -367,10 +357,10 @@ class PentagonProject():
 
     def __prepare_ssh_config_vars(self):
         template_name = "ssh_config.jinja"
-        template_path = "{}/config/local".format(self._repository_path)
-        target = "{}/config/local/ssh_config".format(self._repository_path)
+        template_path = "{}/config/local".format(self._repository_directory)
+        target = "{}/config/local/ssh_config".format(self._repository_directory)
         context = {
-            'infrastructure_repository': self._repository_path,
+            'infrastructure_repository': self._repository_directory,
             'production_kube_key': self._ssh_keys['production_kube'],
             'working_kube_key': self._ssh_keys['working_kube'],
             'production_private_key': self._ssh_keys['production_private'],
@@ -381,10 +371,10 @@ class PentagonProject():
 
     def __prepare_ansible_cfg_vars(self):
         template_name = "ansible.cfg.jinja"
-        template_path = "{}/config/local".format(self._repository_path)
-        target = "{}/config/local/ansible.cfg".format(self._repository_path)
+        template_path = "{}/config/local".format(self._repository_directory)
+        target = "{}/config/local/ansible.cfg".format(self._repository_directory)
         context = {
-            'infrastructure_repository': self._repository_path,
+            'infrastructure_repository': self._repository_directory,
         }
         return self.__render_template(template_name, template_path, target, context)
 
@@ -402,24 +392,31 @@ class PentagonProject():
         with open(public_key, 'w') as content_file:
             content_file.write(pubkey.exportKey('OpenSSH'))
 
+    def __directory_check(self):
+        if not self.__workspace_directory_exists():
+            raise PentagonException("Workspace directory does not exist. Have you set up your workstation?")
+
+        if not self.__projects_directory_exists():
+            raise PentagonException("Projects directory does not exist. Have you set up your workstation?")
+
+        if not self.__project_directory_exists():
+            raise PentagonException("Project path does not exist. Have you created your project yet?")
+
     def start(self):
-        if not self.__project_path_exists() or self._force:
-            self.__initialize_virtualenv()
+        self.__directory_check()
+
+        if not self.__repository_directory_exists() or self._force:
             if not self._git_repo:
                 logging.info("Copying project files...")
                 self.__copy_project_tree()
                 self.__git_init()
-                self.__virtual_env_pip_install()
                 self.__render_templates()
                 if self._create_keys:
                     self.__create_keys()
                 if self._outfile is not None:
                     self.__write_config_file()
         else:
-            raise PentagonException('Project path exists.')
-
-    def initialize_virtualenv(self):
-        self.__initialize_virtualenv()
+            raise PentagonException('Project path exists. Cowardly refusing to overwrite existing project.')
 
     def configure_project(self):
         self.__configure_project()
@@ -450,5 +447,5 @@ class PentagonProject():
 
     def __copy_project_tree(self):
         logging.info(self._project_source)
-        logging.info(self._repository_path)
-        copytree(self._project_source, self._repository_path, symlinks=True, ignore=ignore_patterns('__init__.py', '*.pyc', 'release.py'))
+        logging.info(self._repository_directory)
+        copytree(self._project_source, self._repository_directory, symlinks=True, ignore=ignore_patterns('__init__.py', '*.pyc', 'release.py'))
