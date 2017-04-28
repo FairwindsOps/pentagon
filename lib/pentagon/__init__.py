@@ -104,7 +104,7 @@ class PentagonProject():
             return self._args.get(arg_name)
         return default
 
-    def __init__(self, name, args):
+    def __init__(self, name, args={}):
         self._args = args
         self._name = name
         logging.debug(self._args)
@@ -128,7 +128,6 @@ class PentagonProject():
         self._workspace_directory = os.path.expanduser(self.get_arg('workspace_directory', '~/workspace'))
         self._projects_directory = os.path.expanduser('{}/projects'.format(self._workspace_directory))
         self._project_directory = os.path.expanduser('{}/projects/{}'.format(self._workspace_directory, self._name))
-        self._venv_directory = os.path.expanduser('{}/venvs'.format(self._workspace_directory))
         self._repository_directory = "{}/{}".format(
             self._project_directory,
             self._repository_name)
