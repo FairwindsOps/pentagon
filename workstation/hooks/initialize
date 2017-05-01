@@ -1,3 +1,0 @@
-#!/bin/bash
-# This hook is sourced during the startup phase when loading virtualenvwrapper.sh.
-
