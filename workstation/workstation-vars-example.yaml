@@ -1,4 +1,0 @@
-# Customize variables under ~/.ro/workstation-vars.yaml
-# Expected variables with example values:
-workspace_dir: /Users/jane/work/workspace/
-pentagon_repo_path: /Users/jane/work/pentagon/
