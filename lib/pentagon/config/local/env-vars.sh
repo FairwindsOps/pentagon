@@ -1,24 +1,38 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 
-# source env-vars.sh
-# iterate through an array defined here, set an uuper cased env var for each key, as defined in vars.yml
+# Usage: source env-vars.sh [unset]
+# set/unset environment variables from YAML vars set in config/
+# two separate files are supported, config vars and secret vars, sourced from separate files
 # requires shyaml from https://github.com/0k/shyaml
 
+PATH_TO_CONFIG_VARS="${INFRASTRUCTURE_REPO}/config/local/vars.yml"
+PATH_TO_SECRET_VARS="${INFRASTRUCTURE_REPO}/config/private/secrets.yml"
 
+LIST_OF_CONFIG_VARIABLES=( "vpc_name" "aws_region" "ansible_config" )
+LIST_OF_SECRET_VARIABLES=( "aws_secret_key" )
 
-path_to_yaml_vars="${INFRASTRUCTURE_REPO}/config/local/vars.yml"
-
-LIST_OF_VARIABLES=( "vpc_name" "aws_region" "ansible_config" )
-LIST_OF_SECRETS=( "aws_secret_key" )
-
+##
+# Functions
+##
 
 set_vars() {
-for key in  ${LIST_OF_VARIABLES[@]}; do
+# config vars
+for key in  ${LIST_OF_CONFIG_VARIABLES[@]}; do
+  # convert to upper case
+  upper_case_key=$(echo $key | awk '{print toupper($0)}')
+
+  raw_value=$(cat $PATH_TO_CONFIG_VARS | shyaml get-value $key)
+  # some values in vars.yml use other variables that need to be dereferenced
+  dereferenced_value=$(eval echo $raw_value)
+  export $upper_case_key=$dereferenced_value
+done
+
+# secret vars
+for key in  ${LIST_OF_SECRET_VARIABLES[@]}; do
   # converting to upper case
   upper_case_key=$(echo $key | awk '{print toupper($0)}')
 
-  raw_value=$(cat $path_to_yaml_vars | shyaml get-value $key)
-
+  raw_value=$(cat $path_to_secret_vars | shyaml get-value $key)
   # some values in vars.yml use other variables that need to be dereferenced
   dereferenced_value=$(eval echo $raw_value)
   export $upper_case_key=$dereferenced_value
@@ -26,10 +40,16 @@ done
 }
 
 unset_vars() {
-  for key in  ${LIST_OF_VARIABLES[@]}; do
+  # config vars
+  for key in  ${LIST_OF_CONFIG_VARIABLES[@]}; do
+    # convert to upper case
+    var=$(echo $key | awk '{print toupper($0)}')
+    unset $var
+  done
+  # secret vars
+  for key in  ${LIST_OF_SECRET_VARIABLES[@]}; do
     # upper casing
     var=$(echo $key | awk '{print toupper($0)}')
-    # unset the env var
     unset $var
   done
 }
