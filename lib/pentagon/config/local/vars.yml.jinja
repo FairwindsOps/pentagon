@@ -1,0 +1,13 @@
+# Variables set here are not necessarily available as environment variables in your shell.
+# To add any, modify the appropriate list in env-vars.sh
+
+vpc_name: "{{ vpc_name }}"
+
+aws_access_key: "{{ aws_access_key }}"
+aws_default_region:  "{{ aws_default_region }}"
+aws_availability_zones: "{{ aws_availability_zones }}"
+aws_availability_zone_count: "{{ aws_availability_zone_count }}"
+
+ansible_config: '$INFRASTRUCTURE_REPO/config/local/ansible.cfg'
+kubeconfig: '$INFRASTRUCTURE_REPO/config/private/kube_config'
+aws_inventory_path: '$INFRASTRUCTURE_REPO/plugins/'

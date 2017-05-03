@@ -3,6 +3,7 @@ import pentagon
 import sys
 import click
 import logging
+import traceback
 
 
 @click.group()
@@ -59,27 +60,10 @@ def start_project(name, **kwargs):
         print next_steps()
     except Exception as e:
         logging.error(e)
-
-
-@click.command()
-@click.argument('name')
-@click.option('--workspace-directory', default='~/workspace', help='Directory to place new project, defaults to ~/workspace/')
-@click.option('--log-level', default="INFO", help="Log Level DEBUG,INFO,WARN,ERROR")
-def delete_project(name, **kwargs):
-    logging.basicConfig(level=kwargs.get('log_level'))
-    project = pentagon.PentagonProject(name, kwargs)
-    project.delete()
-
-from subprocess import call
-@click.command()
-@click.option('--name', help="Component name")
-def install_component(name):
-    call("pentagon-proposal-wc/components/" + name + "/install.sh")
+        logging.debug(traceback.print_exc(e))
 
 
 cli.add_command(start_project, "start-project")
-cli.add_command(delete_project, "delete-project")
-cli.add_command(install_component, "install-component")
 
 
 def next_steps():
