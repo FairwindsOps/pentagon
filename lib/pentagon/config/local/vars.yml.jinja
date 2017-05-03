@@ -1,0 +1,14 @@
+# Variables set here are not necessarily available as environment variables in your shell.
+# To add any, modify the appropriate list in env-vars.sh
+
+vpc_name: "{{ vpc_name }}"
+vpc_cidr_base: "{{ vpc_cidr_base }}"
+
+aws_availability_zones: "{{ aws_availability_zones }}"
+aws_availability_zone_count: "{{ aws_availability_zone_count }}"
+aws_region:  "{{ aws_region }}"
+
+ansible_config: '$INFRASTRUCTURE_REPO/config/local/ansible.cfg'
+aws_config_file: '$INFRASTRUCTURE_REPO/config/local/aws_config'
+kubeconfig: '$INFRASTRUCTURE_REPO/config/private/kube_config'
+aws_inventory_path: '$INFRASTRUCTURE_REPO/plugins/'
