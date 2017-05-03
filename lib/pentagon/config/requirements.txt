@@ -1,4 +1,0 @@
-ansible
-boto
-six
-shyaml==0.5.0
