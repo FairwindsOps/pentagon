@@ -27,7 +27,9 @@ setup(name='pentagon',
         "GitPython==2.1.3",
         "Jinja2==2.9.5",
         "pycrypto==2.6.1",
-        "PyYAML==3.12"
+        "PyYAML==3.12",
+        "shyaml==0.5.0",
+        "ansible==2.3.0.0"
       ],
       package_dir={'': 'lib'},
       packages=find_packages('lib'),
