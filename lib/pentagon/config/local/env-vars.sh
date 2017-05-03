@@ -32,7 +32,7 @@ for key in  ${LIST_OF_SECRET_VARIABLES[@]}; do
   # converting to upper case
   upper_case_key=$(echo $key | awk '{print toupper($0)}')
 
-  raw_value=$(cat $path_to_secret_vars | shyaml get-value $key)
+  raw_value=$(cat $PATH_TO_SECRET_VARS | shyaml get-value $key)
   # some values in vars.yml use other variables that need to be dereferenced
   dereferenced_value=$(eval echo $raw_value)
   export $upper_case_key=$dereferenced_value
