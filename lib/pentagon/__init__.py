@@ -285,9 +285,9 @@ class PentagonProject():
         template_name = "secrets.yml.jinja"
         template_path = "{}/config/private".format(self._repository_directory)
         target = "{}/config/private/secrets.yml".format(self._repository_directory)
-        context = {'AWS_ACCESS_KEY': self._aws_access_key,
-                   'aws_secret_key': self._aws_secret_key,
-                   'AWS_DEFAULT_REGION': self._aws_default_region}
+        context = {
+            'aws_secret_key': self._aws_secret_key,
+                   }
         return self.__render_template(template_name, template_path, target, context)
 
     def __prepare_config_local_vars(self):
@@ -298,7 +298,7 @@ class PentagonProject():
             'org_name': self._name,
             'vpc_name': self._vpc_name,
             'aws_access_key': self._aws_access_key,
-            'aws_region': self._aws_default_region,
+            'aws_default_region': self._aws_default_region,
             'aws_availability_zones': self._aws_availability_zones,
             'aws_availability_zone_count': self._aws_availability_zone_count
             }
