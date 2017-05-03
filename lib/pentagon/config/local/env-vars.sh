@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 # Usage: source env-vars.sh [unset]
-# set/unset environment variables from YAML vars set in config/
+# set/unset environment variables from a specified set of YAML vars set in LIST_OF_CONFIG_VARIABLES or LIST_OF_SECRET_VARIABLES
 # two separate files are supported, config vars and secret vars, sourced from separate files
 # requires shyaml from https://github.com/0k/shyaml
 
