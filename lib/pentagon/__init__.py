@@ -281,12 +281,13 @@ class PentagonProject():
         logging.debug("Removing {}/{}".format(template_path, template_name))
         os.remove("{}/{}".format(template_path, template_name))
 
+    # generates config/private/secrets.yml
     def __prepare_private_vars(self):
-        template_name = "vars.jinja"
-        template_path = "{}/config/local".format(self._repository_directory)
-        target = "{}/config/private/vars".format(self._repository_directory)
+        template_name = "secrets.yml.jinja"
+        template_path = "{}/config/private".format(self._repository_directory)
+        target = "{}/config/private/secrets.yml".format(self._repository_directory)
         context = {'AWS_ACCESS_KEY': self._aws_access_key,
-                   'AWS_SECRET_KEY': self._aws_secret_key,
+                   'aws_secret_key': self._aws_secret_key,
                    'AWS_DEFAULT_REGION': self._aws_default_region}
         return self.__render_template(template_name, template_path, target, context)
 
@@ -297,11 +298,19 @@ class PentagonProject():
         context = {'KOPS_STATE_STORE_BUCKET': self._state_store_bucket}
         return self.__render_template(template_name, template_path, target, context)
 
+    # generates config/local/vars.yml
     def __prepare_account_vars_yml(self):
         template_name = "vars.yml.jinja"
-        template_path = "{}/default/account".format(self._repository_directory)
-        target = "{}/default/account/vars.yml".format(self._repository_directory)
-        context = {'org_name': self._name, 'vpc_name': self._vpc_name}
+        template_path = "{}/config/local".format(self._repository_directory)
+        target = "{}/config/local/vars.yml".format(self._repository_directory)
+        context = {
+            'org_name': self._name,
+            'vpc_name': self._vpc_name,
+            'aws_access_key': self._aws_access_key,
+            'aws_region': self._aws_default_region,
+            'aws_availability_zones': self._aws_availability_zones,
+            'aws_availability_zone_count': self._aws_availability_zone_count
+            }
         return self.__render_template(template_name, template_path, target, context)
 
     def __prepare_tf_vars(self):
