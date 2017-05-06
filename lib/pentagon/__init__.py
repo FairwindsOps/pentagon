@@ -448,3 +448,23 @@ class PentagonProject():
         logging.info(self._project_source)
         logging.info(self._repository_directory)
         copytree(self._project_source, self._repository_directory, symlinks=True, ignore=ignore_patterns('__init__.py', '*.pyc', 'release.py'))
+
+class PentagonComponentException(Exception):
+    pass
+
+from subprocess import call
+class PentagonComponent():
+    def __init__(self, name):
+        self._name = name
+        self._project_source = os.path.dirname(__file__)
+        pass
+
+    def install(self):
+        if self._name:
+            # print self._name
+            # print self._project_source
+            component_path = self._project_source + "/components/{name}".format(name=self._name)
+            # print component_path
+            install_path = component_path + "/install.sh"
+            # print install_path
+            call([install_path, component_path])
