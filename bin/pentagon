@@ -63,6 +63,19 @@ def start_project(name, **kwargs):
         logging.debug(traceback.print_exc(e))
 
 
+from pentagon import PentagonComponent as component
+@click.command()
+@click.option('--name', help="Component name")
+def install_component(name):
+    try:
+        component(name).install()
+    except Exception as e:
+        logging.error(e)
+        logging.debug(traceback.print_exc(e))
+
+
+
+cli.add_command(install_component, "install-component")
 cli.add_command(start_project, "start-project")
 
 
