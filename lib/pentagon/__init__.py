@@ -1,6 +1,7 @@
 # from __future__ import (absolute_import, division, print_function)
 # __metaclass__ = type
 
+import shlex
 import subprocess
 import jinja2
 import datetime
@@ -452,19 +453,22 @@ class PentagonProject():
 class PentagonComponentException(Exception):
     pass
 
-from subprocess import call
 class PentagonComponent():
-    def __init__(self, name):
+    def __init__(self, name, args):
         self._name = name
+        self._args = args
         self._project_source = os.path.dirname(__file__)
         pass
 
     def install(self):
         if self._name:
-            # print self._name
-            # print self._project_source
+            # the path to the component
             component_path = self._project_source + "/components/{name}".format(name=self._name)
-            # print component_path
             install_path = component_path + "/install.sh"
-            # print install_path
-            call([install_path, component_path])
+            # assemble the command line. based on the Note at https://docs.python.org/2/library/subprocess.html#popen-constructor
+            command_line = install_path + ' --component-path ' + component_path
+            for key,value in self._args.items():
+                if value != None:
+                    command_line += ' --' + key + ' ' + value
+            args = shlex.split(command_line)
+            p = subprocess.Popen(args)
