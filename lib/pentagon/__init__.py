@@ -468,7 +468,7 @@ class PentagonComponent():
             # assemble the command line. based on the Note at https://docs.python.org/2/library/subprocess.html#popen-constructor
             command_line = install_path + ' --component-path ' + component_path
             for key,value in self._args.items():
-                if value != None:
+                if value is not None:
                     command_line += ' --' + key + ' ' + value
             args = shlex.split(command_line)
             p = subprocess.Popen(args)
