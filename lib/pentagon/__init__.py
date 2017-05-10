@@ -37,7 +37,7 @@ class PentagonProject():
     _vpc_id = '<vpc_id>'
 
     # KOPS:
-    _state_store_bucket = '<statestore-bucket>'
+    _infrastructure_bucket = '<statestore-bucket>'
 
     # Working Kubernetes
     _working_kubernetes_cluster_name = '<working_kubernetes_cluster_name>'
@@ -152,7 +152,7 @@ class PentagonProject():
             self._vpc_id = self.get_arg('vpc_id', self._vpc_id)
 
             # KOPS:
-            self._state_store_bucket = self.get_arg('state_store_bucket', self._repository_name)
+            self._infrastructure_bucket = self.get_arg('infrastructure_bucket', self._infrastructure_bucket)
 
             # Working Kubernetes
             self._working_kubernetes_cluster_name = self.get_arg('working_kubernetes_cluster_name', 'working-1.{}.com'.format(self._name))
@@ -301,7 +301,8 @@ class PentagonProject():
             'aws_access_key': self._aws_access_key,
             'aws_default_region': self._aws_default_region,
             'aws_availability_zones': self._aws_availability_zones,
-            'aws_availability_zone_count': self._aws_availability_zone_count
+            'aws_availability_zone_count': self._aws_availability_zone_count,
+            'infrastructure_bucket': self._infrastructure_bucket
             }
         return self.__render_template(template_name, template_path, target, context)
 
@@ -315,6 +316,15 @@ class PentagonProject():
             'aws_availability_zones': self._aws_availability_zones,
             'aws_availability_zone_count': self._aws_availability_zone_count,
             'aws_region': self._aws_default_region
+        }
+        return self.__render_template(template_name, template_path, target, context)
+
+    def __prepare_tf_remote(self):
+        template_name = "terraform-remote.sh.jinja"
+        template_path = "{}/default/vpc".format(self._repository_directory)
+        target = "{}/default/vpc/terraform-remote.sh".format(self._repository_directory)
+        context = {
+            'vpc_name': self._vpc_name
         }
         return self.__render_template(template_name, template_path, target, context)
 
@@ -434,6 +444,7 @@ class PentagonProject():
             self.__prepare_working_kops_vars_sh()
             self.__prepare_production_kops_vars_sh()
             self.__prepare_tf_vars()
+            self.__prepare_tf_remote()
 
     def __create_keys(self):
             key_path = self._private_path

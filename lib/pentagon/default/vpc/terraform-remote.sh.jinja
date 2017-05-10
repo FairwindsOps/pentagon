@@ -1,11 +1,11 @@
 #!/usr/bin/env  bash
 set -x
 
-export STATE_STORAGE=s3
-export STATE_BUCKET=${KOPS_STATE_STORE}
+STATE_STORAGE=s3
+STATE_BUCKET=${INFRASTRUCTURE_BUCKET}
 # change for multiple VPCs:
-export STATE_KEY=${INFRASTRUCTURE_BUCKET}/${DEFAULT_VPC_TAG}/tfstate
-export STATE_REGION=${AWS_DEFAULT_REGION}
+STATE_KEY={{ vpc_name }}/tfstate
+STATE_REGION=${AWS_DEFAULT_REGION}
 
 echo "configuring remote state ${STATE_STORAGE}://${STATE_BUCKET}/${STATE_KEY} in ${STATE_REGION}"
 
