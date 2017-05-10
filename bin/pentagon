@@ -64,7 +64,7 @@ def start_project(name, **kwargs):
 
 
 @click.command()
-@click.option('--name', help="Component name")
+@click.option('--name', help="Component name", required=True)
 @click.option('--environment', help="Environment")
 @click.option('--cluster', help="Cluster name")
 @click.option('--namespace', help="Namespace")
