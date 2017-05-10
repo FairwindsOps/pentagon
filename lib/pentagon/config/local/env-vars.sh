@@ -8,7 +8,7 @@
 PATH_TO_CONFIG_VARS="${INFRASTRUCTURE_REPO}/config/local/vars.yml"
 PATH_TO_SECRET_VARS="${INFRASTRUCTURE_REPO}/config/private/secrets.yml"
 
-LIST_OF_CONFIG_VARIABLES=( "aws_access_key" "aws_region" "ansible_config" "kubeconfig" )
+LIST_OF_CONFIG_VARIABLES=( "aws_access_key" "aws_default_region" "ansible_config" "kubeconfig" "infrastructure_bucket")
 LIST_OF_SECRET_VARIABLES=( "aws_secret_key" )
 
 ##
