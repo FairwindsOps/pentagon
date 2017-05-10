@@ -63,6 +63,20 @@ def start_project(name, **kwargs):
         logging.debug(traceback.print_exc(e))
 
 
+@click.command()
+@click.option('--name', help="Component name", required=True)
+@click.option('--environment', help="Environment")
+@click.option('--cluster', help="Cluster name")
+@click.option('--namespace', help="Namespace")
+@click.option('--version', help="Version")
+def install_component(name, **kwargs):
+    try:
+        pentagon.PentagonComponent(name, kwargs).install()
+    except Exception as e:
+        logging.error(e)
+        logging.debug(traceback.print_exc(e))
+
+cli.add_command(install_component, "install-component")
 cli.add_command(start_project, "start-project")
 
 

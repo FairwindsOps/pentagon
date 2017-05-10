@@ -1,6 +1,7 @@
 # from __future__ import (absolute_import, division, print_function)
 # __metaclass__ = type
 
+import shlex
 import subprocess
 import jinja2
 import datetime
@@ -447,3 +448,30 @@ class PentagonProject():
         logging.info(self._project_source)
         logging.info(self._repository_directory)
         copytree(self._project_source, self._repository_directory, symlinks=True, ignore=ignore_patterns('__init__.py', '*.pyc', 'release.py'))
+
+class PentagonComponentException(Exception):
+    pass
+
+class PentagonComponent():
+    def __init__(self, name, args):
+        self._name = name
+        self._args = args
+        self._project_source = os.path.dirname(__file__)
+        pass
+
+    def install(self):
+        if self._name:
+            # the path to the component
+            component_path = self._project_source + "/components/{name}".format(name=self._name)
+            install_path = component_path + "/install.sh"
+            # assemble the command line. based on the Note at https://docs.python.org/2/library/subprocess.html#popen-constructor
+            command_line = install_path + ' --component-path ' + component_path
+            for key,value in self._args.items():
+                if value is not None:
+                    command_line += ' --' + key + ' ' + value
+            args = shlex.split(command_line)
+            try:
+                p = subprocess.Popen(args)
+            except Exception as e:
+                logging.error("Failed to run the install script.")
+                logging.error(e)
