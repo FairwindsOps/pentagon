@@ -471,4 +471,8 @@ class PentagonComponent():
                 if value is not None:
                     command_line += ' --' + key + ' ' + value
             args = shlex.split(command_line)
-            p = subprocess.Popen(args)
+            try:
+                p = subprocess.Popen(args)
+            except Exception as e:
+                logging.error("Failed to run the install script.")
+                logging.error(e)
