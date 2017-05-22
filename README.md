@@ -1,6 +1,6 @@
 # Pentagon
 
-Pentagon is a framework for repeatable, containerized, cloud-based infrastructures. It defines the tools ([Ansible](https://www.ansible.com/), [Terraform](https://www.terraform.io/), [kops](https://github.com/kubernetes/kops)) used to manage the resources, as well as the directory structure of the infrastructure-as-code repository that manages those resources. It is designed to be customizable while at the same time built with defaults that fit the needs of most web application companies.
+Pentagon is a framework for repeatable, containerized, cloud-based infrastructures (current state is beta). It defines the tools ([Ansible](https://www.ansible.com/), [Terraform](https://www.terraform.io/), [kops](https://github.com/kubernetes/kops)) used to manage the resources, as well as the directory structure of the infrastructure-as-code repository that manages those resources. It is designed to be customizable while at the same time built with defaults that fit the needs of most web application companies.
 
 Pentagon defines an ecosystem composed of core (this repository), and other compatible modules, including dependencies such as terraform-vpc, Ansible roles like the ones defined in [ansible-requirements](lib/pentagon/ansible-requirements.txt), and [rok8s-scripts](https://github.com/reactiveops/rok8s-scripts).
 
