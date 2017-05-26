@@ -437,7 +437,7 @@ class PentagonProject():
                     images = client.describe_images(Owners=self._ami_owners, Filters=self._vpn_ami_filters)
                     self._vpn_ami_id = images['Images'][-1]['ImageId']
                 except Exception, e:
-                    logging.error("Encountered \" {} \" getting ami-id. VPN not configured fully".format(e))
+                    logging.error("Encountered \" {} \" getting ami-id. VPN not configured fully. See docs/vpn.md for more information".format(e))
             else:
                 logging.warn("Cannot get ami-id without AWS Key, Secret and Default Region set")
 
