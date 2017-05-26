@@ -68,7 +68,7 @@ class PentagonProject():
     _vpn_ami_id_placeholder = "<ami_id>"
     _vpn_ami_filters = [{'Name': 'virtualization-type', 'Values': ['hvm']},
                         {'Name': 'architecture', 'Values': ['x86_64']},
-                        {'Name': 'name', 'Values': ['ubuntu/images/hvm-ssd/ubuntu-xenial*']}]
+                        {'Name': 'name', 'Values': ['ubuntu/images/hvm-ssd/ubuntu-trusty*']}]
 
     default_ssh_keys = {
         'admin_vpn_key': 'admin-vpn',
@@ -434,7 +434,7 @@ class PentagonProject():
                 os.environ['AWS_DEFAULT_REGION'] = self._aws_default_region
                 try:
                     client = boto3.client('ec2')
-                    images = client.describe_images(Owners=self._ami_owners,Filters=self._vpn_ami_filters)
+                    images = client.describe_images(Owners=self._ami_owners, Filters=self._vpn_ami_filters)
                     self._vpn_ami_id = images['Images'][-1]['ImageId']
                 except Exception, e:
                     logging.error("Encountered \" {} \" getting ami-id. VPN not configured fully".format(e))
