@@ -152,6 +152,12 @@ It is our curated ecosystem of container-based infrastructure based on Kubernete
   * **--production-kubernetes-network-cidr**:
     * Network cidr of the kubernetes production cluster
     * Defaults to `172.20.0.0/16`
+  * **--configure-vpn/--no-configure-vpn**:
+    * Do, or do not configure the vpn env.yaml file
+    * Defaults to True
+  * **--vpn-ami-id
+    * AWS ami id to use for the VPN instance
+    * Defaults to looking up ami-id from AWS
   * **--log-level**:
     * Pentagon CLI Log Level. Accepts DEBUG,INFO,WARN,ERROR
     * Defaults to INFO

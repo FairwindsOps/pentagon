@@ -11,6 +11,8 @@ import logging
 import yaml
 import os
 import re
+import boto3
+import sys
 
 from git import Repo, Git
 from shutil import copytree, ignore_patterns
@@ -27,11 +29,13 @@ class PentagonProject():
     # DEFAULTS
 
     # AWS and VPC
-    _aws_access_key = '<aws-access-key>'
-    _aws_secret_key = '<aws-secret-key>'
-    _aws_default_region = '<aws-default-region>'
-    _aws_availability_zone_count = '<aws-availability-zone-count>'
-    _aws_availability_zones = '<aws-availability-zones>'
+    _aws_access_key_placeholder = '<aws-access-key>'
+    _aws_secret_key_placeholder = '<aws-secret-key>'
+    _aws_default_region_placeholder = '<aws-default-region>'
+    _aws_availability_zone_count_placeholder = '<aws-availability-zone-count>'
+    _aws_availability_zones_placeholder = '<aws-availability-zones>'
+
+    # VPC
     _vpc_name = '<vpc_name>'
     _vpc_cidr_base = '<vpc_cidr_base>'
     _vpc_id = '<vpc_id>'
@@ -58,6 +62,13 @@ class PentagonProject():
     _production_kubernetes_worker_node_type = '<production_kubernetes_worker_node_type>'
     _production_kubernetes_v_log_level = '<production_kubernetes_v_log_level>'
     _production_kubernetes_network_cidr = '<production_kubernetes_network_cidr>'
+
+    # VPN
+    _ami_owners = ['099720109477']  # Amazon AMI owner
+    _vpn_ami_id_placeholder = "<ami_id>"
+    _vpn_ami_filters = [{'Name': 'virtualization-type', 'Values': ['hvm']},
+                        {'Name': 'architecture', 'Values': ['x86_64']},
+                        {'Name': 'name', 'Values': ['ubuntu/images/hvm-ssd/ubuntu-xenial*']}]
 
     default_ssh_keys = {
         'admin_vpn_key': 'admin-vpn',
@@ -137,12 +148,16 @@ class PentagonProject():
 
         if self._configure_project:
             # AWS Specific Stuff
-            self._aws_access_key = self.get_arg('aws_access_key', self._aws_access_key)
-            self._aws_secret_key = self.get_arg('aws_secret_key', self._aws_secret_key)
+            self._aws_access_key = self.get_arg('aws_access_key', self._aws_access_key_placeholder)
+            self._aws_secret_key = self.get_arg('aws_secret_key', self._aws_secret_key_placeholder)
             if self.get_arg('aws_default_region'):
                 self._aws_default_region = self.get_arg('aws_default_region')
                 self._aws_availability_zone_count = int(self.get_arg('aws_availability_zone_count', self.vpc_default_values.get('aws_availability_zones')))
                 self._aws_availability_zones = self.get_arg('aws_availability_zones', self.__default_aws_availability_zones())
+            else:
+                self._aws_default_region = self._aws_default_region_placeholder
+                self._aws_availability_zone_count = self._aws_availability_zone_count_placeholder
+                self._aws_availability_zones = self._aws_availability_zones_placeholder
 
             # VPC information
             self._vpc_name = self.get_arg('vpc_name', self.vpc_default_values.get('vpc_name'))
@@ -388,6 +403,44 @@ class PentagonProject():
         }
         return self.__render_template(template_name, template_path, target, context)
 
+    def __prepare_vpn_cfg_vars(self):
+        self.__get_vpn_ami_id()
+        template_name = "env.yml.jinja"
+        template_path = "{}/default/resources/admin-environment".format(self._repository_directory)
+        target = "{}/default/resources/admin-environment/env.yml".format(self._repository_directory)
+        context = {
+            'admin_vpn_key': self._ssh_keys['admin_vpn'],
+            'vpn_ami_id': self._vpn_ami_id
+        }
+        return self.__render_template(template_name, template_path, target, context)
+
+    def __get_vpn_ami_id(self):
+
+        self._vpn_ami_id = self._vpn_ami_id_placeholder
+
+        if self.get_arg('configure_vpn'):
+            if self.get_arg('vpn_ami_id'):
+                self._vpn_ami_id = self.get_arg('vpn_ami_id')
+            elif \
+                    self._aws_access_key != self._aws_access_key_placeholder and \
+                    self._aws_secret_key != self._aws_secret_key_placeholder and \
+                    self._aws_default_region != self._aws_default_region_placeholder:
+
+                logging.info("Getting VPN ami-id from AWS")
+
+                # Set EC2 environ vars for boto3 to use
+                os.environ['AWS_ACCESS_KEY'] = self._aws_access_key
+                os.environ['AWS_SECRET_KEY'] = self._aws_secret_key
+                os.environ['AWS_DEFAULT_REGION'] = self._aws_default_region
+                try:
+                    client = boto3.client('ec2')
+                    images = client.describe_images(Owners=self._ami_owners,Filters=self._vpn_ami_filters)
+                    self._vpn_ami_id = images['Images'][-1]['ImageId']
+                except Exception, e:
+                    logging.error("Encountered \" {} \" getting ami-id. VPN not configured fully".format(e))
+            else:
+                logging.warn("Cannot get ami-id without AWS Key, Secret and Default Region set")
+
     def __create_key(self, name, path, bits=2048):
         key = RSA.generate(bits)
 
@@ -444,6 +497,7 @@ class PentagonProject():
             self.__prepare_production_kops_vars_sh()
             self.__prepare_tf_vars()
             self.__prepare_tf_remote()
+            self.__prepare_vpn_cfg_vars()
 
     def __create_keys(self):
             key_path = self._private_path

@@ -51,6 +51,8 @@ def cli():
 @click.option('--production-kubernetes-dns-zone', help="DNS Zone of the kubernetes production cluster")
 @click.option('--production-kubernetes-v-log-level', help="V Log Level kubernetes production cluster")
 @click.option('--production-kubernetes-network-cidr', help="Network cidr of the kubernetes working cluster")
+@click.option('--configure-vpn/--no-configure-vpn', default=True, help="Whether or not to configure the vpn.")
+@click.option('--vpn-ami-id', help="ami-id to use for the VPN instance")
 @click.option('--log-level', default="INFO", help="Log Level DEBUG,INFO,WARN,ERROR")
 def start_project(name, **kwargs):
     try:
