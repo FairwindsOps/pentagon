@@ -42,7 +42,8 @@ setup(name='pentagon',
         "pycrypto==2.6.1",
         "PyYAML==3.12",
         "shyaml==0.5.0",
-        "ansible==2.3.0.0"
+        "ansible==2.3.0.0",
+        "boto3==1.4.4"
       ],
       package_dir={'': 'lib'},
       packages=find_packages('lib'),
