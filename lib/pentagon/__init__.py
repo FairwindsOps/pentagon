@@ -40,9 +40,6 @@ class PentagonProject():
     _vpc_cidr_base = '<vpc_cidr_base>'
     _vpc_id = '<vpc_id>'
 
-    # KOPS:
-    _infrastructure_bucket = '<statestore-bucket>'
-
     # Working Kubernetes
     _working_kubernetes_cluster_name = '<working_kubernetes_cluster_name>'
     _working_kubernetes_dns_zone = '<working_kubernetes_dns_zone>'
@@ -166,7 +163,7 @@ class PentagonProject():
             self._vpc_id = self.get_arg('vpc_id', self._vpc_id)
 
             # KOPS:
-            self._infrastructure_bucket = self.get_arg('infrastructure_bucket', self._infrastructure_bucket)
+            self._infrastructure_bucket = self.get_arg('infrastructure_bucket', self._repository_name)
 
             # Working Kubernetes
             self._working_kubernetes_cluster_name = self.get_arg('working_kubernetes_cluster_name', 'working-1.{}.com'.format(self._name))
@@ -380,6 +377,25 @@ class PentagonProject():
         }
         return self.__render_template(template_name, template_path, target, context)
 
+    def __prepare_account_vars_sh(self):
+        template_name = "vars.sh.jinja"
+        template_path = "{}/default/account/".format(self._repository_directory)
+        target = "{}/default/account/vars.sh".format(self._repository_directory)
+        context = {
+            'KOPS_STATE_STORE_BUCKET': self._infrastructure_bucket
+        }
+        return self.__render_template(template_name, template_path, target, context)
+
+    def __prepare_account_vars_yml(self):
+        template_name = "vars.yml.jinja"
+        template_path = "{}/default/account/".format(self._repository_directory)
+        target = "{}/default/account/vars.yml".format(self._repository_directory)
+        context = {
+            'org_name': self._name,
+            'vpc_name': self._vpc_name
+        }
+        return self.__render_template(template_name, template_path, target, context)
+
     def __prepare_ssh_config_vars(self):
         template_name = "ssh_config.jinja"
         template_path = "{}/config/local".format(self._repository_directory)
@@ -498,6 +514,8 @@ class PentagonProject():
             self.__prepare_tf_vars()
             self.__prepare_tf_remote()
             self.__prepare_vpn_cfg_vars()
+            self.__prepare_account_vars_yml()
+            self.__prepare_account_vars_sh()
 
     def __create_keys(self):
             key_path = self._private_path

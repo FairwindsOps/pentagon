@@ -8,8 +8,8 @@
 PATH_TO_CONFIG_VARS="${INFRASTRUCTURE_REPO}/config/local/vars.yml"
 PATH_TO_SECRET_VARS="${INFRASTRUCTURE_REPO}/config/private/secrets.yml"
 
-LIST_OF_CONFIG_VARIABLES=( "aws_access_key" "aws_default_region" "ansible_config" "kubeconfig" "infrastructure_bucket")
-LIST_OF_SECRET_VARIABLES=( "aws_secret_key" )
+LIST_OF_CONFIG_VARIABLES=( "TF_VAR_aws_access_key" "AWS_ACCESS_KEY" "AWS_ACCESS_KEY_ID" "AWS_DEFAULT_REGION" "ANSIBLE_CONFIG" "KUBECONFIG" "INFRASTRUCTURE_BUCKET")
+LIST_OF_SECRET_VARIABLES=( "TF_VAR_aws_secret_key" "AWS_SECRET_KEY" "AWS_SECRET_ACCESS_KEY" )
 
 ##
 # Functions
@@ -18,39 +18,29 @@ LIST_OF_SECRET_VARIABLES=( "aws_secret_key" )
 set_vars() {
 # config vars
 for key in  ${LIST_OF_CONFIG_VARIABLES[@]}; do
-  # convert to upper case
-  upper_case_key=$(echo $key | awk '{print toupper($0)}')
-
   raw_value=$(cat $PATH_TO_CONFIG_VARS | shyaml get-value $key)
   # some values in vars.yml use other variables that need to be dereferenced
   dereferenced_value=$(eval echo $raw_value)
-  export $upper_case_key=$dereferenced_value
+  export $key=$dereferenced_value
 done
 
 # secret vars
 for key in  ${LIST_OF_SECRET_VARIABLES[@]}; do
-  # converting to upper case
-  upper_case_key=$(echo $key | awk '{print toupper($0)}')
-
   raw_value=$(cat $PATH_TO_SECRET_VARS | shyaml get-value $key)
   # some values in vars.yml use other variables that need to be dereferenced
   dereferenced_value=$(eval echo $raw_value)
-  export $upper_case_key=$dereferenced_value
+  export $key=$dereferenced_value
 done
 }
 
 unset_vars() {
   # config vars
   for key in  ${LIST_OF_CONFIG_VARIABLES[@]}; do
-    # convert to upper case
-    var=$(echo $key | awk '{print toupper($0)}')
-    unset $var
+    unset $key
   done
   # secret vars
   for key in  ${LIST_OF_SECRET_VARIABLES[@]}; do
-    # upper casing
-    var=$(echo $key | awk '{print toupper($0)}')
-    unset $var
+    unset $key
   done
 }
 
