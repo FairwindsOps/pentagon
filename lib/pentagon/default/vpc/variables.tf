@@ -16,7 +16,7 @@ variable "aws_azs" {
 ###
 
 variable "vpc_cidr" {
-  default = "10.10"
+  default = "172.20"
 }
 
 variable "aws_vpc_name" {}
