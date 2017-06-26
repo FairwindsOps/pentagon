@@ -26,7 +26,7 @@ It is our curated ecosystem of container-based infrastructure based on Kubernete
 
 ### _start-project_
 
- `pentagon start-project` creates a new project in your workspace directory and creates a matching virutalenv for you. Most values have defaults that should get you up and running very quickly with a new pentagon project. You may also clone an existing pentagon project if one exists.
+ `pentagon start-project` creates a new project in your workspace directory and creates a matching virtualenv for you. Most values have defaults that should get you up and running very quickly with a new pentagon project. You may also clone an existing pentagon project if one exists.
 
  #### Options
   * **-f, --config-file**:
