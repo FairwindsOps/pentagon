@@ -40,6 +40,9 @@ class PentagonProject():
     _vpc_cidr_base = '<vpc_cidr_base>'
     _vpc_id = '<vpc_id>'
 
+    # Kubernetes version
+    _kubernetes_version = '<kubernetes_version>'
+
     # Working Kubernetes
     _working_kubernetes_cluster_name = '<working_kubernetes_cluster_name>'
     _working_kubernetes_dns_zone = '<working_kubernetes_dns_zone>'
@@ -74,6 +77,8 @@ class PentagonProject():
         'production_kube_key': 'production-kube',
         'production_private_key': 'production-private',
     }
+
+    kubernetes_default_version = '1.5.7'
 
     working_kubernetes_default_values = {
         'working_kubernetes_node_count': 3,
@@ -164,6 +169,9 @@ class PentagonProject():
 
             # KOPS:
             self._infrastructure_bucket = self.get_arg('infrastructure_bucket', self._repository_name)
+
+            # Kubernetes version
+            self._kubernetes_version = self.get_arg('kubernetes_version', self.kubernetes_default_version)
 
             # Working Kubernetes
             self._working_kubernetes_cluster_name = self.get_arg('working_kubernetes_cluster_name', 'working-1.{}.com'.format(self._name))
@@ -348,6 +356,7 @@ class PentagonProject():
             'aws_availability_zones': re.sub(" ", "", self._aws_availability_zones),
             'vpc_id': self._vpc_id,
             'ssh_key_path': "{}{}.pub".format(self._private_path, self._ssh_keys['working_kube']),
+            'kubernetes_version': self._kubernetes_version,
             'kubernetes_node_count': self._working_kubernetes_node_count,
             'kubernetes_master_aws_zone': self._working_kubernetes_master_aws_zone,
             'kubernetes_master_node_type': self._working_kubernetes_master_node_type,
@@ -367,6 +376,7 @@ class PentagonProject():
             'aws_availability_zones': re.sub(" ", "", self._aws_availability_zones),
             'vpc_id': self._vpc_id,
             'ssh_key_path': "{}{}.pub".format(self._private_path, self._ssh_keys['production_kube']),
+            'kubernetes_version': self._kubernetes_version,
             'kubernetes_node_count': self._production_kubernetes_node_count,
             'kubernetes_master_aws_zone': self._production_kubernetes_master_aws_zone,
             'kubernetes_master_node_type': self._production_kubernetes_master_node_type,
