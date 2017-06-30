@@ -35,6 +35,7 @@ def cli():
 @click.option('--vpc-name', help="Name of VPC to create")
 @click.option('--vpc-cidr-base', help="First two octets of the VPC ip space")
 @click.option('--vpc-id', help="AWS VPC id to create the kubernetes clusters in")
+@click.option('--kubernetes-version', help="Version of kubernetes to use for cluster nodes")
 @click.option('--working-kubernetes-cluster-name', help="Name of the working kubernetes cluster nodes")
 @click.option('--working-kubernetes-node-count', help="Name of the working kubernetes cluster nodes")
 @click.option('--working-kubernetes-master-aws-zone', help="Availability zone to place the kube master in")

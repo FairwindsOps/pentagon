@@ -23,7 +23,7 @@ kops create cluster \
   --vpc $VPC_ID \
   --network-cidr $NETWORK_CIDR \
   --name $CLUSTER_NAME \
-  --kubernetes-version=1.4.8 \  # set version here as appropriate
+  --kubernetes-version=$KUBERNETES_VERSION \
   --bastion=false
 
 ## Step 2

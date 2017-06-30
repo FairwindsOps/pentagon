@@ -6,6 +6,8 @@ export VPC_ID="{{ vpc_id }}"
 # this should be set to be unique per cluster
 export SSH_KEY_PATH="{{ ssh_key_path }}"
 
+export KUBERNETES_VERSION={{ kubernetes_version }}
+
 export NODE_COUNT={{ kubernetes_node_count }}
 export MASTER_ZONES="{{ kubernetes_master_aws_zone }}"
 export DNS_ZONE="{{ kubernetes_dns_zone }}"
