@@ -26,7 +26,7 @@ It is our curated ecosystem of container-based infrastructure based on Kubernete
 
 ### _start-project_
 
- `pentagon start-project` creates a new project in your workspace directory and creates a matching virutalenv for you. Most values have defaults that should get you up and running very quickly with a new pentagon project. You may also clone an existing pentagon project if one exists.
+ `pentagon start-project` creates a new project in your workspace directory and creates a matching virtualenv for you. Most values have defaults that should get you up and running very quickly with a new pentagon project. You may also clone an existing pentagon project if one exists.
 
  #### Options
   * **-f, --config-file**:
@@ -54,7 +54,7 @@ It is our curated ecosystem of container-based infrastructure based on Kubernete
   * **--aws-secret-key**:
     * AWS secret key
     * No Default
-  * **--aws-default-region**:        
+  * **--aws-default-region**:
     * AWS default region
     * No Default
     * If the `--aws-default-region` option is set it will allow the default to be set for `--aws-availability-zones` and `--aws-availability-zone-count`
@@ -204,7 +204,7 @@ PPP
 ```
 
 * When this is successful, the directory structure will look like this:
-```    
+```
 (hillghost1) 708 myuser:hillghost1$ tree
 .
 └── hillghost1-infrastructure
