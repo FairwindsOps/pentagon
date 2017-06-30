@@ -307,6 +307,7 @@ class PentagonProject():
         target = "{}/config/private/secrets.yml".format(self._repository_directory)
         context = {
             'aws_secret_key': self._aws_secret_key,
+            'aws_access_key': self._aws_access_key
                    }
         return self.__render_template(template_name, template_path, target, context)
 
@@ -317,7 +318,6 @@ class PentagonProject():
         context = {
             'org_name': self._name,
             'vpc_name': self._vpc_name,
-            'aws_access_key': self._aws_access_key,
             'aws_default_region': self._aws_default_region,
             'aws_availability_zones': self._aws_availability_zones,
             'aws_availability_zone_count': self._aws_availability_zone_count,
