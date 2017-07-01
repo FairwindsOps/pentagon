@@ -116,6 +116,9 @@ class PentagonProject():
             which fools the .get() method """
         if self._args.get(arg_name) is not None:
             return self._args.get(arg_name)
+        elif os.environ.get('PENTAGON_{}'.format(arg_name), None) is not None:
+            return os.environ.get('PENTAGON_{}'.format(arg_name), None)
+
         return default
 
     def __init__(self, name, args={}):
