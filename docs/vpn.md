@@ -9,17 +9,16 @@ This can be done before or after configuring and deploying your kubernetes clust
 
 ```
 $ cd config/private
-$ keyname="hillghost_vpn_20160101"
 $ aws ec2 create-key-pair --key-name $keyname  --query 'KeyMaterial' --output text > ${keyname}.pem
+$ aws ec2 import-key-pair --key-name=admin-vpn --public-key-material="`cat $INFRASTRUCTURE_REPO/config/private/admin-vpn.pub`
 $ chmod 400 ${keyname}.pem
 ```
-[(Creating a key pair)](http://docs.aws.amazon.com/cli/latest/userguide/cli-ec2-keypairs.html#creating-a-key-pair)
 
-* Update `config/local/ssh_config` to add path to the key created in step 1 (absolute paths only).
-* Update `config/local/ansible.cfg` to point to the ssh config above (absolute paths only).
-* Edit `default/resources/admin-environment/env.yml`
+
+* `config/local/ssh_config` has the key path and subnets set for ssh access
+* In `default/resources/admin-environment/env.yml` verify the following are set properly
   - `aws_key_name` : name of the key pair created earlier
-  - `default_ami` : Ubuntu trusty as of this writing. Make sure it is located in correct region, instance type: `hvm:ebs-ssd`. Use the [Ubuntu AMI locator](https://cloud-images.ubuntu.com/locator/) if needed.
+  - `default_ami` : If not preset, se the [Ubuntu AMI locator](https://cloud-images.ubuntu.com/locator/). Ubuntu trusty as of this writing. Make sure it is located in correct region, instance type: `hvm:ebs-ssd`.  if needed.
   - Edit other variables as needed. VPN users to be created, aka VPN clients, are contained in the Ansible array, `openvpn_clients`
 * If you haven't already, in the `$INFRASTRUCTURE_REPO` directory, install ansible requirements:
 
