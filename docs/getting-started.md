@@ -14,6 +14,7 @@ It is our curated ecosystem of container-based infrastructure based on Kubernete
 ### QUICK START
 * `pentagon start-project <project-name> --aws-access-key <aws-access-key> --aws-secret-key <aws-secret-key> --aws-default-region <aws-default-region>`
   * With the above basic options set, all defaults will be set for you and unless values need to be updated, you should be able to run terraform after creating the S3 Bucket to store state (`state-store-bucket`).
+  * You may set 
 
 ### Start new project
 * `pentagon start-project <project-name> <options>`
@@ -26,7 +27,7 @@ It is our curated ecosystem of container-based infrastructure based on Kubernete
 
 ### _start-project_
 
- `pentagon start-project` creates a new project in your workspace directory and creates a matching virtualenv for you. Most values have defaults that should get you up and running very quickly with a new pentagon project. You may also clone an existing pentagon project if one exists.
+ `pentagon start-project` creates a new project in your workspace directory and creates a matching virtualenv for you. Most values have defaults that should get you up and running very quickly with a new pentagon project. You may also clone an existing pentagon project if one exists.  You may set any of these options as environment variables instead by prefixing them with `PENTAGON_`, for example, for security purposes `PENTAGON_aws_access_key` can be used instead of `--aws-access-key`
 
  #### Options
   * **-f, --config-file**:
