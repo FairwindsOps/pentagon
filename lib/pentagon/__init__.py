@@ -116,6 +116,9 @@ class PentagonProject():
             which fools the .get() method """
         if self._args.get(arg_name) is not None:
             return self._args.get(arg_name)
+        elif os.environ.get('PENTAGON_{}'.format(arg_name), None) is not None:
+            return os.environ.get('PENTAGON_{}'.format(arg_name), None)
+
         return default
 
     def __init__(self, name, args={}):
@@ -307,6 +310,7 @@ class PentagonProject():
         target = "{}/config/private/secrets.yml".format(self._repository_directory)
         context = {
             'aws_secret_key': self._aws_secret_key,
+            'aws_access_key': self._aws_access_key
                    }
         return self.__render_template(template_name, template_path, target, context)
 
@@ -317,7 +321,6 @@ class PentagonProject():
         context = {
             'org_name': self._name,
             'vpc_name': self._vpc_name,
-            'aws_access_key': self._aws_access_key,
             'aws_default_region': self._aws_default_region,
             'aws_availability_zones': self._aws_availability_zones,
             'aws_availability_zone_count': self._aws_availability_zone_count,
