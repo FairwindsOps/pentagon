@@ -10,7 +10,7 @@ This can be done before or after configuring and deploying your kubernetes clust
 ```
 $ cd config/private
 $ aws ec2 create-key-pair --key-name $keyname  --query 'KeyMaterial' --output text > ${keyname}.pem
-$ aws ec2 import-key-pair --key-name=admin-vpn --public-key-material="`cat $INFRASTRUCTURE_REPO/config/private/admin-vpn.pub`
+$ aws ec2 import-key-pair --key-name=admin-vpn --public-key-material="`cat $INFRASTRUCTURE_REPO/config/private/admin-vpn.pub`"
 $ chmod 400 ${keyname}.pem
 ```
 
