@@ -1,15 +1,21 @@
-.PHONY: all plan apply destroy provision ssh
+.PHONY: all bucket plan apply destroy clean
 
-all: plan apply provision
+all: bucket plan apply
+
+bucket:
+	aws s3 ls s3://$${INFRASTRUCTURE_BUCKET} \
+	|| aws s3 mb s3://$${INFRASTRUCTURE_BUCKET} \
+        &&  aws s3api put-bucket-versioning \
+	 --bucket $${INFRASTRUCTURE_BUCKET} \
+	 --versioning-configuration  \
+	Status=Enabled
 
 plan:
-	terraform remote pull
-	terraform get -update
-	terraform plan -module-depth=-1 -var-file terraform.tfvars -out terraform.tfplan
+	terraform init -backend=true
+	terraform plan -module-depth=-1 -var-file terraform.tfvars 
 
 apply:
-	terraform apply terraform.tfplan
-	terraform remote push
+	terraform apply
 
 destroy:
 	terraform plan -destroy -var-file terraform.tfvars -out terraform.tfplan
