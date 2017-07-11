@@ -3,13 +3,11 @@
 all: plan apply provision
 
 plan:
-	terraform remote pull || ./terraform-remote.sh && terraform remote pull
-	terraform get -update
-	terraform plan -module-depth=-1 -var-file terraform.tfvars -out terraform.tfplan
+	terraform init -backend=true
+	terraform plan -module-depth=-1 -var-file terraform.tfvars
 
 apply:
-	terraform apply terraform.tfplan
-	terraform remote push
+	terraform apply
 
 destroy:
 	terraform plan -destroy -var-file terraform.tfvars -out terraform.tfplan

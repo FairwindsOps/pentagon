@@ -31,3 +31,13 @@ module "vpc" {
   private_working_subnet_cidrs       = "${var.private_working_subnet_cidrs}"
 
 }
+
+// terraform backend config
+
+terraform {
+  backend "s3" {
+    bucket = "{{ infrastructure_bucket }}"
+    key    = "{{ vpc_name }}/terraform-vpc/tf.state"
+    region = "{{ aws_region }}"
+  }
+}
