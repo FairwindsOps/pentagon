@@ -86,6 +86,10 @@ cli.add_command(start_project, "start-project")
 def next_steps():
     steps = """
 
+# Generate your local configuration
+cd <project_name>-infrastructure/
+./config/local/local-config-init
+
 # S3 buckets will need to be created
 
 # Execute the following steps to create VPC

@@ -46,6 +46,12 @@ source default/account/vars.sh
 
 Per AWS account variables are in `default/account/vars.sh` used for creating the Kubernetes cluster but not needed for most other operations. When creating a cluster the `kops.sh` file
 
+Per user configuration needs to be generated. These files cannot directly use the `$INFRASTRUCTURE_REPO` environment variable for various reasons. The `config/local/local-config-init` script will generate the files needed from templates in that same folder.
+
+```
+./config/local/local-config-init
+```
+
 ### VPC
 
 The VPC Terraform code is in `default/vpc` and has a `Makefile` to help with the commands needed.

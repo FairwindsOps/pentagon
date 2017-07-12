@@ -410,11 +410,10 @@ class PentagonProject():
         return self.__render_template(template_name, template_path, target, context)
 
     def __prepare_ssh_config_vars(self):
-        template_name = "ssh_config.jinja"
+        template_name = "ssh_config-default.jinja"
         template_path = "{}/config/local".format(self._repository_directory)
-        target = "{}/config/local/ssh_config".format(self._repository_directory)
+        target = "{}/config/local/ssh_config-default".format(self._repository_directory)
         context = {
-            'infrastructure_repository': self._repository_directory,
             'production_kube_key': self._ssh_keys['production_kube'],
             'working_kube_key': self._ssh_keys['working_kube'],
             'production_private_key': self._ssh_keys['production_private'],
@@ -424,12 +423,10 @@ class PentagonProject():
         return self.__render_template(template_name, template_path, target, context)
 
     def __prepare_ansible_cfg_vars(self):
-        template_name = "ansible.cfg.jinja"
+        template_name = "ansible.cfg-default.jinja"
         template_path = "{}/config/local".format(self._repository_directory)
-        target = "{}/config/local/ansible.cfg".format(self._repository_directory)
-        context = {
-            'infrastructure_repository': self._repository_directory,
-        }
+        target = "{}/config/local/ansible.cfg-default".format(self._repository_directory)
+        context = {}
         return self.__render_template(template_name, template_path, target, context)
 
     def __prepare_vpn_cfg_vars(self):
