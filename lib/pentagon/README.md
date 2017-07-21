@@ -15,9 +15,7 @@ kubectl should try to match the cluster version, in this case the 1.5.x series f
 
 Python Libraries:
 
-Libraries required are installed as part of [Pentagon](https://github.com/reactiveops/pentagon)
-
-This can be installed into a [virtualenv](https://virtualenv.pypa.io/en/stable/) to isolate the installtion from your system.
+Libraries required can be installed with `pip install -r requirements.txt`. These can be installed into a [virtualenv](https://virtualenv.pypa.io/en/stable/) to isolate the installation from your system.
 
 ### Shell environment
 

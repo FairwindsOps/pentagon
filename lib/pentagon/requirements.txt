@@ -1,0 +1,4 @@
+boto3==1.4.4
+ansible==2.3.0.0
+shyaml==0.5.0
+awscli==1.11.122
