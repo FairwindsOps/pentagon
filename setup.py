@@ -35,6 +35,9 @@ setup(name='pentagon',
       author_email='reactive@reactiveops.com',
       url='http://reactiveops.com/',
       license='GPLv3',
+
+      # Changes to requirements here may need to be updated in
+      # lib/pentagon/requirements.txt and requirements.txt as well
       install_requires=[
         "click==6.7",
         "GitPython==2.1.3",
