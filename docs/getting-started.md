@@ -13,8 +13,8 @@ It is our curated ecosystem of container-based infrastructure based on Kubernete
 ## Usage
 ### QUICK START
 * `pentagon start-project <project-name> --aws-access-key <aws-access-key> --aws-secret-key <aws-secret-key> --aws-default-region <aws-default-region>`
-  * With the above basic options set, all defaults will be set for you and unless values need to be updated, you should be able to run terraform after creating the S3 Bucket to store state (`state-store-bucket`).
-  * You may set 
+  * With the above basic options set, all defaults will be set for you and unless values need to be updated, you should be able to run terraform after creating the S3 Bucket to store state (`infrastructure-bucket`).
+  * You may set
 
 ### Start new project
 * `pentagon start-project <project-name> <options>`
@@ -65,7 +65,7 @@ It is our curated ecosystem of container-based infrastructure based on Kubernete
   * **--aws-availability-zone-count**:
     * Number of availability zones to use
     * Defaults to 3 when a default region is entered. Otherwise, a placeholder string is used
-  * **--state-store-bucket**:
+  * **--infrastructure-bucket**:
     * Name of S3 Bucket to store state
     * Defaults to `<project-name>-infrastructure`
     * pentagon start-project does not create this bucket and it will need to be created
