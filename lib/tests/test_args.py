@@ -2,7 +2,7 @@ import unittest
 import pentagon
 import os
 import logging
-from pentagon.tests.test_base import TestPentagonProject
+from tests.test_base import TestPentagonProject
 
 
 class TestPentagonProjectWithoutArgs(TestPentagonProject):
@@ -33,7 +33,7 @@ class TestPentagonProjectWithAllArgs(TestPentagonProject):
         'vpc_cidr_base': 'test_vpc_cidr_base',
         'vpc_id': 'test_vpc_id',
         # KOPS:
-        'state_store_bucket': 'test-statestore-bucket',
+        'infrastructure_bucket': 'test-statestore-bucket',
         # Working Kubernetes
         'working_kubernetes_cluster_name': 'test-working-cluster-name',
         'working_kubernetes_dns_zone': 'test-working-cluster-dns-zone',
@@ -78,7 +78,7 @@ class TestPentagonProjectWithAllArgs(TestPentagonProject):
         self.assertEqual(self.p._vpc_name, self.args['vpc_name'])
 
     def test_kops_args(self):
-        self.assertEqual(self.p._state_store_bucket, self.args['state_store_bucket'])
+        self.assertEqual(self.p._infrastructure_bucket, self.args['infrastructure_bucket'])
 
     def test_kubernetes_args(self):
         base_kube_args = [

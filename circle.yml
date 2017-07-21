@@ -35,11 +35,9 @@ machine:
 
 dependencies:
   pre:
-    - pip install -r lib/pentagon/tests/requirements.txt
+    - pip install -r lib/tests/requirements.txt
     - pip install ./
     - npm install
-    - docker-pull
-    - docker build --rm=false -t ${DOCKERTAG}:latest .
 
   override:
     - echo "overriding inferred dependencies"
@@ -47,41 +45,3 @@ dependencies:
 database:
   override:
     - echo "overriding inferred dependencies"
-
-test:
-  override:
-    # - docker run $DOCKERTAG bundle exec rake test
-    - nosetests lib/pentagon/tests/
-
-deployment:
-  development:
-    # branch: /feature-.*/
-    branch: docs
-    commands:
-      - docker-push -f deploy/development.config
-      - ensure-kubectl
-      - prepare-kubectl
-      - kubectl config set-context development --user $CLUSTER_NICKNAME_WORKING --cluster $CLUSTER_NICKNAME_WORKING --namespace development
-      - kubectl config use-context development
-      - k8s-deploy -f deploy/development.config
-
-  staging:
-    branch: master
-    commands:
-      - docker-push -f deploy/staging.config
-      - ensure-kubectl
-      - prepare-kubectl
-      - kubectl config set-context staging --user $CLUSTER_NICKNAME_WORKING --cluster $CLUSTER_NICKNAME_WORKING --namespace staging
-      - kubectl config use-context staging
-      - k8s-deploy -f deploy/staging.config
-
-  production:
-    tag: /release-.*/
-    commands:
-      # to be removed:
-      # - docker-push -f deploy/production.config
-      - ensure-kubectl
-      - prepare-kubectl
-      - kubectl config set-context production --user $CLUSTER_NICKNAME_PRODUCTION --cluster $CLUSTER_NICKNAME_PRODUCTION --namespace production
-      - kubectl config use-context production
-      - k8s-deploy -f deploy/production.config
