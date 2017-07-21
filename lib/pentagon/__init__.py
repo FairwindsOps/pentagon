@@ -475,7 +475,8 @@ class PentagonProject():
 
     def __directory_check(self):
         if not self.__workspace_directory_exists():
-            raise PentagonException("Workspace directory does not exist. Have you set up your workstation?")
+            msg = "Workspace directory `{0}` does not exist.".format(self._workspace_directory)
+            raise PentagonException(msg)
 
     def start(self):
         self.__directory_check()
