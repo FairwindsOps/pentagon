@@ -35,7 +35,7 @@ machine:
 
 dependencies:
   pre:
-    - pip install -r lib/pentagon/tests/requirements.txt
+    - pip install -r lib/tests/requirements.txt
     - pip install ./
     - npm install
     - docker-pull
@@ -51,7 +51,7 @@ database:
 test:
   override:
     # - docker run $DOCKERTAG bundle exec rake test
-    - nosetests lib/pentagon/tests/
+    - nosetests lib/tests/
 
 deployment:
   development:

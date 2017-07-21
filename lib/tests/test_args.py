@@ -2,7 +2,7 @@ import unittest
 import pentagon
 import os
 import logging
-from pentagon.tests.test_base import TestPentagonProject
+from tests.test_base import TestPentagonProject
 
 
 class TestPentagonProjectWithoutArgs(TestPentagonProject):
