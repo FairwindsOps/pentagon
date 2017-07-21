@@ -25,16 +25,10 @@ class TestPentagonProject(unittest.TestCase):
         self.assertEqual(self.p._repository_name, '{}-infrastructure'.format(self.name))
 
     def test_repository_directory(self):
-        self.assertEqual(self.p._repository_directory, "{}/{}".format(self.p._project_directory, self.p._repository_name))
+        self.assertEqual(self.p._repository_directory, "{}/{}".format(self.p._workspace_directory, self.p._repository_name))
 
     def test_workspace_directory(self):
         self.assertEqual(self.p._workspace_directory, os.path.expanduser('~/workspace'))
-
-    def test_projects_directory(self):
-        self.assertEqual(self.p._projects_directory, '{}/projects'.format(self.p._workspace_directory))
-
-    def test_project_directory(self):
-        self.assertEqual(self.p._project_directory, '{}/projects/{}'.format(self.p._workspace_directory, self.p._name))
 
     def test_private_path(self):
         self.assertEqual(self.p._private_path, "{}/config/private/".format(self.p._repository_directory))

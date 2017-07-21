@@ -143,10 +143,8 @@ class PentagonProject():
         # Setting local path info
         self._repository_name = os.path.expanduser(self.get_arg("repository_name", "{}-infrastructure".format(name)))
         self._workspace_directory = os.path.expanduser(self.get_arg('workspace_directory', '~/workspace'))
-        self._projects_directory = os.path.expanduser('{}/projects'.format(self._workspace_directory))
-        self._project_directory = os.path.expanduser('{}/projects/{}'.format(self._workspace_directory, self._name))
         self._repository_directory = "{}/{}".format(
-            self._project_directory,
+            self._workspace_directory,
             self._repository_name)
 
         self._private_path = "{}/config/private/".format(self._repository_directory)
@@ -251,12 +249,6 @@ class PentagonProject():
     def __repository_directory_exists(self):
         logging.debug("Verifying repository {}".format(self._repository_directory))
         if os.path.isdir(self._repository_directory):
-            return True
-        return False
-
-    def __projects_directory_exists(self):
-        logging.debug("Verifying projects{}".format(self._projects_directory))
-        if os.path.isdir(self._projects_directory):
             return True
         return False
 
@@ -484,12 +476,6 @@ class PentagonProject():
     def __directory_check(self):
         if not self.__workspace_directory_exists():
             raise PentagonException("Workspace directory does not exist. Have you set up your workstation?")
-
-        if not self.__projects_directory_exists():
-            raise PentagonException("Projects directory does not exist. Have you set up your workstation?")
-
-        if not self.__project_directory_exists():
-            raise PentagonException("Project path does not exist. Have you created your project yet?")
 
     def start(self):
         self.__directory_check()
