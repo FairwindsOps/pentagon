@@ -8,7 +8,7 @@ It is our curated ecosystem of container-based infrastructure based on Kubernete
 ## Requirements
 * python >= 2.7
 * pip install -e git+ssh://git@github.com/reactiveops/pentagon#egg=pentagon
-* [terraform 0.8.8](https://releases.hashicorp.com/terraform/0.8.8/)
+* [terraform >=0.9](https://releases.hashicorp.com/terraform/0.9.0/)
 
 ## Usage
 ### QUICK START
@@ -182,12 +182,14 @@ Successfully installed GitPython-2.1.3 Jinja2-2.9.5 MarkupSafe-1.0 PyYAML-3.12 c
 INFO:root:Creating default AWS AZs
 ...
 
-# S3 buckets will need to be created
-
 # Execute the following steps to create VPC
+
+The name of the s3 bucket created by `make bucket` will be inherited from the `${INFRASTRUCTURE_BUCKET}` envvar.
+
 workon <project_name>
 cd <project_name>-infrastructure/default/vpc
 source ../account/vars.sh
+make bucket
 make plan
 make apply
 
@@ -269,7 +271,6 @@ PPP
     │   └── vpc
     │       ├── Makefile
     │       ├── main.tf
-    │       ├── terraform-remote.sh
     │       ├── terraform.tfvars
     │       └── variables.tf
     ├── docs
