@@ -1,7 +1,5 @@
 # Pentagon
 
-* Welcome! Use the table of Contents on the left to explore.
-
 ## Getting Started
 
 The [Getting Started](getting-started.md) has information about installing Pentagon and creating your first project.
