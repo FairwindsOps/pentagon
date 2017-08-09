@@ -38,7 +38,7 @@ It is our curated ecosystem of container-based infrastructure based on Kubernete
     * No default
   * **--workspace-directory**:
     * Directory to place new project
-    * Defaults to `~/workspace/`
+    * Defaults to `./`
   * **--repository-name**:
     * Name of the folder to initialize the infrastructure repository
     * Defaults to `<project-name>-infrastructure`

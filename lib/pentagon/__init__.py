@@ -142,7 +142,7 @@ class PentagonProject():
 
         # Setting local path info
         self._repository_name = os.path.expanduser(self.get_arg("repository_name", "{}-infrastructure".format(name)))
-        self._workspace_directory = os.path.expanduser(self.get_arg('workspace_directory', '~/workspace'))
+        self._workspace_directory = os.path.expanduser(self.get_arg('workspace_directory', '.'))
         self._repository_directory = "{}/{}".format(
             self._workspace_directory,
             self._repository_name)
@@ -249,12 +249,6 @@ class PentagonProject():
     def __repository_directory_exists(self):
         logging.debug("Verifying repository {}".format(self._repository_directory))
         if os.path.isdir(self._repository_directory):
-            return True
-        return False
-
-    def __project_directory_exists(self):
-        logging.debug("Verifying project {}".format(self._project_directory))
-        if os.path.isdir(self._project_directory):
             return True
         return False
 
