@@ -206,7 +206,7 @@ class PentagonProject():
                          }
 
     def __write_config_file(self):
-        logging.info("Writing argumets to file for Posterity: {}".format(self._outfile))
+        logging.info("Writing arguments to file for Posterity: {}".format(self._outfile))
         config = self._args
         if 'output_file' in config:
             config.pop('output_file')
@@ -327,12 +327,14 @@ class PentagonProject():
         }
         return self.__render_template(template_name, template_path, target, context)
 
-    def __prepare_tf_remote(self):
-        template_name = "terraform-remote.sh.jinja"
+    def __prepare_tf_vpc_module_root(self):
+        template_name = "main.tf.jinja"
         template_path = "{}/default/vpc".format(self._repository_directory)
-        target = "{}/default/vpc/terraform-remote.sh".format(self._repository_directory)
+        target = "{}/default/vpc/main.tf".format(self._repository_directory)
         context = {
-            'vpc_name': self._vpc_name
+            'vpc_name': self._vpc_name,
+            'infrastructure_bucket': self._infrastructure_bucket,
+            'aws_default_region': self._aws_default_region
         }
         return self.__render_template(template_name, template_path, target, context)
 
@@ -503,7 +505,7 @@ class PentagonProject():
             self.__prepare_working_kops_vars_sh()
             self.__prepare_production_kops_vars_sh()
             self.__prepare_tf_vars()
-            self.__prepare_tf_remote()
+            self.__prepare_tf_vpc_module_root()
             self.__prepare_vpn_cfg_vars()
             self.__prepare_account_vars_yml()
             self.__prepare_account_vars_sh()

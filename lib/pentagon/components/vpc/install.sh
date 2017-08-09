@@ -80,3 +80,4 @@ COMPONENT_DIR=$_arg_component_path
 
 /usr/bin/rsync -a --exclude *.jinja $COMPONENT_DIR/files/ $INFRASTRUCTURE_REPO/default/vpc/
 jinja2 $COMPONENT_DIR/files/terraform.tfvars.jinja $INFRASTRUCTURE_REPO/config/local/vars.yml > $INFRASTRUCTURE_REPO/default/vpc/terraform.tfvars
+jinja2 $COMPONENT_DIR/files/main.tf.jinja $INFRASTRUCTURE_REPO/config/local/vars.yml > $INFRASTRUCTURE_REPO/default/vpc/main.tf
