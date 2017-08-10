@@ -1,7 +1,6 @@
 #!/bin/bash
-
-source ../../../account/vars.sh
-source ../vars.sh
+source $(dirname ${BASH_SOURCE[0]})/../../../account/vars.sh
+source $(dirname ${BASH_SOURCE[0]})/../vars.sh
 
 ## STEP 1
 # Note: These instructions are based on kops 1.5.1

@@ -34,6 +34,8 @@ class TestPentagonProjectWithAllArgs(TestPentagonProject):
         'vpc_id': 'test_vpc_id',
         # KOPS:
         'infrastructure_bucket': 'test-statestore-bucket',
+        # DNS:
+        'dns_zone': 'test_dns_zone',
         # Working Kubernetes
         'working_kubernetes_cluster_name': 'test-working-cluster-name',
         'working_kubernetes_dns_zone': 'test-working-cluster-dns-zone',
@@ -89,7 +91,7 @@ class TestPentagonProjectWithAllArgs(TestPentagonProject):
             '_kubernetes_master_node_type',
             '_kubernetes_worker_node_type',
             '_kubernetes_v_log_level',
-            '_kubernetes_network_cidr',
+            '_kubernetes_network_cidr'
         ]
 
         for env in ['working', 'production']:
@@ -98,6 +100,8 @@ class TestPentagonProjectWithAllArgs(TestPentagonProject):
                 attr_name = '_{}'.format(arg_name)
                 pentagon_attribute = getattr(self.p, attr_name)
                 self.assertEqual(pentagon_attribute, self.args.get(arg_name))
+
+        self.assertEqual(getattr(self.p, '_dns_zone'), self.args['dns_zone'])
 
 
 class TestPentagonProjectWithMinimalArgs(TestPentagonProject):

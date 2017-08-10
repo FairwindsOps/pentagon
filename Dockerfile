@@ -1,10 +1,13 @@
-FROM python:2
-WORKDIR /usr/src/app
-COPY requirements.txt /usr/src/app/
-RUN pip install -r requirements.txt
-RUN apt-get update -qq && apt-get install -y nginx
-COPY . /usr/src/app
-RUN pip install ./
-RUN mkdocs build -d /var/www/html
-RUN echo "daemon off;" >> /etc/nginx/nginx.conf
-COPY ./docker/nginx.conf /etc/nginx/sites-enabled/default
+FROM ubuntu:16.04
+
+RUN apt-get update && apt-get install software-properties-common -y
+RUN apt-add-repository ppa:ansible/ansible -y && apt-get update
+RUN apt-get install -y ansible git python-dev python-pip python-dev libffi-dev libssl-dev wget vim zip openvpn awscli
+
+
+RUN wget https://releases.hashicorp.com/terraform/0.10.0/terraform_0.10.0_linux_amd64.zip && unzip terraform_0.10.0_linux_amd64.zip && mv terraform /usr/local/bin/
+
+RUN mkdir -p /pentagon 
+COPY . /pentagon/
+
+RUN pip install -U -e  ./pentagon

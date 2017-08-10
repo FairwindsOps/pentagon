@@ -1,4 +1,22 @@
 ---
+- name: upload admin ssh key
+  hosts: localhost
+  connection: local
+  gather_facts: False
+
+  pre_tasks:
+    - include_vars: "{{ item }}"
+      with_items:
+        - ../../account/vars.yml
+        - env.yml
+      tags: always
+  
+  tasks:
+    - ec2_key:
+        name: "{{ aws_key_name }}"
+        key_material: "{{ item }}"
+      with_file: "../../../config/private/{{ aws_key_name }}.pub"
+
 - name:  set up vpn prerequisites
   hosts: localhost
   connection: local

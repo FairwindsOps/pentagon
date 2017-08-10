@@ -5,11 +5,19 @@
 # two separate files are supported, config vars and secret vars, sourced from separate files
 # requires shyaml from https://github.com/0k/shyaml
 
-PATH_TO_CONFIG_VARS="${INFRASTRUCTURE_REPO}/config/local/vars.yml"
-PATH_TO_SECRET_VARS="${INFRASTRUCTURE_REPO}/config/private/secrets.yml"
+LOCAL_CONFIG_DIR=$(dirname ${BASH_SOURCE[0]})
+
+PATH_TO_CONFIG_VARS="${LOCAL_CONFIG_DIR}/vars.yml"
+PATH_TO_SECRET_VARS="${LOCAL_CONFIG_DIR}/../private/secrets.yml"
 
 LIST_OF_CONFIG_VARIABLES=( "AWS_DEFAULT_REGION" "ANSIBLE_CONFIG" "KUBECONFIG" "INFRASTRUCTURE_BUCKET")
 LIST_OF_SECRET_VARIABLES=( "TF_VAR_aws_access_key" "AWS_ACCESS_KEY" "AWS_ACCESS_KEY_ID" "TF_VAR_aws_secret_key" "AWS_SECRET_KEY" "AWS_SECRET_ACCESS_KEY" )
+
+# export infrastructre repository when it does not already exist
+if [[ -z ${INFRASTRUCTURE_REPO+x} ]]
+then
+  export INFRASTRUCTURE_REPO=$(readlink -f ${LOCAL_CONFIG_DIR}/../../)
+fi
 
 ##
 # Functions

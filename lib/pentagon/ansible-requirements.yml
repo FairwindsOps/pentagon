@@ -3,7 +3,7 @@
 ##
 # Dependents not located in galaxy.ansible.com need to precede their parents
 ##
-- src: git+ssh://git@github.com/reactiveops/ansible-get-vpc-facts
+- src: "git+https://github.com/reactiveops/ansible-get-vpc-facts.git"
   name: reactiveops.get-vpc-facts
   version: 1.1.0
 
@@ -11,7 +11,7 @@
 # End dependents not located in galaxy.ansible.com
 ##
 
-- src: git+ssh://git@github.com/reactiveops/ansible-vpn-stack
+- src: "git+https://github.com/reactiveops/ansible-vpn-stack.git"
   name: reactiveops.vpn-stack
   version: origin/master
 
@@ -23,7 +23,7 @@
   version: origin/master
   name: Stouts.openvpn-master
 
-- src: "git+ssh://git@github.com/reactiveops/ansible-iam-role.git"
+- src: "git+https://git@github.com/reactiveops/ansible-iam-role.git"
   version: origin/additional-policies
   name: reactiveops.iam-role
 
