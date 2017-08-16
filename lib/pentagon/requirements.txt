@@ -1,4 +1,5 @@
 boto3==1.4.4
+boto==2.48.0
 ansible==2.3.0.0
 shyaml==0.5.0
 awscli==1.11.122

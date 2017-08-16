@@ -168,6 +168,9 @@ class PentagonProject():
             # Until there exists a vpcid get method...
             self._vpc_id = self.get_arg('vpc_id', self._vpc_id)
 
+            # DNS
+            self._dns_zone = self.get_arg('dns_zone', '{}.com'.format(self._name))
+
             # KOPS:
             self._infrastructure_bucket = self.get_arg('infrastructure_bucket', self._repository_name)
 
@@ -175,8 +178,8 @@ class PentagonProject():
             self._kubernetes_version = self.get_arg('kubernetes_version', self.kubernetes_default_version)
 
             # Working Kubernetes
-            self._working_kubernetes_cluster_name = self.get_arg('working_kubernetes_cluster_name', 'working-1.{}.com'.format(self._name))
-            self._working_kubernetes_dns_zone = self.get_arg('working_kubernetes_dns_zone', 'working.{}.com'.format(self._name))
+            self._working_kubernetes_cluster_name = self.get_arg('working_kubernetes_cluster_name', 'working-1.{}'.format(self._dns_zone))
+            self._working_kubernetes_dns_zone = self.get_arg('working_kubernetes_dns_zone', 'working.{}'.format(self._dns_zone))
 
             self._working_kubernetes_node_count = self.get_arg('working_kubernetes_node_count', self.working_kubernetes_default_values.get('working_kubernetes_node_count'))
             self._working_kubernetes_master_aws_zone = self.get_arg('working_kubernetes_master_aws_zone', self._aws_availability_zones.split(',')[0])
@@ -186,8 +189,8 @@ class PentagonProject():
             self._working_kubernetes_network_cidr = self.get_arg('working_kubernetes_network_cidr', self.working_kubernetes_default_values.get('working_kubernetes_network_cidr'))
 
             # Production Kubernetes
-            self._production_kubernetes_cluster_name = self.get_arg('production_kubernetes_cluster_name', 'production-1.{}.com'.format(self._name))
-            self._production_kubernetes_dns_zone = self.get_arg('production_kubernetes_dns_zone', 'production.{}.com'.format(self._name))
+            self._production_kubernetes_cluster_name = self.get_arg('production_kubernetes_cluster_name', 'production-1.{}'.format(self._dns_zone))
+            self._production_kubernetes_dns_zone = self.get_arg('production_kubernetes_dns_zone', 'production.{}'.format(self._dns_zone))
 
             self._production_kubernetes_node_count = self.get_arg('production_kubernetes_node_count', self.production_kubernetes_default_values.get('production_kubernetes_node_count'))
             self._production_kubernetes_master_aws_zone = self.get_arg('production_kubernetes_master_aws_zone', self._aws_availability_zones.split(',')[0])
@@ -196,6 +199,7 @@ class PentagonProject():
             self._production_kubernetes_v_log_level = self.get_arg('production_kubernetes_v_log_level', self.production_kubernetes_default_values.get('production_kubernetes_v_log_level'))
             self._production_kubernetes_network_cidr = self.get_arg('production_kubernetes_network_cidr', self.production_kubernetes_default_values.get('production_kubernetes_network_cidr'))
 
+            
         # SSH Keys
         self._ssh_keys = {
                           'admin_vpn': self.get_arg('admin_vpn_key', self.default_ssh_keys.get('admin_vpn_key')),
@@ -334,7 +338,7 @@ class PentagonProject():
         context = {
             'vpc_name': self._vpc_name,
             'infrastructure_bucket': self._infrastructure_bucket,
-            'aws_default_region': self._aws_default_region
+            'aws_region': self._aws_default_region
         }
         return self.__render_template(template_name, template_path, target, context)
 
@@ -393,7 +397,8 @@ class PentagonProject():
         target = "{}/default/account/vars.yml".format(self._repository_directory)
         context = {
             'org_name': self._name,
-            'vpc_name': self._vpc_name
+            'vpc_name': self._vpc_name,
+            'dns_zone': self._dns_zone,
         }
         return self.__render_template(template_name, template_path, target, context)
 
@@ -442,12 +447,12 @@ class PentagonProject():
 
                 logging.info("Getting VPN ami-id from AWS")
 
-                # Set EC2 environ vars for boto3 to use
-                os.environ['AWS_ACCESS_KEY'] = self._aws_access_key
-                os.environ['AWS_SECRET_KEY'] = self._aws_secret_key
-                os.environ['AWS_DEFAULT_REGION'] = self._aws_default_region
                 try:
-                    client = boto3.client('ec2')
+                    client = boto3.client('ec2',
+                                          aws_access_key_id=self._aws_access_key,
+                                          aws_secret_access_key=self._aws_secret_key,
+                                          region_name=self._aws_default_region
+                                          )
                     images = client.describe_images(Owners=self._ami_owners, Filters=self._vpn_ami_filters)
                     self._vpn_ami_id = images['Images'][-1]['ImageId']
                 except Exception, e:

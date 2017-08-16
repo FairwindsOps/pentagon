@@ -7,7 +7,7 @@ provider "aws" {
 }
 
 module "vpc" {
-  source                             = "git::ssh://git@github.com/reactiveops/terraform-vpc.git?ref=2.0.2"
+  source                             = "git::https://github.com/reactiveops/terraform-vpc.git?ref=2.0.2"
   aws_vpc_name                       = "${var.aws_vpc_name}"
   aws_access_key                     = "${var.aws_access_key}"
   aws_secret_key                     = "${var.aws_secret_key}"

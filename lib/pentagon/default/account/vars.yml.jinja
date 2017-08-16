@@ -3,6 +3,6 @@ org_name: "{{ org_name }}"
 {% raw -%}
 org: "{{ org_name }}" 
 {%- endraw %}
-canonical_zone: "{{org_name}}.com"
+canonical_zone: "{{ dns_zone }}"
 vpn_bucket: "{{org_name}}-vpn"
 secrets_bucket: "{{org_name}}-secrets"
