@@ -14,7 +14,7 @@ Table Of Contents
   * [VPN](getting-started.md#vpn-setup)
   * [KOPS](getting-startd.md#kops)
 * [Advanced Usage](getting-started.md#advanced-project-initialization)
-
+* [Infrastrucure Repository Overview](overview.md)
 
 
 ## AWS Virtual Private Cloud
