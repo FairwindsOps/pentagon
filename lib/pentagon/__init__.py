@@ -106,10 +106,6 @@ class PentagonProject():
 
     _project_source = os.path.dirname(__file__)
 
-    @property
-    def repository_name(self):
-        pass
-
     def get_arg(self, arg_name, default=None):
         """ Get argument name from click arguments, if it exists, or return default.
             Builtin .get method is inadequate because click defaults to a value of None
@@ -147,7 +143,7 @@ class PentagonProject():
             self._workspace_directory,
             self._repository_name)
 
-        self._private_path = "{}/config/private/".format(self._repository_directory)
+        self._private_path = "config/private/"
 
         if self._configure_project:
             # AWS Specific Stuff
@@ -179,7 +175,7 @@ class PentagonProject():
 
             # Working Kubernetes
             self._working_kubernetes_cluster_name = self.get_arg('working_kubernetes_cluster_name', 'working-1.{}'.format(self._dns_zone))
-            self._working_kubernetes_dns_zone = self.get_arg('working_kubernetes_dns_zone', 'working.{}'.format(self._dns_zone))
+            self._working_kubernetes_dns_zone = self.get_arg('working_kubernetes_dns_zone', '{}'.format(self._dns_zone))
 
             self._working_kubernetes_node_count = self.get_arg('working_kubernetes_node_count', self.working_kubernetes_default_values.get('working_kubernetes_node_count'))
             self._working_kubernetes_master_aws_zone = self.get_arg('working_kubernetes_master_aws_zone', self._aws_availability_zones.split(',')[0])
@@ -190,7 +186,7 @@ class PentagonProject():
 
             # Production Kubernetes
             self._production_kubernetes_cluster_name = self.get_arg('production_kubernetes_cluster_name', 'production-1.{}'.format(self._dns_zone))
-            self._production_kubernetes_dns_zone = self.get_arg('production_kubernetes_dns_zone', 'production.{}'.format(self._dns_zone))
+            self._production_kubernetes_dns_zone = self.get_arg('production_kubernetes_dns_zone', '{}'.format(self._dns_zone))
 
             self._production_kubernetes_node_count = self.get_arg('production_kubernetes_node_count', self.production_kubernetes_default_values.get('production_kubernetes_node_count'))
             self._production_kubernetes_master_aws_zone = self.get_arg('production_kubernetes_master_aws_zone', self._aws_availability_zones.split(',')[0])
@@ -199,7 +195,6 @@ class PentagonProject():
             self._production_kubernetes_v_log_level = self.get_arg('production_kubernetes_v_log_level', self.production_kubernetes_default_values.get('production_kubernetes_v_log_level'))
             self._production_kubernetes_network_cidr = self.get_arg('production_kubernetes_network_cidr', self.production_kubernetes_default_values.get('production_kubernetes_network_cidr'))
 
-            
         # SSH Keys
         self._ssh_keys = {
                           'admin_vpn': self.get_arg('admin_vpn_key', self.default_ssh_keys.get('admin_vpn_key')),
@@ -516,7 +511,7 @@ class PentagonProject():
             self.__prepare_account_vars_sh()
 
     def __create_keys(self):
-            key_path = self._private_path
+            key_path = "{}/{}".format(self._repository_directory, self._private_path)
             for key in self._ssh_keys:
                 logging.debug("Creating ssh key {}".format(key))
                 key_name = "{}".format(self._ssh_keys[key])

@@ -4,7 +4,7 @@ export VPC_ID="{{ vpc_id }}"
 
 # the public key to be installed for the admin user
 # this should be set to be unique per cluster
-export SSH_KEY_PATH="{{ ssh_key_path }}"
+export SSH_KEY_PATH="${INFRASTRUCTURE_REPO}/{{ ssh_key_path }}"
 
 export KUBERNETES_VERSION={{ kubernetes_version }}
 
