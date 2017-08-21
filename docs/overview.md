@@ -45,7 +45,7 @@ Contains `vars.sh` and `vars.yaml`. `vars.sh` contains environment variables imp
 
 ### default/clusters/
 Contains `working/` and `production/` directories. Both are laid out identically.
-`working` is intended to contain any non-production Kubernetes pods, deployments, services. `production` is intended to contain and production Kubernetes objects pods, deployments, services etc.
+`working` is intended to contain any non-production Kubernetes pods, deployments, services. `production` is intended to contain any production Kubernetes objects pods, deployments, services etc.
 ```
 ├── cluster-config
 ├── kubernetes
