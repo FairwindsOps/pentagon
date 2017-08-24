@@ -4,12 +4,21 @@ import click
 import logging
 import traceback
 import pentagon
+import yaml
+import json
+
+from pydoc import locate
+from importlib import import_module
+
 
 @click.group()
-def cli():
+@click.pass_context
+def cli(ctx):
     pass
 
+
 @click.command()
+@click.pass_context
 @click.argument('name')
 @click.option('-f', '--config-file', help='File to read configuration options from. File supercedes command line options.')
 @click.option('-o', '--output-file', help='File to write options to after completion')
@@ -54,7 +63,7 @@ def cli():
 @click.option('--configure-vpn/--no-configure-vpn', default=True, help="Whether or not to configure the vpn.")
 @click.option('--vpn-ami-id', help="ami-id to use for the VPN instance")
 @click.option('--log-level', default="INFO", help="Log Level DEBUG,INFO,WARN,ERROR")
-def start_project(name, **kwargs):
+def start_project(ctx, name, **kwargs):
     try:
         logging.basicConfig(level=kwargs.get('log_level'))
         project = pentagon.PentagonProject(name, kwargs)
@@ -65,18 +74,111 @@ def start_project(name, **kwargs):
 
 
 @click.command()
-@click.option('--name', help="Component name", required=True)
-@click.option('--environment', help="Environment")
-@click.option('--cluster', help="Cluster name")
-@click.option('--namespace', help="Namespace")
-@click.option('--version', help="Version")
-def install_component(name, **kwargs):
+@click.pass_context
+@click.argument('component_path')
+@click.option('--data', '-D', multiple=True, help='Individual Key=Value pairs used by the component')
+@click.option('--file', '-f', help='File to read Key=Value pair from (yaml or json are supported)')
+@click.option('--out', '-o', default='./', help="Path to output module result, if any")
+@click.option('--log-level', default="INFO", help="Log Level DEBUG,INFO,WARN,ERROR")
+@click.argument('additional-args', nargs=-1, default=None)
+def add(ctx, component_path, additional_args, **kwargs):
+    _run('add', component_path, additional_args, kwargs)
+
+
+@click.command()
+@click.pass_context
+@click.argument('component_path')
+@click.option('--data', '-D', multiple=True, help='Individual Key=Value pairs used by the component')
+@click.option('--file', '-f', help='File to read Key=Value pair from (yaml or json are supported)')
+@click.option('--out', '-o', default='./', help="Path to output module result, if any")
+@click.option('--log-level', default="INFO", help="Log Level DEBUG,INFO,WARN,ERROR")
+@click.argument('additional-args', nargs=-1, default=None)
+def get(ctx, component_path, additional_args, **kwargs):
+    _run('get', component_path, additional_args, kwargs)
+
+
+def _run(action, component_path, additional_args, options):
+    logging.basicConfig(level=options.get('log_level'))
+    logging.debug("Importing module Pentagon{}".format(component_path))
+    logging.debug("with options: {}".format(options))
+    logging.debug("and additional arguments: {}".format(additional_args))
+
+    component_class = get_component_class(component_path)
+
+    # Process infile or data options
+    data = {}
     try:
-        pentagon.PentagonComponent(name, kwargs).install()
+        file = options.get('file', None)
+        if file is not None:
+            data = parse_infile(file)
+        data = parse_data(options.get('data', data))
+
     except Exception as e:
+        logging.error("Error parsing data from file or -D arguments")
         logging.error(e)
         logging.debug(traceback.print_exc(e))
 
+    try:
+        if action == 'get':
+            component_class(data, additional_args).get(options.get('out'))
+        if action == 'add':
+            component_class(data, additional_args).add(options.get('out'))
+    except Exception, e:
+        logging.error(e)
+        logging.debug(traceback.print_exc(e))
+
+
 # Making names more terminal friendly
-cli.add_command(install_component, "install-component")
 cli.add_command(start_project, "start-project")
+cli.add_command(add, "add")
+cli.add_command(get, "get")
+
+
+def get_component_class(component_path):   # Construct Class path from component input
+    component_path_list = component_path.split(".")
+    if len(component_path_list) > 1:
+        component_name = ".".join(component_path.split(".")[0:-1])
+        component_class_name = component_path.split(".")[-1].title()
+    else:
+        component_name = component_path
+        component_class_name = component_path.title()
+
+    # Find Class if it exists
+    component_class = locate("pentagon.component.{}.{}".format(component_name, component_class_name))
+    if component_class is None:
+        component_class = locate("pentagon{}.{}".format(component_name, component_class_name))
+
+    if component_class is None:
+        logging.error("No module or class found: {}".format(component_path))
+
+    return component_class
+
+
+def parse_infile(file):
+    """ Parse data structure from file into dictionary for component use """
+    print file
+    with open(file) as data_file:
+        # try:
+        #     data = json.load(data_file)
+        #     return data
+        # except ValueError as json_error:
+        #     pass
+
+        try:
+            data = yaml.load(data_file)
+            print data
+            return data
+        except yaml.YAMLError as yaml_error:
+            pass
+
+    logging.error("Unable to parse in file. {}{} ".format(json_errror, yaml_error))
+
+
+def parse_data(data, d={}):
+    """ Function to parse the incoming -D options into a dict """
+    for kv in data:
+        key = kv.split('=')[0]
+        val = kv.split('=')[1]
+        d[key] = val
+
+    return d

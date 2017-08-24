@@ -1,0 +1,59 @@
+gcloud beta container \
+--project {{ project }} \
+clusters create {{ cluster_name }} \
+{%- if cluster_cidr %}
+--cluster-ipv4-cidr={{ cluster_cidr}} \
+{%- endif %}
+{%- if cluster_version %}
+--cluster-version={{ cluster_version }} \
+{%- endif %}
+{%- if disable_addons %}
+--disable-addons={{ disable_addons|join(',') }} \
+{%- endif %}
+--zone={{ zone }} \
+{%- if additional_zones %}
+--additional-zones={{ additional_zones|join(',') }} \
+{%- endif %}
+{%- if disk_size %}
+--disk-size={{ disk_size }} \
+{%- endif %}
+{%- if machine_type %}
+--machine-type={{ machine_type }} \
+{%- endif %}
+{%- if max_nodes_per_pool and not enable_autoscaling %}
+--max-nodes-per-pool={{ max_nodes_per_pool }} \
+{%- endif %}
+{%- if network %}
+--network={{ network }} \
+{%- endif %}
+{%- if node_labels %}
+--node-labels={{ node_labels|join(',') }} \
+{%- endif %}
+{%- if num_nodes and not enable_autoscaling %}
+--num-nodes={{ num_nodes }} \
+{%- endif %}
+{%- if image_type %}
+--image-type={{ image_type }} \
+{%- endif %}
+{%- if username %}
+--username={{ username }} \
+{%- endif %}
+{%- if subnetwork %}
+--subnetwork={{ subnetwork }} \
+{%- endif %}
+{%- if scopes %}
+--scopes={{ scopes|join(',') }} \
+{%- endif %}
+{%- if tags %}
+--tags={{ tags|join('.') }}
+{% endif %}
+{%- if enable_autoscaling %}
+--enable-autoscaling \
+--min-nodes={{ min_nodes }} \
+--max-nodes={{ max_nodes }} \
+{%- endif %}
+{#- these are enabled by default
+--enable-cloud-endpoints \
+--enable-cloud-logging \
+--enable-cloud-monitoring \
+#}

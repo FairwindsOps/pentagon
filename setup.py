@@ -47,7 +47,8 @@ setup(name='pentagon',
         "PyYAML==3.12",
         "shyaml==0.5.0",
         "ansible==2.3.0.0",
-        "boto3==1.4.4"
+        "boto3==1.4.4",
+        "google-api-python-client==1.6.2"
       ],
       classifiers=[
           'Development Status :: 5 - Production/Stable',
@@ -67,6 +68,7 @@ setup(name='pentagon',
       entry_points=''' #for click integration
           [console_scripts]
           pentagon=pentagon.cli:cli
+
       ''',
-      data_files=[],
+      packages=find_packages(exclude=['tests'])
       )

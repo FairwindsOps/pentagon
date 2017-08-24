@@ -1,9 +1,6 @@
 # from __future__ import (absolute_import, division, print_function)
 # __metaclass__ = type
 
-import shlex
-import subprocess
-import jinja2
 import datetime
 import shutil
 import string
@@ -13,12 +10,16 @@ import os
 import re
 import boto3
 import sys
+import pentagon.component.vpc as aws_vpc
+from pentagon.helpers import render_template
+
 
 from git import Repo, Git
 from shutil import copytree, ignore_patterns
 from Crypto.PublicKey import RSA
 
 from pentagon.release import __version__, __author__
+
 
 class PentagonException(Exception):
     pass
@@ -255,37 +256,6 @@ class PentagonProject():
         else:
             return Repo.init(self._repository_directory)
 
-    def __run_commands(self, commands):
-        logging.debug(commands)
-        stdout, stderr = subprocess.Popen(commands,
-                                          shell=True,
-                                          executable='/bin/bash',
-                                          stdin=subprocess.PIPE,
-                                          stdout=subprocess.PIPE,
-                                          stderr=subprocess.PIPE).communicate()
-        logging.info(stdout)
-        if stderr != '':
-            logging.error(stderr)
-        return (stdout, stderr)
-
-    def __render_template(self, template_name, template_path, target, context):
-        logging.info("Writing {}".format(target))
-        logging.debug("Template Context: {}".format(context))
-        if os.path.isfile(target):
-            logging.warn("Cowardly refusing to overwrite existing file {}".format(target))
-            return False
-
-        with open(target, 'w+') as vars_file:
-            try:
-                template = jinja2.Environment(loader=jinja2.FileSystemLoader(template_path)).get_template(template_name)
-                vars_file.write(template.render(context))
-            except Exception:
-                logging.error("Error writing {}. {}".format(target, sys.exc_info()[0]))
-                return False
-
-        logging.debug("Removing {}/{}".format(template_path, template_name))
-        os.remove("{}/{}".format(template_path, template_name))
-
     def __prepare_config_private_secrets(self):
         template_name = "secrets.yml.jinja"
         template_path = "{}/config/private".format(self._repository_directory)
@@ -294,7 +264,7 @@ class PentagonProject():
             'aws_secret_key': self._aws_secret_key,
             'aws_access_key': self._aws_access_key
                    }
-        return self.__render_template(template_name, template_path, target, context)
+        return render_template(template_name, template_path, target, context)
 
     def __prepare_config_local_vars(self):
         template_name = "vars.yml.jinja"
@@ -308,20 +278,18 @@ class PentagonProject():
             'aws_availability_zone_count': self._aws_availability_zone_count,
             'infrastructure_bucket': self._infrastructure_bucket
             }
-        return self.__render_template(template_name, template_path, target, context)
+        return render_template(template_name, template_path, target, context)
 
-    def __prepare_tf_vars(self):
-        template_name = "terraform.tfvars.jinja"
-        template_path = "{}/default/vpc".format(self._repository_directory)
-        target = "{}/default/vpc/terraform.tfvars".format(self._repository_directory)
+    def __add_default_aws_vpc(self):
         context = {
             'vpc_name': self._vpc_name,
             'vpc_cidr_base': self._vpc_cidr_base,
             'aws_availability_zones': self._aws_availability_zones,
             'aws_availability_zone_count': self._aws_availability_zone_count,
-            'aws_region': self._aws_default_region
+            'aws_region': self._aws_default_region,
+            'infrastructure_bucket': self._infrastructure_bucket
         }
-        return self.__render_template(template_name, template_path, target, context)
+        aws_vpc.Vpc(context).add("{}/default/vpc".format(self._repository_directory))
 
     def __prepare_tf_vpc_module_root(self):
         template_name = "main.tf.jinja"
@@ -332,7 +300,7 @@ class PentagonProject():
             'infrastructure_bucket': self._infrastructure_bucket,
             'aws_region': self._aws_default_region
         }
-        return self.__render_template(template_name, template_path, target, context)
+        return render_template(template_name, template_path, target, context)
 
     def __prepare_working_kops_vars_sh(self):
         template_name = "vars.sh.jinja"
@@ -352,7 +320,7 @@ class PentagonProject():
             'kubernetes_v_log_level': self._working_kubernetes_v_log_level,
             'kubernetes_network_cidr': self._working_kubernetes_network_cidr
         }
-        return self.__render_template(template_name, template_path, target, context)
+        return render_template(template_name, template_path, target, context)
 
     def __prepare_production_kops_vars_sh(self):
         template_name = "vars.sh.jinja"
@@ -372,7 +340,7 @@ class PentagonProject():
             'kubernetes_v_log_level': self._production_kubernetes_v_log_level,
             'kubernetes_network_cidr': self._production_kubernetes_network_cidr
         }
-        return self.__render_template(template_name, template_path, target, context)
+        return render_template(template_name, template_path, target, context)
 
     def __prepare_account_vars_sh(self):
         template_name = "vars.sh.jinja"
@@ -381,7 +349,7 @@ class PentagonProject():
         context = {
             'KOPS_STATE_STORE_BUCKET': self._infrastructure_bucket
         }
-        return self.__render_template(template_name, template_path, target, context)
+        return render_template(template_name, template_path, target, context)
 
     def __prepare_account_vars_yml(self):
         template_name = "vars.yml.jinja"
@@ -392,7 +360,7 @@ class PentagonProject():
             'vpc_name': self._vpc_name,
             'dns_zone': self._dns_zone,
         }
-        return self.__render_template(template_name, template_path, target, context)
+        return render_template(template_name, template_path, target, context)
 
     def __prepare_ssh_config_vars(self):
         template_name = "ssh_config-default.jinja"
@@ -405,14 +373,14 @@ class PentagonProject():
             'working_private_key': self._ssh_keys['working_private'],
             'admin_vpn_key': self._ssh_keys['admin_vpn'],
         }
-        return self.__render_template(template_name, template_path, target, context)
+        return render_template(template_name, template_path, target, context)
 
     def __prepare_ansible_cfg_vars(self):
         template_name = "ansible.cfg-default.jinja"
         template_path = "{}/config/local".format(self._repository_directory)
         target = "{}/config/local/ansible.cfg-default".format(self._repository_directory)
         context = {}
-        return self.__render_template(template_name, template_path, target, context)
+        return render_template(template_name, template_path, target, context)
 
     def __prepare_vpn_cfg_vars(self):
         self.__get_vpn_ami_id()
@@ -423,7 +391,7 @@ class PentagonProject():
             'admin_vpn_key': self._ssh_keys['admin_vpn'],
             'vpn_ami_id': self._vpn_ami_id
         }
-        return self.__render_template(template_name, template_path, target, context)
+        return render_template(template_name, template_path, target, context)
 
     def __get_vpn_ami_id(self):
 
@@ -501,8 +469,7 @@ class PentagonProject():
             self.__prepare_ansible_cfg_vars()
             self.__prepare_working_kops_vars_sh()
             self.__prepare_production_kops_vars_sh()
-            self.__prepare_tf_vars()
-            self.__prepare_tf_vpc_module_root()
+            self.__add_default_aws_vpc()
             self.__prepare_vpn_cfg_vars()
             self.__prepare_account_vars_yml()
             self.__prepare_account_vars_sh()
@@ -523,32 +490,3 @@ class PentagonProject():
         logging.debug(self._project_source)
         logging.debug(self._repository_directory)
         copytree(self._project_source, self._repository_directory, symlinks=True)
-
-
-class PentagonComponentException(Exception):
-    pass
-
-
-class PentagonComponent():
-    def __init__(self, name, args):
-        self._name = name
-        self._args = args
-        self._project_source = os.path.dirname(__file__)
-        pass
-
-    def install(self):
-        if self._name:
-            # the path to the component
-            component_path = self._project_source + "/components/{name}".format(name=self._name)
-            install_path = component_path + "/install.sh"
-            # assemble the command line. based on the Note at https://docs.python.org/2/library/subprocess.html#popen-constructor
-            command_line = install_path + ' --component-path ' + component_path
-            for key, value in self._args.items():
-                if value is not None:
-                    command_line += ' --' + key + ' ' + value
-            args = shlex.split(command_line)
-            try:
-                p = subprocess.Popen(args)
-            except Exception as e:
-                logging.error("Failed to run the install script.")
-                logging.error(e)
