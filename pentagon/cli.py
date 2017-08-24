@@ -59,7 +59,6 @@ def start_project(name, **kwargs):
         logging.basicConfig(level=kwargs.get('log_level'))
         project = pentagon.PentagonProject(name, kwargs)
         project.start()
-        print next_steps()
     except Exception as e:
         logging.error(e)
         logging.debug(traceback.print_exc(e))
