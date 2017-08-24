@@ -20,7 +20,6 @@ from Crypto.PublicKey import RSA
 
 from pentagon.release import __version__, __author__
 
-
 class PentagonException(Exception):
     pass
 
@@ -103,8 +102,6 @@ class PentagonProject():
     }
 
     availability_zone_designations = list(string.ascii_lowercase)
-
-    _project_source = os.path.dirname(__file__)
 
     def get_arg(self, arg_name, default=None):
         """ Get argument name from click arguments, if it exists, or return default.
@@ -521,12 +518,16 @@ class PentagonProject():
                     logging.warn("Key {}{} exist!".format(key_path, key_name))
 
     def __copy_project_tree(self):
-        logging.info(self._project_source)
-        logging.info(self._repository_directory)
-        copytree(self._project_source, self._repository_directory, symlinks=True, ignore=ignore_patterns('__init__.py', '*.pyc', 'release.py'))
+
+        self._project_source = "{}/../lib/pentagon/".format(os.path.dirname(__file__))
+        logging.debug(self._project_source)
+        logging.debug(self._repository_directory)
+        copytree(self._project_source, self._repository_directory, symlinks=True)
+
 
 class PentagonComponentException(Exception):
     pass
+
 
 class PentagonComponent():
     def __init__(self, name, args):
@@ -542,7 +543,7 @@ class PentagonComponent():
             install_path = component_path + "/install.sh"
             # assemble the command line. based on the Note at https://docs.python.org/2/library/subprocess.html#popen-constructor
             command_line = install_path + ' --component-path ' + component_path
-            for key,value in self._args.items():
+            for key, value in self._args.items():
                 if value is not None:
                     command_line += ' --' + key + ' ' + value
             args = shlex.split(command_line)
