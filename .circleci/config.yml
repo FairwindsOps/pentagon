@@ -31,7 +31,7 @@ jobs:
       - run:
           name: Unit Tests
           command: |
-            sudo pip install -r ${HOME}/pentagon/lib/tests/requirements.txt
+            sudo pip install -r ${HOME}/pentagon/tests/requirements.txt
             nosetests
       - run:
           name: Build Docker Image
