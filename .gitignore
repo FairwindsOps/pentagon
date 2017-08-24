@@ -4,4 +4,4 @@ config/private
 *.pyc
 *.pem
 *.pub
-lib/pentagon.egg-info
+pentagon.egg-info

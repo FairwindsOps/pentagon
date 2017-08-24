@@ -1,15 +1,13 @@
 #!/usr/bin/env python
-import pentagon
 import sys
 import click
 import logging
 import traceback
-
+import pentagon
 
 @click.group()
 def cli():
     pass
-
 
 @click.command()
 @click.argument('name')
@@ -80,30 +78,6 @@ def install_component(name, **kwargs):
         logging.error(e)
         logging.debug(traceback.print_exc(e))
 
+# Making names more terminal friendly
 cli.add_command(install_component, "install-component")
 cli.add_command(start_project, "start-project")
-
-
-def next_steps():
-    steps = """
-
-# Generate your local configuration
-
-cd <project_name>-infrastructure/
-source ./config/local/env-vars.sh
-./config/local/local-config-init
-
-# Execute the following steps to create VPC
-cd <project_name>-infrastructure/default/vpc
-source ../account/vars.sh
-make plan
-make apply
-
-# Get VPCID and add it to default/clusters/<production|working>/vars.sh
-# before running default/clusters/<production|working>/cluster-config/kops.sh
-
-"""
-    return steps
-
-if __name__ == '__main__':
-    cli()

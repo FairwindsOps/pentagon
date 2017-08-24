@@ -20,7 +20,7 @@ from setuptools import setup, find_packages
 
 # read in the variables defined in lib/release as global
 # to be used below
-execfile('lib/pentagon/release.py')
+execfile('pentagon/release.py')
 
 try:
     from setuptools import setup, find_packages
@@ -36,7 +36,7 @@ setup(name='pentagon',
       author_email='reactive@reactiveops.com',
       url='http://reactiveops.com/',
       license='Apache2.0',
-
+      include_package_data=True,
       # Changes to requirements here may need to be updated in
       # lib/pentagon/requirements.txt and requirements.txt as well
       install_requires=[
@@ -49,8 +49,6 @@ setup(name='pentagon',
         "ansible==2.3.0.0",
         "boto3==1.4.4"
       ],
-      package_dir={'': 'lib'},
-      packages=find_packages('lib'),
       classifiers=[
           'Development Status :: 5 - Production/Stable',
           'Environment :: Console',
@@ -66,8 +64,9 @@ setup(name='pentagon',
           'Topic :: System :: Systems Administration',
           'Topic :: Utilities',
       ],
-      scripts=[
-         'bin/pentagon',
-         ],
+      entry_points=''' #for click integration
+          [console_scripts]
+          pentagon=pentagon.cli:cli
+      ''',
       data_files=[],
       )
