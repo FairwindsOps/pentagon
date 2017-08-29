@@ -70,5 +70,5 @@ setup(name='pentagon',
           pentagon=pentagon.cli:cli
 
       ''',
-      packages=find_packages(exclude=['tests'])
+      packages=find_packages(exclude=['tests', 'example-component'])
       )

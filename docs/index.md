@@ -15,6 +15,7 @@ Table Of Contents
   * [KOPS](getting-startd.md#kops)
 * [Advanced Usage](getting-started.md#advanced-project-initialization)
 * [Infrastrucure Repository Overview](overview.md)
+* [Component](components.md)
 
 
 ## AWS Virtual Private Cloud

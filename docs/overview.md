@@ -4,7 +4,6 @@ After running `pentagon start-project` you will have a directory with a layout s
 .
 ├── README.md
 ├── ansible-requirements.yml
-├── components/
 ├── config/
 ├── default/
 ├── docs/
@@ -70,16 +69,11 @@ This is the Ansible plugins directory. The `ec2` infrastructure plugin is enable
 ### roles/
 The Ansible roles are installed here by default. Set in `config/private/ansible.cfg`.
 
-### components/
-Components are a work in progress. The intended functionality is to provide modularity to portions of the Pentagon ecosystem with a command similar to `pentagon add vpc <name>`. This could allow a much more flexible structure while still utilizing the generator functionality of the Pentagon CLI
-
-
 ## Extended Layout Description
 
 ```
 ├── README.md 
 ├── ansible-requirements.yml
-├── components/                                                 * components are WIP
 ├── config/                                                     * Configuration Directory
 │   ├── local/                                                  * Local, non-secret configuration and 
 │   │   ├── ansible.cfg-default                                   templating code to create private configuration
