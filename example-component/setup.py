@@ -29,7 +29,7 @@ except ImportError:
           "pip install setuptools).")
     sys.exit(1)
 
-setup(name='pentagon-component',
+setup(name='pentagon-example-component',
       version=__version__,
       description='Example Pentagon Component',
       author=__author__,

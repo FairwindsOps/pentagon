@@ -8,7 +8,8 @@ import yaml
 import json
 
 from pydoc import locate
-from importlib import import_module
+
+from pentagon import PentagonException
 
 
 @click.group()
@@ -103,9 +104,6 @@ def _run(action, component_path, additional_args, options):
     logging.debug("with options: {}".format(options))
     logging.debug("and additional arguments: {}".format(additional_args))
 
-    component_class = get_component_class(component_path)
-
-    # Process infile or data options
     data = {}
     try:
         file = options.get('file', None)
@@ -116,13 +114,13 @@ def _run(action, component_path, additional_args, options):
     except Exception as e:
         logging.error("Error parsing data from file or -D arguments")
         logging.error(e)
-        logging.debug(traceback.print_exc(e))
+
+    component_class = get_component_class(component_path)
 
     try:
-        if action == 'get':
-            component_class(data, additional_args).get(options.get('out'))
-        if action == 'add':
-            component_class(data, additional_args).add(options.get('out'))
+        getattr(component_class(data, additional_args), action)(options.get('out'))
+    except TypeError, e:
+        logging.error("No module or class found: {}".format(component_path))
     except Exception, e:
         logging.error(e)
         logging.debug(traceback.print_exc(e))
@@ -148,37 +146,36 @@ def get_component_class(component_path):   # Construct Class path from component
     if component_class is None:
         component_class = locate("pentagon{}.{}".format(component_name, component_class_name))
 
-    if component_class is None:
-        logging.error("No module or class found: {}".format(component_path))
-
     return component_class
 
 
 def parse_infile(file):
     """ Parse data structure from file into dictionary for component use """
-    print file
     with open(file) as data_file:
-        # try:
-        #     data = json.load(data_file)
-        #     return data
-        # except ValueError as json_error:
-        #     pass
+        try:
+            data = json.load(data_file)
+            return data
+        except ValueError as json_error:
+            pass
 
         try:
             data = yaml.load(data_file)
-            print data
             return data
         except yaml.YAMLError as yaml_error:
             pass
 
-    logging.error("Unable to parse in file. {}{} ".format(json_errror, yaml_error))
+    logging.error("Unable to parse in file. {}{} ".format(json_error, yaml_error))
 
 
 def parse_data(data, d={}):
     """ Function to parse the incoming -D options into a dict """
     for kv in data:
         key = kv.split('=')[0]
-        val = kv.split('=')[1]
+        try:
+            val = kv.split('=', 1)[1]
+        except IndexError, e:
+            val = True
+
         d[key] = val
 
     return d

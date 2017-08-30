@@ -10,14 +10,13 @@ import os
 import re
 import boto3
 import sys
-import pentagon.component.vpc as aws_vpc
-from pentagon.helpers import render_template
-
 
 from git import Repo, Git
 from shutil import copytree, ignore_patterns
 from Crypto.PublicKey import RSA
 
+import pentagon.component.vpc as aws_vpc
+from pentagon.helpers import render_template
 from pentagon.release import __version__, __author__
 
 
