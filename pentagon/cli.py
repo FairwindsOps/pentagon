@@ -118,10 +118,10 @@ def _run(action, component_path, additional_args, options):
     component_class = get_component_class(component_path)
 
     try:
-        getattr(component_class(data, additional_args), action)(options.get('out'))
-    except TypeError, e:
-        logging.error("Error locating module or class: {}".format(component_path))
-        logging.debug(traceback.format_exc(e))
+        if callable(component_class):
+            getattr(component_class(data, additional_args), action)(options.get('out'))
+        else:
+            logging.error("Error locating module or class: {}".format(component_path))
     except Exception, e:
         logging.error(e)
         logging.debug(traceback.format_exc(e))

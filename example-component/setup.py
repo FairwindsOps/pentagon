@@ -18,10 +18,6 @@ import os
 import sys
 from setuptools import setup, find_packages
 
-# read in the variables defined in lib/release as global
-# to be used below
-from release import __version__, __author__
-
 try:
     from setuptools import setup, find_packages
 except ImportError:
@@ -30,9 +26,9 @@ except ImportError:
     sys.exit(1)
 
 setup(name='pentagon-example-component',
-      version=__version__,
+      version='0.0.1',
       description='Example Pentagon Component',
-      author=__author__,
+      author='ReactiveOp Inc.',
       author_email='reactive@reactiveops.com',
       url='http://reactiveops.com/',
       license='Apache2.0',

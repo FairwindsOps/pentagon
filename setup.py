@@ -18,14 +18,15 @@ import os
 import sys
 from setuptools import setup, find_packages
 
-from pentagon.release import __version__, __author__
-
 try:
     from setuptools import setup, find_packages
 except ImportError:
     print("setup tools required. Please run: "
           "pip install setuptools).")
     sys.exit(1)
+
+__version__ = '1.0-beta'
+__author__ = 'ReactiveOps, Inc.'
 
 setup(name='pentagon',
       version=__version__,

@@ -13,6 +13,7 @@ class ComponentBase():
     _required_parameters = []
 
     def __init__(self, data, additional_args=None, **kwargs):
+
         self._data = data
         self._additional_args = additional_args
 

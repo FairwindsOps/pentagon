@@ -17,7 +17,6 @@ from Crypto.PublicKey import RSA
 
 import pentagon.component.vpc as aws_vpc
 from pentagon.helpers import render_template
-from pentagon.release import __version__, __author__
 
 
 class PentagonException(Exception):
