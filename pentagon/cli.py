@@ -124,7 +124,7 @@ def _run(action, component_path, additional_args, options):
         logging.debug(traceback.format_exc(e))
     except Exception, e:
         logging.error(e)
-        logging.debug(traceback.formate_exc(e))
+        logging.debug(traceback.format_exc(e))
 
 
 # Making names more terminal friendly
