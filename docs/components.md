@@ -72,14 +72,15 @@ Options:
 - add: 
     - Creates `./vpc/` directory with Terraform code for the Pentagon default AWS VPC described [here](#network).
     - `cd ./vpc; make all` will create the vpc as describe by the arguments passed in
-    - In the normal course of using Pentagon and the infrastructure repository, it is unlikely you'll use this component.
-    - Required Arguments:
+    - In the normal course of using Pentagon and the infrastructure repository, it is unlikely you'll use this component as it is automatically installed by default.
+    - Arguments:
         - vpc_name
         - vpc_cidr_base
         - aws_availabilty_zones
         - aws_availability_zone_count
         - aws_region
         - infrastructure_bucket
+    - Without the arguments above, the `add` will complete but the output will be missing values required to create the VPC. You must edit the output files to add those values before it will function properly
     - Example:
         ```
         pentagon add vpc -D vpc_name="pentagon-vpc" -D vpc_cidr_base="172.20" -D aws_availability_zones="ap-northeast-1a, ap-northeast-1c" -D aws_availability_zone_count = "2" -D aws_region = "ap-northeast-1"
@@ -87,7 +88,26 @@ Options:
         
 ## Writing your own components
 
-Component modules must be named `pentagon<component_name>`. Classes are subclasses of the `pentagon.component.ComponentBase` class and they must be named <Component> (note the capital first letter).  The `pentagon add <component_name>` command will prefer built in components to extrenal components so ensure your component name is not already in use. The <component_name> argument can be a dot separated module path ie `gcp.cluster` where the last parameter is the lowercase class name. For example. `gcp.cluster` finds the Cluster class in the cluster module in the gcp module.
+Component modules must be named `pentagon<component_name>`. Classes are subclasses of the `pentagon.component.ComponentBase` class and they must be named <Component> (note the capital first letter).  The `pentagon add <component_name>` command will prefer built in components to external components so ensure your component name is not already in use. The <component_name> argument can be a dot separated module path ie `gcp.cluster` where the last parameter is the lowercase class name. For example. `gcp.cluster` finds the Cluster class in the cluster module in the gcp module.
+
+Examples of plugin component package module name and use:
+    - pentagonexamplecomponent:
+        * package name: `pentagon-example-component`
+        * command: `pentagon add component`
+        * module path: `pentagoncomponent`
+        * class: `Component()`
+    - pentagonkops
+        * package name: `pentagon-kops`
+        * command: `pentagon add kops`
+        * module path: `pentagonkops`
+        * class: `Kops()`
+    - pentaongkops.cluster
+        * package name: `pentagon-kops`
+        * command: `pentagon add kops.cluster`
+        * module path:  `pentagonkops.kops`
+        * class: `Cluster()`
+
+    
 
 See [example](/example-component) 
 

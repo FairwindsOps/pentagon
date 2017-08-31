@@ -3,7 +3,7 @@ import json
 import sys
 
 from pentagon.component import ComponentBase
-from apiclient.discovery import build
+from googleapiclient.discovery import build
 
 
 class Cluster(ComponentBase):
@@ -31,7 +31,7 @@ class Cluster(ComponentBase):
                 self.add_cluster_nodepools(cluster.get('name'), cluster.get('nodePools'), self._data.get('get_default_nodepools'))
 
     def parse_cluster(self, cluster):
-        """ parses cluster object returned from api call and converts it to a data strucutur for the .add() method """        
+        """ parses cluster object returned from api call and converts it to a data structure for the .add() method """
 
         # remove master zone from additional-zones
         locations = cluster.get('locations')
@@ -58,15 +58,15 @@ class Cluster(ComponentBase):
                     'network': cluster['network'],
                     'subnetwork': cluster.get('subnetwork', None),
                     'scopes': cluster['nodeConfig']['oauthScopes'],
-                    'enable_autoscaling': np.get('autoscaling'),
-                    'min_nodes': np.get('autoscaling', {}).get('minNodeCount'),
-                    'max_nodes': np.get('autoscaling', {}).get('maxNodeCount'),
+                    'enable_autoscaling': default_nodepool.get('autoscaling'),
+                    'min_nodes': default_nodepool.get('autoscaling', {}).get('minNodeCount'),
+                    'max_nodes': default_nodepool.get('autoscaling', {}).get('maxNodeCount'),
                 }
 
     def add_cluster_nodepools(self, cluster_name, nodepools, get_default_nodepools=False):
         """ parses cluster node pools and adds nodepool objects """
         for nodepool in nodepools:
-            if nodepool['name'] != 'default-poo_namel' or get_default_nodepools:
+            if nodepool['name'] != 'default-pool' or get_default_nodepools:
                 node_data = {'cluster': cluster_name, 'zone': self._zone, 'name': nodepool['name'], 'project': self._project}
                 Nodepool(node_data).get(self._destination + '/' + cluster_name + '/nodepools')
 
@@ -108,7 +108,7 @@ class Nodepool(ComponentBase):
                     Nodepool(self.parse_nodepool(pool)).add(destination + '/' + self._name)
 
     def parse_nodepool(self, pool):
-        """ parses nodepool object returned from api call and converts it to a data strucutur for the .add() method """        
+        """ parses nodepool object returned from api call and converts it to a data structure for the .add() method """        
         return {
                     'nodepool_name': self._name,
                     'project': self._project,

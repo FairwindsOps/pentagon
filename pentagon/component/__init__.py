@@ -36,7 +36,7 @@ class ComponentBase():
         return sys.modules[self.__module__].__path__[0] + "/files"
 
     def add(self, destination):
-        """ Copies files and tempalts from <component>/files and templates the *.jinja files """
+        """ Copies files and templates from <component>/files and templates the *.jinja files """
 
         self._destination = destination
         try:

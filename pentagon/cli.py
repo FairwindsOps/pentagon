@@ -71,7 +71,7 @@ def start_project(ctx, name, **kwargs):
         project.start()
     except Exception as e:
         logging.error(e)
-        logging.debug(traceback.print_exc(e))
+        logging.debug(traceback.format_exc(e))
 
 
 @click.command()
@@ -120,10 +120,11 @@ def _run(action, component_path, additional_args, options):
     try:
         getattr(component_class(data, additional_args), action)(options.get('out'))
     except TypeError, e:
-        logging.error("No module or class found: {}".format(component_path))
+        logging.error("Error locating module or class: {}".format(component_path))
+        logging.debug(traceback.format_exc(e))
     except Exception, e:
         logging.error(e)
-        logging.debug(traceback.print_exc(e))
+        logging.debug(traceback.formate_exc(e))
 
 
 # Making names more terminal friendly
@@ -132,7 +133,8 @@ cli.add_command(add, "add")
 cli.add_command(get, "get")
 
 
-def get_component_class(component_path):   # Construct Class path from component input
+def get_component_class(component_path):
+    """ Construct Class path from component input """
     component_path_list = component_path.split(".")
     if len(component_path_list) > 1:
         component_name = ".".join(component_path.split(".")[0:-1])
@@ -164,11 +166,14 @@ def parse_infile(file):
         except yaml.YAMLError as yaml_error:
             pass
 
-    logging.error("Unable to parse in file. {}{} ".format(json_error, yaml_error))
+    logging.error("Unable to parse in file. {} {} ".format(json_error, yaml_error))
 
 
-def parse_data(data, d={}):
+def parse_data(data, d=None):
     """ Function to parse the incoming -D options into a dict """
+    if d is None:
+        d = {}
+
     for kv in data:
         key = kv.split('=')[0]
         try:

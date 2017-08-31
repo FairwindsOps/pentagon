@@ -68,7 +68,6 @@ setup(name='pentagon',
       entry_points=''' #for click integration
           [console_scripts]
           pentagon=pentagon.cli:cli
-
       ''',
       packages=find_packages(exclude=['tests', 'example-component'])
       )
