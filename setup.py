@@ -18,9 +18,7 @@ import os
 import sys
 from setuptools import setup, find_packages
 
-# read in the variables defined in lib/release as global
-# to be used below
-execfile('pentagon/release.py')
+from pentagon.release import __version__, __author__
 
 try:
     from setuptools import setup, find_packages
