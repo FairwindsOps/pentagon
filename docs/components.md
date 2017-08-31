@@ -91,21 +91,21 @@ Options:
 Component modules must be named `pentagon<component_name>`. Classes are subclasses of the `pentagon.component.ComponentBase` class and they must be named <Component> (note the capital first letter).  The `pentagon add <component_name>` command will prefer built in components to external components so ensure your component name is not already in use. The <component_name> argument can be a dot separated module path ie `gcp.cluster` where the last parameter is the lowercase class name. For example. `gcp.cluster` finds the Cluster class in the cluster module in the gcp module.
 
 Examples of plugin component package module name and use:
-    - pentagonexamplecomponent:
-        * package name: `pentagon-example-component`
-        * command: `pentagon add component`
-        * module path: `pentagoncomponent`
-        * class: `Component()`
-    - pentagonkops
-        * package name: `pentagon-kops`
-        * command: `pentagon add kops`
-        * module path: `pentagonkops`
-        * class: `Kops()`
-    - pentaongkops.cluster
-        * package name: `pentagon-kops`
-        * command: `pentagon add kops.cluster`
-        * module path:  `pentagonkops.kops`
-        * class: `Cluster()`
+- pentagonexamplecomponent:
+    *  package name: `pentagon-example-component`
+    *  command: `pentagon add component`
+    *  module path: `pentagoncomponent`
+    *  class: `Component()`
+- pentagonkops
+    *  package name: `pentagon-kops`
+    *  command: `pentagon add kops`
+    *  module path: `pentagonkops`
+    *  class: `Kops()`
+- pentaongkops.cluster
+    *  package name: `pentagon-kops`
+    *  command: `pentagon add kops.cluster`
+    *  module path:  `pentagonkops.kops`
+    *  class: `Cluster()`
 
     
 
