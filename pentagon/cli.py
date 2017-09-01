@@ -135,6 +135,9 @@ cli.add_command(get, "get")
 
 def get_component_class(component_path):
     """ Construct Class path from component input """
+    
+    print component_path
+
     component_path_list = component_path.split(".")
     if len(component_path_list) > 1:
         component_name = ".".join(component_path.split(".")[0:-1])
@@ -146,7 +149,7 @@ def get_component_class(component_path):
     # Find Class if it exists
     component_class = locate("pentagon.component.{}.{}".format(component_name, component_class_name))
     if component_class is None:
-        component_class = locate("pentagon{}.{}".format(component_name, component_class_name))
+        component_class = locate("pentagon_{}.{}".format(component_name, component_class_name))
 
     return component_class
 

@@ -44,12 +44,17 @@ class ComponentBase():
         self._destination = destination
         try:
             shutil.copytree(self._files_directory, self._destination_directory_name)
+
+            init_file = self._destination_directory_name + "/__init__.py"
+            if os.path.isfile(init_file):
+                os.remove(init_file)
+
             for template in glob.glob(self._destination_directory_name + "/*.jinja"):
                 template_file_name = template.split('/')[-1]
                 path = '/'.join(template.split('/')[0:-1])
                 target_file_name = re.sub(r'\.jinja$', '', template_file_name)
                 target = self._destination_directory_name + "/" + target_file_name
-                render_template(name, path, target, self._data)
+                render_template(template_file_name, path, target, self._data)
         except Exception as e:
             logging.error("Error occured configuring component")
             logging.error(e)
