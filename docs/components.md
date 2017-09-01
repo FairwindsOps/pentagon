@@ -101,12 +101,11 @@ Examples of plugin component package module name and use:
     *  command: `pentagon add kops`
     *  module path: `pentagonkops`
     *  class: `Kops()`
-- pentaongkops.cluster
+- pentagonkops.cluster
     *  package name: `pentagon-kops`
     *  command: `pentagon add kops.cluster`
     *  module path:  `pentagonkops.kops`
     *  class: `Cluster()`
-
     
 
 See [example](/example-component) 

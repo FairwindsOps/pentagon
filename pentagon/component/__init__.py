@@ -5,6 +5,8 @@ import shutil
 import logging
 import traceback
 import sys
+import re
+
 from pentagon.helpers import render_template
 
 
@@ -30,7 +32,7 @@ class ComponentBase():
     def _destination_directory_name(self):
         if self._destination != './':
             return self._destination
-        return self._data.get('name', self.__class__.__name__.replace('.', '_').lower())
+        return self._data.get('name', self.__class__.__name__.lower())
 
     @property
     def _files_directory(self):
@@ -43,9 +45,10 @@ class ComponentBase():
         try:
             shutil.copytree(self._files_directory, self._destination_directory_name)
             for template in glob.glob(self._destination_directory_name + "/*.jinja"):
-                name = template.split('/')[-1]
+                template_file_name = template.split('/')[-1]
                 path = '/'.join(template.split('/')[0:-1])
-                target = self._destination_directory_name + "/" + name.replace(".jinja", "")
+                target_file_name = re.sub(r'\.jinja$', '', template_file_name)
+                target = self._destination_directory_name + "/" + target_file_name
                 render_template(name, path, target, self._data)
         except Exception as e:
             logging.error("Error occured configuring component")
