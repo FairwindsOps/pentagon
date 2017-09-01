@@ -58,4 +58,4 @@ class ComponentBase():
         except Exception as e:
             logging.error("Error occured configuring component")
             logging.error(e)
-            logging.debug(traceback.print_exc(e))
+            logging.debug(traceback.format_exc(e))

@@ -135,9 +135,6 @@ cli.add_command(get, "get")
 
 def get_component_class(component_path):
     """ Construct Class path from component input """
-    
-    print component_path
-
     component_path_list = component_path.split(".")
     if len(component_path_list) > 1:
         component_name = ".".join(component_path.split(".")[0:-1])
