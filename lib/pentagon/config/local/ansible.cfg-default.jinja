@@ -1,10 +1,10 @@
 [defaults]
 inventory = $INFRASTRUCTURE_REPO/plugins/inventory
-roles_path = $INFRASTRUCTURE_REPO/roles:$INFRASTRUCTURE_REPO/roles
+roles_path = $INFRASTRUCTURE_REPO/../roles:$INFRASTRUCTURE_REPO/roles
 filter_plugins = $INFRASTRUCTURE_REPO/plugins/filter_plugins
 retry_files_save_path = ~/.ansible-retry
 hash_behavior = merge
 
 [ssh_connection]
-# this needs the path defined wihtout the use of ENV variables
+# this needs the path defined without the use of ENV variables
 ssh_args = -F __INFRA_REPO_PATH__/config/private/ssh_config
