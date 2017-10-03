@@ -34,7 +34,6 @@ node-pools create {{ nodepool_name }} \
 --min-nodes={{ min_nodes }} \
 --max-nodes={{ max_nodes }} \
 {%- endif %}
---enable-legacy-authorization
 {#- this are enabled by default
 --enable-cloud-endpoints \
 #}
