@@ -18,16 +18,15 @@ import os
 import sys
 from setuptools import setup, find_packages
 
-# read in the variables defined in lib/release as global
-# to be used below
-execfile('pentagon/release.py')
-
 try:
     from setuptools import setup, find_packages
 except ImportError:
     print("setup tools required. Please run: "
           "pip install setuptools).")
     sys.exit(1)
+
+__version__ = '1.0-beta'
+__author__ = 'ReactiveOps, Inc.'
 
 setup(name='pentagon',
       version=__version__,
@@ -47,7 +46,8 @@ setup(name='pentagon',
         "PyYAML==3.12",
         "shyaml==0.5.0",
         "ansible==2.3.0.0",
-        "boto3==1.4.4"
+        "boto3==1.4.4",
+        "google-api-python-client==1.6.2"
       ],
       classifiers=[
           'Development Status :: 5 - Production/Stable',
@@ -68,5 +68,5 @@ setup(name='pentagon',
           [console_scripts]
           pentagon=pentagon.cli:cli
       ''',
-      data_files=[],
+      packages=find_packages(exclude=['tests', 'example-component'])
       )

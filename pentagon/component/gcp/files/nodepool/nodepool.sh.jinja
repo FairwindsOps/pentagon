@@ -1,0 +1,40 @@
+gcloud beta container \
+--project {{ project }} \
+node-pools create {{ nodepool_name }} \
+--zone={{ zone }} \
+{%- if disk_size %}
+--disk-size={{ disk_size }} \
+{%- endif %}
+{%- if machine_type %}
+--machine-type={{ machine_type }} \
+{%- endif %}
+{%- if max_nodes_per_pool %}
+--max-nodes-per-pool={{ max_nodes_per_pool }} \
+{%- endif %}
+{%- if network %}
+--network={{ network }} \
+{%- endif %}
+{%- if node_labels %}
+--node-labels={{ node_labels|join(',') }} \
+{%- endif %}
+{%- if num_nodes %}
+--num-nodes={{ num_nodes }} \
+{%- endif %}
+{%- if image_type %}
+--image-type={{ image_type }} \
+{%- endif %}
+{%- if scopes %}
+--scopes={{ scopes|join('.') }}
+{% endif %}
+{%- if tags %}
+--tags={{ tags|join('.') }}
+{% endif %}
+{%- if enable_autoscaling %}
+--enable-autoscaling \
+--min-nodes={{ min_nodes }} \
+--max-nodes={{ max_nodes }} \
+{%- endif %}
+{#- this are enabled by default
+--enable-cloud-endpoints \
+#}
+

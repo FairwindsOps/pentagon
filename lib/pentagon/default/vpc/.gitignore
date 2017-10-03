@@ -1,7 +1,0 @@
-*.tfplan
-*.tfstate
-*.state
-*.tfstate.backup
-.terraform/
-.DS_Store
-set_env.sh
