@@ -12,7 +12,7 @@ Table Of Contents
 * [Quick Start Guide](getting-started.md)
   * [VPC](getting-started.md#vpc-setup)
   * [VPN](getting-started.md#vpn-setup)
-  * [KOPS](getting-startd.md#kops)
+  * [KOPS](getting-started.md#kops)
 * [Advanced Usage](getting-started.md#advanced-project-initialization)
 * [Infrastrucure Repository Overview](overview.md)
 * [Component](components.md)
