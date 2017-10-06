@@ -40,3 +40,29 @@ terraform {
     region = "{{ aws_region }}"
   }
 }
+
+// Output VPC values to allow this statefile to be used as a datasource
+
+output "aws_vpc_subnet_admin_ids" {
+  value = "${module.vpc.aws_subnet_admin_ids}"
+}
+
+output "aws_vpc_subnet_private_working_ids" {
+  value = "${module.vpc.aws_subnet_private_working_ids}"
+}
+
+output "aws_vpc_subnet_private_prod_ids" {
+  value = "${module.vpc.aws_subnet_private_prod_ids}"
+}
+
+output "aws_vpc_subnet_public_ids" {
+  value = "${module.vpc.aws_subnet_public_ids}"
+}
+
+output "aws_vpc_id" {
+  value = "${module.vpc.aws_vpc_id}"
+}
+
+output "aws_vpc_cidr" {
+  value = "${module.vpc.aws_vpc_cidr}"
+}
