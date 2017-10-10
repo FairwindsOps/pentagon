@@ -7,6 +7,7 @@ destroy: destroy_vpn destroy_vpn_bucket destroy_vpc destroy_vpc_bucket
 
 install_requirements:
 	pip install -r requirements.txt
+	ansible-galaxy install -r ansible-requirements.yml
 
 source_vars:
 	source "$(INFRASTRUCTURE_REPO)/config/local/env-vars.sh"
