@@ -20,6 +20,7 @@ Pentagon is “batteries included”- not only does one get a network with a clu
 * Ansible [Install Ansible](http://docs.ansible.com/ansible/latest/intro_installation.html)
 * Kubectl [Install kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 * kops [Install kops](https://github.com/kubernetes/kops#installing)
+* jq [Install JQ](https://stedolan.github.io/jq/download/)
 
 ## Installation
 * `pip install -e git+https://github.com/reactiveops/pentagon.git#egg=pentagon`
