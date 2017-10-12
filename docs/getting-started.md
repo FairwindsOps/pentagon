@@ -30,9 +30,16 @@ Pentagon is “batteries included”- not only does one get a network with a clu
 ## Quick Start
 ### Create a Pentagon Project
 * `pentagon start-project <project-name> --aws-access-key <aws-access-key> --aws-secret-key <aws-secret-key> --aws-default-region <aws-default-region>`
-  * With the above basic options set, all defaults will be set for you. You should be able to run Terraform after creating the S3 Bucket to store state unless values need to be updated. (`infrastructure-bucket`).
+  * With the above basic options set, defaults will be set for you. See [Advanced Project Initialization](#advanced-project-initialization) for more options.
   * Arguments may also be set using environment variable in the format `PENTAGON_<argument_name_with_underscores>`.
 * `cd <project-name>-infrastructure`
+
+#### Automatic 
+* `make all`
+  * conducts all following steps up short of Kubernets Cluster Creation
+* skip to [Create Kubernetes Cluster](#create-kubernetes-cluster)
+
+#### Manual steps
 * `pip install -r requirements.txt`
 * `source config/local/env-vars.sh`
   * Sources environment variables required for the following steps. This will be required each time you work with the infrastructure repository or if you move the repository to another location.
@@ -64,12 +71,14 @@ This creates a AWS instance running [OpenVPN](https://openvpn.net/). Read more a
   * Run `ansible-playbook vpn.yml` one last time and it will succeed.
   * Edit `config/private/ssh_config` and add the IP address from the SSH key prompt to the `#VPN instance` section.
 
-### Create a Kubernetes Cluster
+### Configure a Kubernetes Cluster
 Pentagon used Kops to create clusters in AWS. The default layout creates configurations for two Kubernetes clusters: `working` and `production`. See [Overview](overview.md) for a more comprehensive description of the directory layout.
 
 * Make sure your KOPS variables are set correctly with `source default/account/vars.sh`
 * Move into to the path for the cluster you want to work on with `cd default/clusters/<production|working>`
 * Run `bash cluster-config/kops.sh` to create a cluster.spec file for this cluster. This does not create any resources in AWS.
+
+### Create Kubernetes Cluster
 * Use [kops](https://github.com/kubernetes/kops/blob/master/docs/cli/kops.md) to manage the cluster.
   * Run `kops edit cluster <clustername>` to view and edit the `cluster.spec` and make the following edits
     * Choose approriate CIDR ranges for your Kubernetes subnets. That don't conflict with the subnets that were created in the [VPC](#vpc-setup) step. We typically reccomend fairly small subnets ie /22 or /24.

@@ -1,0 +1,34 @@
+---
+- name: remove admin ssh key
+  hosts: localhost
+  connection: local
+  gather_facts: False
+
+  pre_tasks:
+    - include_vars: "{{ item }}"
+      with_items:
+        - ../../account/vars.yml
+        - env.yml
+      tags: always
+  
+  tasks:
+    - ec2_key:
+        name: "{{ aws_key_name }}"
+        state: absent
+
+- name:  set up vpn prerequisites
+  hosts: localhost
+  vars:
+    destroy: true
+  connection: local
+  gather_facts: False
+
+  pre_tasks:
+    - include_vars: "{{ item }}"
+      with_items:
+        - ../../account/vars.yml
+        - env.yml
+      tags: always
+
+  roles:
+    - reactiveops.vpn-stack
