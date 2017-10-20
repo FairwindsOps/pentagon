@@ -16,6 +16,7 @@ from shutil import copytree, ignore_patterns
 from Crypto.PublicKey import RSA
 
 import pentagon.component.vpc as aws_vpc
+import pentagon.component.kops as kops
 from pentagon.helpers import render_template
 
 
@@ -174,7 +175,7 @@ class PentagonProject():
             self._working_kubernetes_dns_zone = self.get_arg('working_kubernetes_dns_zone', '{}'.format(self._dns_zone))
 
             self._working_kubernetes_node_count = self.get_arg('working_kubernetes_node_count', self.working_kubernetes_default_values.get('working_kubernetes_node_count'))
-            self._working_kubernetes_master_aws_zone = self.get_arg('working_kubernetes_master_aws_zone', self._aws_availability_zones.split(',')[0])
+            self._working_kubernetes_master_aws_zones = self.get_arg('working_kubernetes_master_aws_zone', self._aws_availability_zones.split(','))
             self._working_kubernetes_master_node_type = self.get_arg('working_kubernetes_master_node_type', self.working_kubernetes_default_values.get('working_kubernetes_master_node_type'))
             self._working_kubernetes_worker_node_type = self.get_arg('working_kubernetes_worker_node_type', self.working_kubernetes_default_values.get('working_kubernetes_worker_node_type'))
             self._working_kubernetes_v_log_level = self.get_arg('working_kubernetes_v_log_level', self.working_kubernetes_default_values.get('working_kubernetes_v_log_level'))
@@ -185,7 +186,7 @@ class PentagonProject():
             self._production_kubernetes_dns_zone = self.get_arg('production_kubernetes_dns_zone', '{}'.format(self._dns_zone))
 
             self._production_kubernetes_node_count = self.get_arg('production_kubernetes_node_count', self.production_kubernetes_default_values.get('production_kubernetes_node_count'))
-            self._production_kubernetes_master_aws_zone = self.get_arg('production_kubernetes_master_aws_zone', self._aws_availability_zones.split(',')[0])
+            self._production_kubernetes_master_aws_zones = self.get_arg('production_kubernetes_master_aws_zone', self._aws_availability_zones.split(','))
             self._production_kubernetes_master_node_type = self.get_arg('production_kubernetes_master_node_type', self.production_kubernetes_default_values.get('production_kubernetes_master_node_type'))
             self._production_kubernetes_worker_node_type = self.get_arg('production_kubernetes_worker_node_type', self.production_kubernetes_default_values.get('production_kubernetes_worker_node_type'))
             self._production_kubernetes_v_log_level = self.get_arg('production_kubernetes_v_log_level', self.production_kubernetes_default_values.get('production_kubernetes_v_log_level'))
@@ -300,45 +301,43 @@ class PentagonProject():
         }
         return render_template(template_name, template_path, target, context)
 
-    def __prepare_working_kops_vars_sh(self):
-        template_name = "vars.sh.jinja"
-        template_path = "{}/default/clusters/working/".format(self._repository_directory)
-        target = "{}/default/clusters/working/vars.sh".format(self._repository_directory)
+    def __add_kops_working_cluster(self):
         context = {
-            'kubernetes_cluster_name': self._working_kubernetes_cluster_name,
-            'aws_availability_zones': re.sub(" ", "", self._aws_availability_zones),
+            'cluster_name': self._working_kubernetes_cluster_name,
+            'availability_zones': re.sub(" ", "", self._aws_availability_zones).split(","),
             'vpc_id': self._vpc_id,
             'ssh_key_path': "{}{}.pub".format(self._private_path, self._ssh_keys['working_kube']),
             'kubernetes_version': self._kubernetes_version,
-            'kubernetes_node_count': self._working_kubernetes_node_count,
-            'kubernetes_master_aws_zone': self._working_kubernetes_master_aws_zone,
-            'kubernetes_master_node_type': self._working_kubernetes_master_node_type,
-            'kubernetes_worker_node_type': self._working_kubernetes_worker_node_type,
-            'kubernetes_dns_zone': self._working_kubernetes_dns_zone,
+            'ig_max_size': self._working_kubernetes_node_count,
+            'ig_min_size': self._working_kubernetes_node_count,
+            'master_availability_zones': self._working_kubernetes_master_aws_zones,
+            'master_node_type': self._working_kubernetes_master_node_type,
+            'node_type': self._working_kubernetes_worker_node_type,
+            'cluster_dns': self._working_kubernetes_dns_zone,
             'kubernetes_v_log_level': self._working_kubernetes_v_log_level,
-            'kubernetes_network_cidr': self._working_kubernetes_network_cidr
+            'network_cidr': self._working_kubernetes_network_cidr,
+            'kops_state_store_bucket': self._infrastructure_bucket
         }
-        return render_template(template_name, template_path, target, context)
+        kops.Cluster(context).add("{}/default/clusters/working/cluster_config".format(self._repository_directory))
 
-    def __prepare_production_kops_vars_sh(self):
-        template_name = "vars.sh.jinja"
-        template_path = "{}/default/clusters/production/".format(self._repository_directory)
-        target = "{}/default/clusters/production/vars.sh".format(self._repository_directory)
+    def __add_kops_production_cluster(self):
         context = {
-            'kubernetes_cluster_name': self._production_kubernetes_cluster_name,
-            'aws_availability_zones': re.sub(" ", "", self._aws_availability_zones),
+            'cluster_name': self._production_kubernetes_cluster_name,
+            'availability_zones': re.sub(" ", "", self._aws_availability_zones).split(","),
             'vpc_id': self._vpc_id,
             'ssh_key_path': "{}{}.pub".format(self._private_path, self._ssh_keys['production_kube']),
             'kubernetes_version': self._kubernetes_version,
-            'kubernetes_node_count': self._production_kubernetes_node_count,
-            'kubernetes_master_aws_zone': self._production_kubernetes_master_aws_zone,
-            'kubernetes_master_node_type': self._production_kubernetes_master_node_type,
-            'kubernetes_worker_node_type': self._production_kubernetes_worker_node_type,
-            'kubernetes_dns_zone': self._production_kubernetes_dns_zone,
+            'ig_max_size': self._production_kubernetes_node_count,
+            'ig_min_size': self._production_kubernetes_node_count,
+            'master_availability_zones': self._production_kubernetes_master_aws_zones,
+            'master_node_type': self._production_kubernetes_master_node_type,
+            'node_type': self._production_kubernetes_worker_node_type,
+            'cluster_dns': self._production_kubernetes_dns_zone,
             'kubernetes_v_log_level': self._production_kubernetes_v_log_level,
-            'kubernetes_network_cidr': self._production_kubernetes_network_cidr
+            'network_cidr': self._production_kubernetes_network_cidr,
+            'kops_state_store_bucket': self._infrastructure_bucket
         }
-        return render_template(template_name, template_path, target, context)
+        kops.Cluster(context).add("{}/default/clusters/production/cluster_config".format(self._repository_directory))
 
     def __prepare_account_vars_sh(self):
         template_name = "vars.sh.jinja"
@@ -465,12 +464,13 @@ class PentagonProject():
             self.__prepare_config_local_vars()
             self.__prepare_ssh_config_vars()
             self.__prepare_ansible_cfg_vars()
-            self.__prepare_working_kops_vars_sh()
-            self.__prepare_production_kops_vars_sh()
             self.__add_default_aws_vpc()
             self.__prepare_vpn_cfg_vars()
             self.__prepare_account_vars_yml()
             self.__prepare_account_vars_sh()
+
+            self.__add_kops_working_cluster()
+            self.__add_kops_production_cluster()
 
     def __create_keys(self):
             key_path = "{}/{}".format(self._repository_directory, self._private_path)

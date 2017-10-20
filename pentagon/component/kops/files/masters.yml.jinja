@@ -1,0 +1,16 @@
+{% for az in master_availability_zones -%}
+---
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  labels:
+    kops.k8s.io/cluster: {{ cluster_name }}
+  name: master-{{ az }}
+spec:
+  machineType: {{ master_node_type }}
+  maxSize: 1
+  minSize: 1
+  role: Master
+  subnets:
+  - {{ az }}
+{% endfor %}

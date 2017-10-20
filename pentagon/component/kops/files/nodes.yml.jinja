@@ -1,0 +1,17 @@
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  labels:
+    kops.k8s.io/cluster: {{ cluster_name }}
+  name: nodes
+spec:
+  machineType: {{ node_type }}
+  maxSize: {{ ig_max_size }}
+  minSize: {{ ig_min_size }}
+  role: Node
+  subnets:
+  {% for az in availability_zones -%}
+  - {{ az }}
+  {% endfor -%}
+  rootVolumeSize: 200
+  rootVolumeType: gp2

@@ -2,7 +2,7 @@ gcloud beta container \
 --project {{ project }} \
 clusters create {{ cluster_name }} \
 {%- if cluster_cidr %}
---cluster-ipv4-cidr={{ cluster_cidr}} \
+--cluster-ipv4-cidr={{ cluster_cidr }} \
 {%- endif %}
 {%- if cluster_version %}
 --cluster-version={{ cluster_version }} \
