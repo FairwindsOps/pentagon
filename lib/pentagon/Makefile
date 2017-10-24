@@ -134,15 +134,15 @@ configure_production_cluster:
 
 update_working_cluster:
 	source config/local/env-vars.sh; \
-	source config/default/account/vars.sh; \
+	source default/account/vars.sh; \
 	cd default/clusters/working/cluster-config; \
-	kops update cluster `cat vars.yml | shyaml get-value cluster_name` --yes
+	kops update cluster `cat ../vars.yml | shyaml get-value cluster_name` --yes
 
 update_production_cluster:
 	source config/local/env-vars.sh; \
 	source default/account/vars.sh; \
 	cd default/clusters/production/cluster-config; \
-	kops update cluster `cat vars.yml | shyaml get-value cluster_name` --yes
+	kops update cluster `cat ../vars.yml | shyaml get-value cluster_name` --yes
 
 destroy_working_cluster:
 	source config/local/env-vars.sh; \
