@@ -17,7 +17,7 @@ from Crypto.PublicKey import RSA
 
 import pentagon.component.vpc as aws_vpc
 import pentagon.component.kops as kops
-from pentagon.helpers import render_template
+from pentagon.helpers import render_template, write_yaml_file
 
 
 class PentagonException(Exception):
@@ -306,7 +306,7 @@ class PentagonProject():
             'cluster_name': self._working_kubernetes_cluster_name,
             'availability_zones': re.sub(" ", "", self._aws_availability_zones).split(","),
             'vpc_id': self._vpc_id,
-            'ssh_key_path': "{}{}.pub".format(self._private_path, self._ssh_keys['working_kube']),
+            'ssh_key_path': "${{INFRASTRUCTURE_REPO}}/{}/{}.pub".format(self._private_path, self._ssh_keys['working_kube']),
             'kubernetes_version': self._kubernetes_version,
             'ig_max_size': self._working_kubernetes_node_count,
             'ig_min_size': self._working_kubernetes_node_count,
@@ -318,14 +318,14 @@ class PentagonProject():
             'network_cidr': self._working_kubernetes_network_cidr,
             'kops_state_store_bucket': self._infrastructure_bucket
         }
-        kops.Cluster(context).add("{}/default/clusters/working/cluster_config".format(self._repository_directory))
+        write_yaml_file("{}/default/clusters/working/vars.yml".format(self._repository_directory), context)
 
     def __add_kops_production_cluster(self):
         context = {
             'cluster_name': self._production_kubernetes_cluster_name,
             'availability_zones': re.sub(" ", "", self._aws_availability_zones).split(","),
             'vpc_id': self._vpc_id,
-            'ssh_key_path': "{}{}.pub".format(self._private_path, self._ssh_keys['production_kube']),
+            'ssh_key_path': "${{INFRASTRUCTURE_REPO}}/{}/{}.pub".format(self._private_path, self._ssh_keys['production_kube']),
             'kubernetes_version': self._kubernetes_version,
             'ig_max_size': self._production_kubernetes_node_count,
             'ig_min_size': self._production_kubernetes_node_count,
@@ -335,9 +335,9 @@ class PentagonProject():
             'cluster_dns': self._production_kubernetes_dns_zone,
             'kubernetes_v_log_level': self._production_kubernetes_v_log_level,
             'network_cidr': self._production_kubernetes_network_cidr,
-            'kops_state_store_bucket': self._infrastructure_bucket
+            'kops_state_store_bucket': self._infrastructure_bucket,
         }
-        kops.Cluster(context).add("{}/default/clusters/production/cluster_config".format(self._repository_directory))
+        write_yaml_file("{}/default/clusters/production/vars.yml".format(self._repository_directory), context)
 
     def __prepare_account_vars_sh(self):
         template_name = "vars.sh.jinja"

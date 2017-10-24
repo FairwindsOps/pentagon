@@ -1,8 +1,18 @@
+{%- if not network_mask -%}
+{%- set network_mask = 24 -%}
+{%- endif -%}
+{%- if not third_octet -%}
+{%- set third_octet = 16 -%}
+{%- endif %}
 apiVersion: kops/v1alpha2
 kind: Cluster
 metadata:
   name: {{ cluster_name }}
 spec:
+  {%- if additional_policies %}
+  additional_policies: |
+   {{ additional_policies|indent(4) }}
+  {%- endif %}
   api:
     loadBalancer:
       type: Public
@@ -14,16 +24,16 @@ spec:
   dnsZone: {{ cluster_dns }}
   etcdClusters:
   - etcdMembers:
-    {%- for az in master_azs %}
+    {%- for az in master_availability_zones %}
     - instanceGroup: master-{{ az }}
       name: {{ az }}
-    {% endfor -%}
+    {%- endfor %}
     name: main
   - etcdMembers:
-    {%- for az in master_azs %}
+    {%- for az in master_availability_zones %}
     - instanceGroup: master-{{ az }}
       name: {{ az }}
-    {% endfor -%}
+    {%- endfor %}
     name: events
   kubernetesApiAccess:
   - 0.0.0.0/0
@@ -38,20 +48,19 @@ spec:
   sshAccess:
   - 0.0.0.0/0
   subnets:
-  {%- for subnet in private_subnets %}
-  - cidr: {{ subnet.cidr }}
-    name: {{ subnet.name }}
+  {%- for az in availability_zones %}
+  - cidr: {{ "172.20." + ((third_octet|int)+loop.index-1)|string + ".0/" + network_mask|string }}
+    name: {{ az }}
     type: Private
-    zone: {{ subnet.az }}
-    egress: {{ subnet.egress}}
-  {% endfor -%}
-  {%- for subnet in utility_subnets %}
-  - cidr: {{ subnet.cidr }}
-    name: {{ subnet.name }}
-    type: Private
-    zone: {{ subnet.az }}
-    egress: {{ subnet.egress}}
-  {% endfor -%}  
+    zone: {{ az }}
+    egress: {{ nat_gateways[loop.index] }}
+  {%- endfor -%}
+  {%- for az in availability_zones %}
+  - cidr: {{ "172.20." + ((third_octet|int)+loop.index-1+4)|string + ".0/" + network_mask|string }}
+    name: utility-{{ az }}
+    type: Utility
+    zone: {{ az }}
+  {%- endfor %}  
   topology:
     dns:
       type: Public
