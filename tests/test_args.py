@@ -40,7 +40,7 @@ class TestPentagonProjectWithAllArgs(TestPentagonProject):
         'working_kubernetes_cluster_name': 'test-working-cluster-name',
         'working_kubernetes_dns_zone': 'test-working-cluster-dns-zone',
         'working_kubernetes_node_count': 3,
-        'working_kubernetes_master_aws_zone': 'test-working-aws-master-zone',
+        'working_kubernetes_master_aws_zones': 'test-working-aws-master-zone',
         'working_kubernetes_master_node_type': 'test-working-master-node-type',
         'working_kubernetes_worker_node_type': 'test-working-worker-node-type',
         'working_kubernetes_v_log_level': 'test-working-v-log-level',
