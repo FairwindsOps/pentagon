@@ -111,10 +111,8 @@ def _run(action, component_path, additional_args, options):
             file_data = parse_infile(file)
 
             for key in data:
-                print key
                 file_data[key] = data[key]
 
-            print file_data
             data = file_data
 
     except Exception as e:
