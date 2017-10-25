@@ -6,8 +6,8 @@ metadata:
   name: nodes
 spec:
   machineType: {{ node_type }}
-  maxSize: {{ ig_max_size }}
-  minSize: {{ ig_min_size }}
+  maxSize: {{ ig_max_size | default 3 }}
+  minSize: {{ ig_min_size | default 3 }}
   role: Node
   subnets:
   {% for az in availability_zones -%}

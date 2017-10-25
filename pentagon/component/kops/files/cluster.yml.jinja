@@ -39,7 +39,7 @@ spec:
   - 0.0.0.0/0
   kubernetesVersion: {{ kubernetes_version }}
   masterPublicName: api.{{ cluster_name }}
-  networkCIDR: {{ network_cidr }}
+  networkCIDR: 172.20.0.0/16
   networkID: {{ vpc_id }}
   networking:
     weave:
