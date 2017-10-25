@@ -186,7 +186,7 @@ class PentagonProject():
             self._production_kubernetes_dns_zone = self.get_arg('production_kubernetes_dns_zone', '{}'.format(self._dns_zone))
 
             self._production_kubernetes_node_count = self.get_arg('production_kubernetes_node_count', self.production_kubernetes_default_values.get('production_kubernetes_node_count'))
-            self._production_kubernetes_master_aws_zones = self.get_arg('production_kubernetes_master_aws_zone', self._aws_availability_zones.split(','))
+            self._production_kubernetes_master_aws_zones = self.get_arg('production_kubernetes_master_aws_zones', self._aws_availability_zones.split(','))
             self._production_kubernetes_master_node_type = self.get_arg('production_kubernetes_master_node_type', self.production_kubernetes_default_values.get('production_kubernetes_master_node_type'))
             self._production_kubernetes_worker_node_type = self.get_arg('production_kubernetes_worker_node_type', self.production_kubernetes_default_values.get('production_kubernetes_worker_node_type'))
             self._production_kubernetes_v_log_level = self.get_arg('production_kubernetes_v_log_level', self.production_kubernetes_default_values.get('production_kubernetes_v_log_level'))
