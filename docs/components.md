@@ -92,6 +92,7 @@ Options:
     - Creates yml files in  `./<cluster_name>/` compiled from the data passed in.
     - `bash ./<cluster_name>/kops.sh` will create the cluster as configured.
     - Argument/ ConfigFile keys:
+      - `additional_policies`: Additional IAM policies to inflict upon the cluster
       - `vpc_id`: AWS VPC Id of VPC to create cluster in (required)
       - `cluster_name`: Name of the cluster to create (required)
       - `kops_state_store_bucket`: Name of the s3 bucket where Kops State will be stored (required)
