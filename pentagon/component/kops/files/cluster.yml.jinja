@@ -1,9 +1,3 @@
-{%- if not network_mask -%}
-{%- set network_mask = 24 -%}
-{%- endif -%}
-{%- if not third_octet -%}
-{%- set third_octet = 16 -%}
-{%- endif -%}
 apiVersion: kops/v1alpha2
 kind: Cluster
 metadata:
@@ -17,7 +11,7 @@ spec:
     loadBalancer:
       type: Public
   authorization:
-    alwaysAllow: {}
+    {{ authorization }}
   channel: stable
   cloudProvider: aws
   configBase: s3://{{ kops_state_store_bucket }}/{{ cluster_name }}
@@ -39,7 +33,7 @@ spec:
   - 0.0.0.0/0
   kubernetesVersion: {{ kubernetes_version }}
   masterPublicName: api.{{ cluster_name }}
-  networkCIDR: 172.20.0.0/16
+  networkCIDR: {{ network_cidr }}
   networkID: {{ vpc_id }}
   networking:
     weave:
@@ -49,14 +43,14 @@ spec:
   - 0.0.0.0/0
   subnets:
   {%- for az in availability_zones %}
-  - cidr: {{ "172.20." + ((third_octet|int)+loop.index-1)|string + ".0/" + network_mask|string }}
+  - cidr: {{ network_cidr_base|string + "." + ((third_octet|int)+loop.index-1)|string + ".0/" + network_mask|string }}
     name: {{ az }}
     type: Private
     zone: {{ az }}
     egress: {{ nat_gateways[loop.index] }}
   {%- endfor -%}
   {%- for az in availability_zones %}
-  - cidr: {{ "172.20." + ((third_octet|int)+loop.index-1+4)|string + ".0/" + network_mask|string }}
+  - cidr: {{ network_cidr_base|string + "." + ((third_octet|int)+loop.index-1+(third_octet_increment*4))|string + ".0/" + network_mask|string }}
     name: utility-{{ az }}
     type: Utility
     zone: {{ az }}

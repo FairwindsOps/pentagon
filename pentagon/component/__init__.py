@@ -10,7 +10,7 @@ import re
 from pentagon.helpers import render_template
 
 
-class ComponentBase():
+class ComponentBase(object):
     """ Base class for Pentagon Components. """
     _required_parameters = []
 

@@ -5,13 +5,13 @@ metadata:
     kops.k8s.io/cluster: {{ cluster_name }}
   name: nodes
 spec:
-  machineType: {{ node_type }}
-  maxSize: {{ ig_max_size if ig_max_size else 3 }}
-  minSize: {{ ig_min_size if ig_min_size else 3 }}
+  machineType: {{ worker_node_type }}
+  maxSize: {{ ig_max_size if ig_max_size else node_count }}
+  minSize: {{ ig_min_size if ig_min_size else node_count }}
   role: Node
   subnets:
   {% for az in availability_zones -%}
   - {{ az }}
   {% endfor -%}
-  rootVolumeSize: 200
+  rootVolumeSize: {{ node_root_volume_size }}
   rootVolumeType: gp2

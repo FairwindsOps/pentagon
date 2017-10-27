@@ -106,6 +106,12 @@ Options:
       - `ig_max_size`: Max number of instance in the default node group. (default: 3)
       - `ig_min_size`: Min number of instance in the default node group. (default: 3)
       - `ssh_key_path`: Path of public key for ssh access to nodes. (required)
+      - `network_cidr`: VPC cidr for Kops created Kubernetes subnetes (default: 172.0.0.0/16)
+      - `network_cidr_base`: First two octects of the network to template subnet cidrs from  (default: 172.0)
+      - `third_octet`: Starting value for the third octet of the subnet cidrs (default: 16) 
+      - `network_mask`: Value for network mask in subnet cidrs (defalt: 24)
+      - `third_octet_increment`: Increment to increase third octet by for each of the Kubernetes subnets (default: 1) By default, the cidr of the first three private subnets will be 172.20.16.0/24, 172.20.17.0/24, 172.20.18.0/24
+      - `authorization`: Authorization type for cluster. Allowed values are `alwaysAllow` and `rbac` (default: alwaysAllow)
     - Example Config File
     ```
     availability_zones: [eu-west-1a, eu-west-1b, eu-west-1c]
@@ -132,6 +138,11 @@ Options:
     node_type: t2.medium
     ssh_key_path: ${INFRASTRUCTURE_REPO}/config/private//working-kube.pub
     vpc_id: vpc-4aa3fa2d
+    network_cidr: 172.0.0.0/16
+    network_cidr_base: 172.0
+    third_octet: 16
+    third_octet_increment: 1
+    network_mask: 24
     nat_gateways:
       - nat-0c6ef9261d8ebd788
       - nat-0de4ec4c946e3b7ce

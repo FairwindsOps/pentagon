@@ -80,11 +80,11 @@ Pentagon used Kops to create clusters in AWS. The default layout creates configu
 * Run `bash cluster-config/kops.sh` to create a cluster.spec file for this cluster. This does not create any resources in AWS.
 
 ### Create Kubernetes Cluster
-* Use [kops](https://github.com/kubernetes/kops/blob/master/docs/cli/kops.md) to manage the cluster.
-  * Run `kops edit cluster <clustername>` to view and edit the `cluster.spec` and make the following edits
-    * Choose approriate CIDR ranges for your Kubernetes subnets. That don't conflict with the subnets that were created in the [VPC](#vpc-setup) step. We typically reccomend fairly small subnets ie /22 or /24.
-    * Using the AWS console, find the `NAT Gateways` section of the `VPC Dashboard`. Note the `NAT Gateway ID`s for each of your AZs. For each of the `Private` subnets in the `cluster.spec` add an `egress: <nat-id>` line where `nat-id` is the `NAT Gateway ID` corresponding to the same AZ as the `Private` subnet.
-    * Save and exit
+* Use the Kops component to create your cluster. [components#kops.cluster]
+* By default a `vars.yml` will be created at `default/clusters/working` and `default/clusters/production`. Those files are sufficient to create a cluster using the kop.cluster component
+
+* Use [kops](https://github.com/kubernetes/kops/blob/master/docs/cli/kops.md) to manage the cluster if necessary.
+  * Run `kops edit cluster <clustername>` to view or edit the `cluster.spec`
   * You may also wish to edit the instance groups prior to cluster creation:
     * `kops get instancegroups --name <clustername>` to list them (one master group per AZ and one node group)
     * `kops edit instancegroups --name <clustername> <instancegroupname>` to edit any of them

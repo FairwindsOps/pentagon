@@ -9,10 +9,22 @@ import subprocess
 
 from pentagon.component import ComponentBase
 from pentagon.helpers import render_template
+from pentagon.defaults import PentagonDefaults
 
 
 class Cluster(ComponentBase):
     _path = os.path.dirname(__file__)
+
+    def add(self, destination):
+        print self._data
+        for key in PentagonDefaults.kubernetes:
+            if not self._data.get(key):
+                self._data[key] = PentagonDefaults.kubernetes[key]
+
+        if not self._data.get('network_cidr_base'):
+            self._data['network_cidr_base'] = PentagonDefaults.vpc['cidr_base']
+
+        return super(Cluster, self).add(destination)
 
     def get(self, destination):
 
