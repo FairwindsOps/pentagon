@@ -7,9 +7,9 @@ INFRASTRUCTURE_BUCKET = $(notdir ${INFRASTRUCTURE_REPO})
 BASENAME = $(notdir ${INFRASTRUCTURE_REPO})
 VPN_BUCKET = $(subst infrastructure,vpn,$(BASENAME))
 
-all: local_config_init install_requirements vpc vpc_id nat_gateways configure_working_cluster configure_production_cluster #vpn
+all: local_config_init install_requirements vpc vpc_id nat_gateways configure_working_cluster configure_production_cluster vpn
 
-destroy: destroy_vpn destroy_vpn_bucket destroy_working_cluster destroy_production_cluster destroy_vpc destroy_vpc_bucket 
+destroy: destroy_vpn destroy_vpn_bucket destroy_working_cluster destroy_production_cluster destroy_vpc destroy_vpc_bucket
 
 install_requirements:
 	source config/local/env-vars.sh; \
@@ -29,13 +29,6 @@ destroy_vpc:
 	source config/local/env-vars.sh; \
 	cd ${INFRASTRUCTURE_REPO}/default/vpc ; \
 	make destroy
-
-test2: test1
-	echo Thing2 
-
-test1:
-	bash -c "false || exit"; 
-
 
 destroy_vpc_bucket:
 	source config/local/env-vars.sh; \

@@ -1,4 +1,3 @@
-from pentagon.component import ComponentBase
 import os
 import glob
 import shutil
@@ -8,6 +7,7 @@ import sys
 import re
 import subprocess
 
+from pentagon.component import ComponentBase
 from pentagon.helpers import render_template
 
 
@@ -22,28 +22,24 @@ class Cluster(ComponentBase):
 
         if self._bucket is None:
             logging.error("kops_state_store required.")
-            sys.exit()
+            sys.exit(1)
 
         if self._cluster_name is None:
             logging.error("name is required.")
-            sys.exit()
+            sys.exit(1)
 
         os.mkdir(self._cluster_name)
         os.chdir(self._cluster_name)
 
-        # get cluster yaml
-        logging.debug("Getting cluster.")
-        with open('cluster.yml', 'w') as cf:
-            args = ['kops',
-                    'get',
-                    'cluster',
-                    '--name={}'.format(self._cluster_name),
-                    '--state=s3://{}'.format(self._bucket),
-                    '-oyaml']
-            print " ".join(args)
+        self._get_cluster_yaml()
 
-            subprocess.Popen(args, stdout=cf)
+        for ig in self._cluster_instance_groups:
+            self._get_instance_group_yaml(ig)
 
+        self._get_cluster_admin_secret()
+
+    @property
+    def _cluster_instance_groups(self):
         # get igs yaml
         logging.debug("Getting instance groups.")
         args = ['kops',
@@ -52,25 +48,32 @@ class Cluster(ComponentBase):
                 '--name={}'.format(self._cluster_name),
                 '--state=s3://{}'.format(self._bucket)]
 
-        igs = [ig.split("\t") for ig in subprocess.check_output(args).split("\n")]
-        for ig in igs[1:-1]:
-            if "master" in ig[0]:
-                ig_file = open("master.yml", "a+")
-            else:
-                ig_file = open("{}.yml".format(ig[0]), "w")
-            args = ['kops',
-                    'get',
-                    'ig',
-                    ig[0],
-                    '--name={}'.format(self._cluster_name),
-                    '--state=s3://{}'.format(self._bucket),
-                    '-oyaml']
+        return [ig.split("\t")[0] for ig in subprocess.check_output(args).split("\n")][1:-1]
 
+    def _get_instance_group_yaml(self, ig):
+        args = ['kops',
+                'get',
+                'ig',
+                ig,
+                '--name={}'.format(self._cluster_name),
+                '--state=s3://{}'.format(self._bucket),
+                '-oyaml']
+
+        ig_yaml = subprocess.check_output(args)
+
+        file_mode = 'w'
+        if "master" in ig:
+            ig_file_name = "master.yml"
+            file_mode = 'a'
+        else:
+            ig_file_name = "{}.yml".format(ig)
+
+        with open(ig_file_name, file_mode) as ig_file:
             ig_file.write("---\n")
-            ig_yaml = subprocess.check_output(args)
             ig_file.write("{}\n".format(ig_yaml))
             ig_file.close()
 
+    def _get_cluster_admin_secret(self):
         # get secret sorta
         logging.debug("Getting ssh key secret. This will require transformation before a new cluster can be created")
         with open('secret.sh', 'w') as sf:
@@ -82,3 +85,20 @@ class Cluster(ComponentBase):
                     '--state=s3://{}'.format(self._bucket)]
 
             subprocess.Popen(args, stdout=sf)
+
+    def _get_cluster_yaml(self):
+        # get cluster yaml
+        logging.debug("Getting cluster.")
+        with open('cluster.yml', 'w') as cf:
+            args = ['kops',
+                    'get',
+                    'cluster',
+                    '--name={}'.format(self._cluster_name),
+                    '--state=s3://{}'.format(self._bucket),
+                    '-oyaml']
+
+            p = subprocess.Popen(args, stdout=cf)
+            stdout, stderr = p.communicate()
+            if p.returncode != 0:
+                logging.error("Error getting cluster: {}".format(stderr))
+                sys.exit(1)

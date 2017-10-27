@@ -109,6 +109,18 @@ Options:
     - Example Config File
     ```
     availability_zones: [eu-west-1a, eu-west-1b, eu-west-1c]
+    additional_policies: |
+      {
+          "Effect": "Allow",
+          "Action": [
+              "autoscaling:DescribeAutoScalingGroups",
+              "autoscaling:DescribeAutoScalingInstances",
+              "autoscaling:DescribeTags",
+              "autoscaling:SetDesiredCapacity",
+              "autoscaling:TerminateInstanceInAutoScalingGroup"
+          ],
+          "Resource": "*"
+      }
     cluster_dns: cluster1.reactiveops.io
     cluster_name: working-1.cluster1.reactiveops.io
     ig_max_size: 3
@@ -135,10 +147,10 @@ Options:
 - get: 
     - Creates yml files in `./<cluster_name>/create_cluster.sh` by querying the state of an existing cluster and parsing values. For when you have an existing cluster that you want to capture its configuration.
     - Creates `./<cluster_name>/cluster.yml`, `./<cluster_name>/nodes.yml`, `./<cluster_name>/master.yml`, `./<cluster_name>/secret.sh`
-    - `secret.sh` does not have the contect of the secret and will be able re-create the cluster secret if needed. You will have to transform the key id into a saved public key.
+    - `secret.sh` does not have the content of the secret and will be able re-create the cluster secret if needed. You will have to transform the key id into a saved public key.
     - Arguments:
-      - `name`: Kops cluster name you are getting (required). Can be set as environment variabl "CLUSTER_NAME".
-      - `kops_state_store_bucket`: s3 bucket name where cluster state is stored (required). Can be set as environment_variable (KOPS_STATE_STORE_BUCKET)
+      - `name`: Kops cluster name you are getting (required). Argument can also be set through and environment variable called "CLUSTER_NAME".
+      - `kops_state_store_bucket`: s3 bucket name where cluster state is stored (required). Argument can also be set through and environment variable called "KOPS_STATE_STORE_BUCKET"
     - Example: 
       ```
       pentagon get kops.cluster -Dname=working-1.cluster.reactiveops.io -Dkops_state_store=reactiveops.io-infrastructure

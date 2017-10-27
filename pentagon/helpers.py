@@ -25,7 +25,7 @@ def render_template(template_name, template_path, target, context):
 
 
 def write_yaml_file(filename, dict):
-    """ Accepts  dictionary and a filepath. Writes dictionary in yaml to file path, recursively creating path if necessary """
+    """ Accepts  filepath,  dictionary. Writes dictionary in yaml to file path, recursively creating path if necessary """
 
     if not os.path.exists(os.path.dirname(filename)):
         try:
