@@ -16,7 +16,7 @@ LIST_OF_SECRET_VARIABLES=( "TF_VAR_aws_access_key" "AWS_ACCESS_KEY" "AWS_ACCESS_
 # export infrastructre repository when it does not already exist
 if [[ -z ${INFRASTRUCTURE_REPO+x} ]]
 then
-  export INFRASTRUCTURE_REPO=$(readlink -f ${LOCAL_CONFIG_DIR}/../../)
+  export INFRASTRUCTURE_REPO=$(greadlink -f ${LOCAL_CONFIG_DIR}/../../)
 fi
 
 ##
