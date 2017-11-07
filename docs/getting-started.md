@@ -81,7 +81,7 @@ Pentagon used Kops to create clusters in AWS. The default layout creates configu
 
 ### Create Kubernetes Cluster
 * Use the Kops component to create your cluster. [components#kops.cluster]
-* By default a `vars.yml` will be created at `default/clusters/working` and `default/clusters/production`. Those files are sufficient to create a cluster using the kop.cluster component
+* By default a `vars.yml` will be created at `default/clusters/working` and `default/clusters/production`. Those files are sufficient to create a cluster using the kops.cluster though, if you are not using `make all` from above you will need to enter `nat_gateways` and `vpc-id` as described in [kops component documentation](components.md#kops-cluster)
 
 * Use [kops](https://github.com/kubernetes/kops/blob/master/docs/cli/kops.md) to manage the cluster if necessary.
   * Run `kops edit cluster <clustername>` to view or edit the `cluster.spec`
