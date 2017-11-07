@@ -104,12 +104,16 @@ def _run(action, component_path, additional_args, options):
     logging.debug("with options: {}".format(options))
     logging.debug("and additional arguments: {}".format(additional_args))
 
-    data = {}
+    data = parse_data(options.get('data', {}))
     try:
         file = options.get('file', None)
         if file is not None:
-            data = parse_infile(file)
-        data = parse_data(options.get('data', data))
+            file_data = parse_infile(file)
+
+            for key in data:
+                file_data[key] = data[key]
+
+            data = file_data
 
     except Exception as e:
         logging.error("Error parsing data from file or -D arguments")
@@ -153,15 +157,19 @@ def get_component_class(component_path):
 
 def parse_infile(file):
     """ Parse data structure from file into dictionary for component use """
-    with open(file) as data_file:
+    with open(file, 'r') as data_file:
         try:
             data = json.load(data_file)
+            logging.debug("Data parsed from file {}: {}".format(file, data))
             return data
         except ValueError as json_error:
             pass
 
+        data_file.seek(0)
+
         try:
             data = yaml.load(data_file)
+            logging.debug("Data parsed from file {}: {}".format(file, data))
             return data
         except yaml.YAMLError as yaml_error:
             pass

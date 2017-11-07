@@ -10,7 +10,7 @@ import re
 from pentagon.helpers import render_template
 
 
-class ComponentBase():
+class ComponentBase(object):
     """ Base class for Pentagon Components. """
     _required_parameters = []
 
@@ -40,7 +40,6 @@ class ComponentBase():
 
     def add(self, destination):
         """ Copies files and templates from <component>/files and templates the *.jinja files """
-
         self._destination = destination
         try:
             shutil.copytree(self._files_directory, self._destination_directory_name)

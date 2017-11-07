@@ -7,9 +7,9 @@ INFRASTRUCTURE_BUCKET = $(notdir ${INFRASTRUCTURE_REPO})
 BASENAME = $(notdir ${INFRASTRUCTURE_REPO})
 VPN_BUCKET = $(subst infrastructure,vpn,$(BASENAME))
 
-all: local_config_init install_requirements vpc vpc_id vpn working_cluster production_cluster
+all: local_config_init install_requirements vpc vpc_id nat_gateways configure_working_cluster configure_production_cluster vpn
 
-destroy: destroy_vpn destroy_vpn_bucket destroy_vpc destroy_vpc_bucket
+destroy: destroy_vpn destroy_vpn_bucket destroy_working_cluster destroy_production_cluster destroy_vpc destroy_vpc_bucket
 
 install_requirements:
 	source config/local/env-vars.sh; \
@@ -30,31 +30,43 @@ destroy_vpc:
 	cd ${INFRASTRUCTURE_REPO}/default/vpc ; \
 	make destroy
 
-
 destroy_vpc_bucket:
 	source config/local/env-vars.sh; \
-	aws s3api list-object-versions --bucket  $(INFRASTRUCTURE_BUCKET) | jq -r '.Versions[] | .VersionId + " " + .Key' > .tmp ; \
+	aws s3 ls s3://$(INFRASTRUCTURE_BUCKET) || exit 0 && \
+	aws s3api list-object-versions --bucket  $(INFRASTRUCTURE_BUCKET) | jq -r '.Versions[] | .VersionId + " " + .Key' > .tmp && \
+	while read version ; do echo $$version ; vid=$$(echo $$version | awk '{ print $$1 }') ; key=$$(echo $$version | awk '{ print $$2 }') && \
+	aws s3api delete-object --bucket  $(INFRASTRUCTURE_BUCKET) --version-id $${vid} --key $${key}; \
+	done < .tmp && \
+	rm .tmp && \
+	aws s3api list-object-versions --bucket  $(INFRASTRUCTURE_BUCKET) | jq -r '.DeleteMarkers[] | .VersionId + " " + .Key' > .tmp && \
 	while read version ; do echo $$version ; vid=$$(echo $$version | awk '{ print $$1 }') ; key=$$(echo $$version | awk '{ print $$2 }') ;\
 	aws s3api delete-object --bucket  $(INFRASTRUCTURE_BUCKET) --version-id $${vid} --key $${key}; \
-	done < .tmp ;\
-	rm .tmp ;\
-	aws s3api list-object-versions --bucket  $(INFRASTRUCTURE_BUCKET) | jq -r '.DeleteMarkers[] | .VersionId + " " + .Key' > .tmp ; \
-	while read version ; do echo $$version ; vid=$$(echo $$version | awk '{ print $$1 }') ; key=$$(echo $$version | awk '{ print $$2 }') ;\
-	aws s3api delete-object --bucket  $(INFRASTRUCTURE_BUCKET) --version-id $${vid} --key $${key}; \
-	done < .tmp ;\
-	rm .tmp ;\
+	echo $? ; \
+	done < .tmp &&\
+	rm .tmp &&\
 	aws s3api delete-bucket --bucket $(INFRASTRUCTURE_BUCKET)
 
-VPC_ID = "$(shell  source config/local/env-vars.sh; cd $${INFRASTRUCTURE_REPO}/default/vpc ; terraform state show module.vpc.aws_vpc.default | head -n 1| awk '{ print $$3 }')"
+VPC_ID = "$(shell  source config/local/env-vars.sh; cd $${INFRASTRUCTURE_REPO}/default/vpc ; terraform output aws_vpc_id)"
 vpc_id:
 	@echo $(VPC_ID)
 	source config/local/env-vars.sh; \
-	grep -v "VPC_ID" default/clusters/working/vars.sh > default/clusters/working/vars.sh.tmp && \
-	mv default/clusters/working/vars.sh.tmp default/clusters/working/vars.sh; \
-	grep -v "VPC_ID" default/clusters/production/vars.sh > default/clusters/production/vars.sh.tmp && \
-	mv default/clusters/production/vars.sh.tmp default/clusters/production/vars.sh; \
-	echo "export VPC_ID=\"$(VPC_ID)\"" >> default/clusters/working/vars.sh; \
-	echo "export VPC_ID=\"$(VPC_ID)\"" >> default/clusters/production/vars.sh;
+	grep -v "vpc_id" default/clusters/working/vars.yml > default/clusters/working/vars.yml.tmp && \
+	mv default/clusters/working/vars.yml.tmp default/clusters/working/vars.yml; \
+	grep -v "vpc_id" default/clusters/production/vars.yml > default/clusters/production/vars.yml.tmp && \
+	mv default/clusters/production/vars.yml.tmp default/clusters/production/vars.yml; \
+	echo "vpc_id: $(VPC_ID)" >> default/clusters/working/vars.yml; \
+	echo "vpc_id: $(VPC_ID)" >> default/clusters/production/vars.yml;
+
+nat_gateways:
+	source config/local/env-vars.sh; \
+	cd $${INFRASTRUCTURE_REPO}/default/vpc; \
+	echo "nat_gateways:" > $${INFRASTRUCTURE_REPO}/default/clusters/nat_gateways.yml; \
+	for ng in `terraform output -json aws_nat_gateway_ids |jq -r '.value[]' `; \
+	  do echo "  - $$ng" >> $${INFRASTRUCTURE_REPO}/default/clusters/nat_gateways.yml; \
+	done; \
+
+	cat default/clusters/nat_gateways.yml >> default/clusters/working/vars.yml
+	cat default/clusters/nat_gateways.yml >> default/clusters/production/vars.yml
 
 vpn:
 	source config/local/env-vars.sh; \
@@ -72,12 +84,14 @@ destroy_vpn:
 
 destroy_vpn_bucket:
 	source config/local/env-vars.sh; \
-	aws s3api list-object-versions --bucket  $(VPN_BUCKET) | jq -r '.Versions[] | .VersionId + " " + .Key' > .tmp ; \
+	aws s3 ls s3://$(VPN_BUCKET) || exit 0 && \
+	aws s3api list-object-versions --bucket  $(VPN_BUCKET) | jq -r '.Versions[] | .VersionId + " " + .Key' > .tmp && \
 	while read version ; do echo $$version ; vid=$$(echo $$version | awk '{ print $$1 }') ; key=$$(echo $$version | awk '{ print $$2 }') ;\
 	aws s3api delete-object --bucket  $(VPN_BUCKET) --version-id $${vid} --key $${key}; \
-	done < .tmp ;\
-	rm .tmp ;\
+	done < .tmp &&\
+	rm .tmp &&\
 	aws s3api delete-bucket --bucket $(VPN_BUCKET)
+
 
 make_tunnel:
 	#Experimental
@@ -97,13 +111,40 @@ test_connect_vpn:
 	ls
 	grep "Initialization Sequence Completed" openvpn.out
 
-clusters: working_cluster production_cluster
-
-working_cluster: vpc_id
+configure_working_cluster:
 	source config/local/env-vars.sh; \
-	cd default/clusters/working/cluster-config; \
+	cd default/clusters/working; \
+	pentagon add kops.cluster -f vars.yml -D"name=cluster-config"; \
+	cd cluster-config; \
 	source ./kops.sh || true
 
-production_cluster: vpc_id
-	cd default/clusters/production/cluster-config; \
+configure_production_cluster:
+	source config/local/env-vars.sh; \
+	cd default/clusters/production; \
+	pentagon add kops.cluster -f vars.yml -D"name=cluster-config"; \
+	cd cluster-config; \
 	source ./kops.sh || true
+
+update_working_cluster:
+	source config/local/env-vars.sh; \
+	source default/account/vars.sh; \
+	cd default/clusters/working/cluster-config; \
+	kops update cluster `cat ../vars.yml | shyaml get-value cluster_name` --yes
+
+update_production_cluster:
+	source config/local/env-vars.sh; \
+	source default/account/vars.sh; \
+	cd default/clusters/production/cluster-config; \
+	kops update cluster `cat ../vars.yml | shyaml get-value cluster_name` --yes
+
+destroy_working_cluster:
+	source config/local/env-vars.sh; \
+	source default/account/vars.sh; \
+	cd default/clusters/working; \
+	kops delete cluster `cat vars.yml | shyaml get-value cluster_name` --yes
+
+destroy_production_cluster:
+	source config/local/env-vars.sh; \
+	source default/account/vars.sh; \
+	cd default/clusters/production; \
+	kops delete cluster `cat vars.yml | shyaml get-value cluster_name` --yes

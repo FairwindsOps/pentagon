@@ -66,3 +66,8 @@ output "aws_vpc_id" {
 output "aws_vpc_cidr" {
   value = "${module.vpc.aws_vpc_cidr}"
 }
+
+output "aws_nat_gateway_ids" {
+  value = "${module.vpc.aws_nat_gateway_ids}"
+}
+

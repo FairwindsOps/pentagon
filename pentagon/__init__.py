@@ -16,15 +16,17 @@ from shutil import copytree, ignore_patterns
 from Crypto.PublicKey import RSA
 
 import pentagon.component.vpc as aws_vpc
-from pentagon.helpers import render_template
+import pentagon.component.kops as kops
+from pentagon.helpers import render_template, write_yaml_file
+from pentagon.defaults import PentagonDefaults
 
 
 class PentagonException(Exception):
     pass
 
 
-class PentagonProject():
-    # DEFAULTS
+class PentagonProject(object):
+    # Placeholders for when there is not sensible default
 
     # AWS and VPC
     _aws_access_key_placeholder = '<aws-access-key>'
@@ -38,28 +40,16 @@ class PentagonProject():
     _vpc_cidr_base = '<vpc_cidr_base>'
     _vpc_id = '<vpc_id>'
 
-    # Kubernetes version
-    _kubernetes_version = '<kubernetes_version>'
-
     # Working Kubernetes
     _working_kubernetes_cluster_name = '<working_kubernetes_cluster_name>'
     _working_kubernetes_dns_zone = '<working_kubernetes_dns_zone>'
-    _working_kubernetes_node_count = '<working_kubernetes_node_count>'
     _working_kubernetes_master_aws_zone = '<working_kubernetes_master_aws_zone>'
-    _working_kubernetes_master_node_type = '<working_kubernetes_master_node_type>'
-    _working_kubernetes_worker_node_type = '<working_kubernetes_worker_node_type>'
-    _working_kubernetes_v_log_level = '<working_kubernetes_v_log_level>'
-    _working_kubernetes_network_cidr = '<working_kubernetes_network_cidr>'
 
     # Production Kubernetes
     _production_kubernetes_cluster_name = '<production_kubernetes_cluster_name>'
     _production_kubernetes_dns_zone = '<production_kubernetes_dns_zone>'
     _production_kubernetes_node_count = '<production_kubernetes_node_count>'
     _production_kubernetes_master_aws_zone = '<production_kubernetes_master_aws_zone>'
-    _production_kubernetes_master_node_type = '<production_kubernetes_master_node_type>'
-    _production_kubernetes_worker_node_type = '<production_kubernetes_worker_node_type>'
-    _production_kubernetes_v_log_level = '<production_kubernetes_v_log_level>'
-    _production_kubernetes_network_cidr = '<production_kubernetes_network_cidr>'
 
     # VPN
     _ami_owners = ['099720109477']  # Amazon AMI owner
@@ -67,38 +57,6 @@ class PentagonProject():
     _vpn_ami_filters = [{'Name': 'virtualization-type', 'Values': ['hvm']},
                         {'Name': 'architecture', 'Values': ['x86_64']},
                         {'Name': 'name', 'Values': ['ubuntu/images/hvm-ssd/ubuntu-trusty*']}]
-
-    default_ssh_keys = {
-        'admin_vpn_key': 'admin-vpn',
-        'working_kube_key': 'working-kube',
-        'working_private_key': 'working-private',
-        'production_kube_key': 'production-kube',
-        'production_private_key': 'production-private',
-    }
-
-    kubernetes_default_version = '1.5.7'
-
-    working_kubernetes_default_values = {
-        'working_kubernetes_node_count': 3,
-        'working_kubernetes_master_node_type': 't2.medium',
-        'working_kubernetes_worker_node_type': 't2.medium',
-        'working_kubernetes_v_log_level': 10,
-        'working_kubernetes_network_cidr': '172.20.0.0/16',
-    }
-
-    production_kubernetes_default_values = {
-        'production_kubernetes_node_count': 3,
-        'production_kubernetes_master_node_type': 't2.medium',
-        'production_kubernetes_worker_node_type': 't2.medium',
-        'production_kubernetes_v_log_level': 10,
-        'production_kubernetes_network_cidr': '172.20.0.0/16',
-    }
-
-    vpc_default_values = {
-        'vpc_name': datetime.datetime.today().strftime('%Y%m%d'),
-        'vpc_cidr_base': '172.20',
-        'aws_availability_zones': 3,
-    }
 
     availability_zone_designations = list(string.ascii_lowercase)
 
@@ -139,7 +97,7 @@ class PentagonProject():
             self._workspace_directory,
             self._repository_name)
 
-        self._private_path = "config/private/"
+        self._private_path = "config/private"
 
         if self._configure_project:
             # AWS Specific Stuff
@@ -147,7 +105,7 @@ class PentagonProject():
             self._aws_secret_key = self.get_arg('aws_secret_key', self._aws_secret_key_placeholder)
             if self.get_arg('aws_default_region'):
                 self._aws_default_region = self.get_arg('aws_default_region')
-                self._aws_availability_zone_count = int(self.get_arg('aws_availability_zone_count', self.vpc_default_values.get('aws_availability_zones')))
+                self._aws_availability_zone_count = int(self.get_arg('aws_availability_zone_count', PentagonDefaults.vpc['aws_availability_zones_count']))
                 self._aws_availability_zones = self.get_arg('aws_availability_zones', self.__default_aws_availability_zones())
             else:
                 self._aws_default_region = self._aws_default_region_placeholder
@@ -155,9 +113,8 @@ class PentagonProject():
                 self._aws_availability_zones = self._aws_availability_zones_placeholder
 
             # VPC information
-            self._vpc_name = self.get_arg('vpc_name', self.vpc_default_values.get('vpc_name'))
-            self._vpc_cidr_base = self.get_arg('vpc_cidr_base', self.vpc_default_values.get('vpc_cidr_base'))
-            # Until there exists a vpcid get method...
+            self._vpc_name = self.get_arg('vpc_name', PentagonDefaults.vpc['name'])
+            self._vpc_cidr_base = self.get_arg('vpc_cidr_base', PentagonDefaults.vpc['cidr_base'])
             self._vpc_id = self.get_arg('vpc_id', self._vpc_id)
 
             # DNS
@@ -167,37 +124,37 @@ class PentagonProject():
             self._infrastructure_bucket = self.get_arg('infrastructure_bucket', self._repository_name)
 
             # Kubernetes version
-            self._kubernetes_version = self.get_arg('kubernetes_version', self.kubernetes_default_version)
+            self._kubernetes_version = self.get_arg('kubernetes_version', PentagonDefaults.kubernetes['version'])
 
             # Working Kubernetes
             self._working_kubernetes_cluster_name = self.get_arg('working_kubernetes_cluster_name', 'working-1.{}'.format(self._dns_zone))
             self._working_kubernetes_dns_zone = self.get_arg('working_kubernetes_dns_zone', '{}'.format(self._dns_zone))
 
-            self._working_kubernetes_node_count = self.get_arg('working_kubernetes_node_count', self.working_kubernetes_default_values.get('working_kubernetes_node_count'))
-            self._working_kubernetes_master_aws_zone = self.get_arg('working_kubernetes_master_aws_zone', self._aws_availability_zones.split(',')[0])
-            self._working_kubernetes_master_node_type = self.get_arg('working_kubernetes_master_node_type', self.working_kubernetes_default_values.get('working_kubernetes_master_node_type'))
-            self._working_kubernetes_worker_node_type = self.get_arg('working_kubernetes_worker_node_type', self.working_kubernetes_default_values.get('working_kubernetes_worker_node_type'))
-            self._working_kubernetes_v_log_level = self.get_arg('working_kubernetes_v_log_level', self.working_kubernetes_default_values.get('working_kubernetes_v_log_level'))
-            self._working_kubernetes_network_cidr = self.get_arg('working_kubernetes_network_cidr', self.working_kubernetes_default_values.get('working_kubernetes_network_cidr'))
+            self._working_kubernetes_node_count = self.get_arg('working_kubernetes_node_count', PentagonDefaults.kubernetes['node_count'])
+            self._working_kubernetes_master_aws_zones = self.get_arg('working_kubernetes_master_aws_zones', self._aws_availability_zones)
+            self._working_kubernetes_master_node_type = self.get_arg('working_kubernetes_master_node_type', PentagonDefaults.kubernetes['master_node_type'])
+            self._working_kubernetes_worker_node_type = self.get_arg('working_kubernetes_worker_node_type', PentagonDefaults.kubernetes['worker_node_type'])
+            self._working_kubernetes_v_log_level = self.get_arg('working_kubernetes_v_log_level', PentagonDefaults.kubernetes['v_log_level'])
+            self._working_kubernetes_network_cidr = self.get_arg('working_kubernetes_network_cidr', PentagonDefaults.kubernetes['network_cidr'])
 
             # Production Kubernetes
             self._production_kubernetes_cluster_name = self.get_arg('production_kubernetes_cluster_name', 'production-1.{}'.format(self._dns_zone))
             self._production_kubernetes_dns_zone = self.get_arg('production_kubernetes_dns_zone', '{}'.format(self._dns_zone))
 
-            self._production_kubernetes_node_count = self.get_arg('production_kubernetes_node_count', self.production_kubernetes_default_values.get('production_kubernetes_node_count'))
-            self._production_kubernetes_master_aws_zone = self.get_arg('production_kubernetes_master_aws_zone', self._aws_availability_zones.split(',')[0])
-            self._production_kubernetes_master_node_type = self.get_arg('production_kubernetes_master_node_type', self.production_kubernetes_default_values.get('production_kubernetes_master_node_type'))
-            self._production_kubernetes_worker_node_type = self.get_arg('production_kubernetes_worker_node_type', self.production_kubernetes_default_values.get('production_kubernetes_worker_node_type'))
-            self._production_kubernetes_v_log_level = self.get_arg('production_kubernetes_v_log_level', self.production_kubernetes_default_values.get('production_kubernetes_v_log_level'))
-            self._production_kubernetes_network_cidr = self.get_arg('production_kubernetes_network_cidr', self.production_kubernetes_default_values.get('production_kubernetes_network_cidr'))
+            self._production_kubernetes_node_count = self.get_arg('production_kubernetes_node_count', PentagonDefaults.kubernetes['node_count'])
+            self._production_kubernetes_master_aws_zones = self.get_arg('production_kubernetes_master_aws_zones', self._aws_availability_zones)
+            self._production_kubernetes_master_node_type = self.get_arg('production_kubernetes_master_node_type', PentagonDefaults.kubernetes['master_node_type'])
+            self._production_kubernetes_worker_node_type = self.get_arg('production_kubernetes_worker_node_type', PentagonDefaults.kubernetes['worker_node_type'])
+            self._production_kubernetes_v_log_level = self.get_arg('production_kubernetes_v_log_level', PentagonDefaults.kubernetes['v_log_level'])
+            self._production_kubernetes_network_cidr = self.get_arg('production_kubernetes_network_cidr', PentagonDefaults.kubernetes['network_cidr'])
 
         # SSH Keys
         self._ssh_keys = {
-                          'admin_vpn': self.get_arg('admin_vpn_key', self.default_ssh_keys.get('admin_vpn_key')),
-                          'working_kube': self.get_arg('working_kube_key', self.default_ssh_keys.get('working_kube_key')),
-                          'production_kube': self.get_arg('production_kube_key', self.default_ssh_keys.get('production_kube_key')),
-                          'working_private': self.get_arg('working_private_key', self.default_ssh_keys.get('working_private_key')),
-                          'production_private': self.get_arg('production_private_key', self.default_ssh_keys.get('production_private_key')),
+                          'admin_vpn': self.get_arg('admin_vpn_key', PentagonDefaults.ssh['admin_vpn_key']),
+                          'working_kube': self.get_arg('working_kube_key', PentagonDefaults.ssh['working_kube_key']),
+                          'production_kube': self.get_arg('production_kube_key', PentagonDefaults.ssh['production_kube_key']),
+                          'working_private': self.get_arg('working_private_key', PentagonDefaults.ssh['working_private_key']),
+                          'production_private': self.get_arg('production_private_key', PentagonDefaults.ssh['production_private_key']),
                          }
 
     def __write_config_file(self):
@@ -300,45 +257,45 @@ class PentagonProject():
         }
         return render_template(template_name, template_path, target, context)
 
-    def __prepare_working_kops_vars_sh(self):
-        template_name = "vars.sh.jinja"
-        template_path = "{}/default/clusters/working/".format(self._repository_directory)
-        target = "{}/default/clusters/working/vars.sh".format(self._repository_directory)
+    def __add_kops_working_cluster(self):
         context = {
-            'kubernetes_cluster_name': self._working_kubernetes_cluster_name,
-            'aws_availability_zones': re.sub(" ", "", self._aws_availability_zones),
+            'cluster_name': self._working_kubernetes_cluster_name,
+            'availability_zones': re.sub(" ", "", self._aws_availability_zones).split(","),
             'vpc_id': self._vpc_id,
-            'ssh_key_path': "{}{}.pub".format(self._private_path, self._ssh_keys['working_kube']),
+            'ssh_key_path': "${{INFRASTRUCTURE_REPO}}/{}/{}.pub".format(self._private_path, self._ssh_keys['working_kube']),
             'kubernetes_version': self._kubernetes_version,
-            'kubernetes_node_count': self._working_kubernetes_node_count,
-            'kubernetes_master_aws_zone': self._working_kubernetes_master_aws_zone,
-            'kubernetes_master_node_type': self._working_kubernetes_master_node_type,
-            'kubernetes_worker_node_type': self._working_kubernetes_worker_node_type,
-            'kubernetes_dns_zone': self._working_kubernetes_dns_zone,
+            'ig_max_size': self._working_kubernetes_node_count,
+            'ig_min_size': self._working_kubernetes_node_count,
+            'master_availability_zones': [zone.strip() for zone in self._working_kubernetes_master_aws_zones.split(',')],
+            'master_node_type': self._working_kubernetes_master_node_type,
+            'worker_node_type': self._working_kubernetes_worker_node_type,
+            'cluster_dns': self._working_kubernetes_dns_zone,
             'kubernetes_v_log_level': self._working_kubernetes_v_log_level,
-            'kubernetes_network_cidr': self._working_kubernetes_network_cidr
+            'network_cidr': self._working_kubernetes_network_cidr,
+            'network_cidr_base': self._vpc_cidr_base,
+            'kops_state_store_bucket': self._infrastructure_bucket
         }
-        return render_template(template_name, template_path, target, context)
+        write_yaml_file("{}/default/clusters/working/vars.yml".format(self._repository_directory), context)
 
-    def __prepare_production_kops_vars_sh(self):
-        template_name = "vars.sh.jinja"
-        template_path = "{}/default/clusters/production/".format(self._repository_directory)
-        target = "{}/default/clusters/production/vars.sh".format(self._repository_directory)
+    def __add_kops_production_cluster(self):
         context = {
-            'kubernetes_cluster_name': self._production_kubernetes_cluster_name,
-            'aws_availability_zones': re.sub(" ", "", self._aws_availability_zones),
+            'cluster_name': self._production_kubernetes_cluster_name,
+            'availability_zones': re.sub(" ", "", self._aws_availability_zones).split(","),
             'vpc_id': self._vpc_id,
-            'ssh_key_path': "{}{}.pub".format(self._private_path, self._ssh_keys['production_kube']),
+            'ssh_key_path': "${{INFRASTRUCTURE_REPO}}/{}/{}.pub".format(self._private_path, self._ssh_keys['production_kube']),
             'kubernetes_version': self._kubernetes_version,
-            'kubernetes_node_count': self._production_kubernetes_node_count,
-            'kubernetes_master_aws_zone': self._production_kubernetes_master_aws_zone,
-            'kubernetes_master_node_type': self._production_kubernetes_master_node_type,
-            'kubernetes_worker_node_type': self._production_kubernetes_worker_node_type,
-            'kubernetes_dns_zone': self._production_kubernetes_dns_zone,
+            'ig_max_size': self._production_kubernetes_node_count,
+            'ig_min_size': self._production_kubernetes_node_count,
+            'master_availability_zones': [zone.strip() for zone in self._production_kubernetes_master_aws_zones.split(',')],
+            'master_node_type': self._production_kubernetes_master_node_type,
+            'worker_node_type': self._production_kubernetes_worker_node_type,
+            'cluster_dns': self._production_kubernetes_dns_zone,
             'kubernetes_v_log_level': self._production_kubernetes_v_log_level,
-            'kubernetes_network_cidr': self._production_kubernetes_network_cidr
+            'network_cidr': self._production_kubernetes_network_cidr,
+            'network_cidr_base': self._vpc_cidr_base,
+            'kops_state_store_bucket': self._infrastructure_bucket,
         }
-        return render_template(template_name, template_path, target, context)
+        write_yaml_file("{}/default/clusters/production/vars.yml".format(self._repository_directory), context)
 
     def __prepare_account_vars_sh(self):
         template_name = "vars.sh.jinja"
@@ -465,15 +422,16 @@ class PentagonProject():
             self.__prepare_config_local_vars()
             self.__prepare_ssh_config_vars()
             self.__prepare_ansible_cfg_vars()
-            self.__prepare_working_kops_vars_sh()
-            self.__prepare_production_kops_vars_sh()
             self.__add_default_aws_vpc()
             self.__prepare_vpn_cfg_vars()
             self.__prepare_account_vars_yml()
             self.__prepare_account_vars_sh()
 
+            self.__add_kops_working_cluster()
+            self.__add_kops_production_cluster()
+
     def __create_keys(self):
-            key_path = "{}/{}".format(self._repository_directory, self._private_path)
+            key_path = "{}/{}/".format(self._repository_directory, self._private_path)
             for key in self._ssh_keys:
                 logging.debug("Creating ssh key {}".format(key))
                 key_name = "{}".format(self._ssh_keys[key])

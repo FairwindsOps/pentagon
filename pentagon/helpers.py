@@ -2,6 +2,7 @@ import logging
 import os
 import traceback
 import jinja2
+import yaml
 
 
 def render_template(template_name, template_path, target, context):
@@ -21,3 +22,17 @@ def render_template(template_name, template_path, target, context):
 
         logging.debug("Removing {}/{}".format(template_path, template_name))
         os.remove("{}/{}".format(template_path, template_name))
+
+
+def write_yaml_file(filename, dict):
+    """ Accepts  filepath,  dictionary. Writes dictionary in yaml to file path, recursively creating path if necessary """
+
+    if not os.path.exists(os.path.dirname(filename)):
+        try:
+            os.makedirs(os.path.dirname(filename))
+        except OSError as exc:
+            if exc.errno != errno.EEXIST:
+                raise
+
+    with open(filename, "w") as f:
+        f.write(yaml.safe_dump(dict))
