@@ -6,6 +6,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.2.0] - 2017-11-8
+### Added
+- Added kops component
+
+### Changed
+- Added VPN name to include project name. Allows multiple VPN instances per VPC
+- Set default versions to ansible roles
+- Updated default kops cluster templates to use new kops component
+- Updated make file to use Terraform outputs and improve robustness of creat and destroy
+- Fixed legacy authorization bug in gcp coponent
+
+### Removed
+- Removed the older kops cluster creation
+
+
 ## [1.1.0] - 2017-10-4
 ### Added
 - Added Changelog
