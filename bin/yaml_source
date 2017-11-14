@@ -1,0 +1,46 @@
+#!/bin/bash -e
+
+usage="$0 file [unset] --   Where file.yml is a yml file of key value pairs
+  Sets environment variable where Key is the variable name and Value is its value
+  If unset is used, it unsets the keys in the file
+"
+
+vars_file=$1
+
+if  [ -e $1 ]
+then
+  echo $usage
+  exit 1
+fi
+
+get_keys() {
+  cat $vars_file| shyaml keys
+}
+
+set_vars() {
+for key in `get_keys`
+do
+  raw_value=$(cat $vars_file | shyaml get-value $key)
+  # some values in vars.yml use other variables that need to be dereferenced
+  dereferenced_value=$(eval echo $raw_value)
+  export $key="${dereferenced_value}"
+done
+}
+
+unset_vars() {
+  for key in `get_keys`
+  do
+    unset "${key}"
+  done
+}
+
+if [ ! -f $vars_file ]
+then
+  echo $vars_file does not exist. 
+else
+  if  [[  $2 == 'unset' ]] ; then
+    unset_vars
+  else
+    set_vars
+  fi
+fi
