@@ -68,5 +68,8 @@ setup(name='pentagon',
           [console_scripts]
           pentagon=pentagon.cli:cli
       ''',
-      packages=find_packages(exclude=['tests', 'example-component'])
+      packages=find_packages(exclude=['tests', 'example-component']),
+      scripts=[
+         'bin/yaml_source',
+         ],
       )
