@@ -7,12 +7,6 @@ usage="$0 file [unset] --   Where file.yml is a yml file of key value pairs
 
 vars_file=$1
 
-if  [ -e $1 ]
-then
-  echo $usage
-  exit 1
-fi
-
 get_keys() {
   cat $vars_file| shyaml keys
 }
@@ -34,7 +28,10 @@ unset_vars() {
   done
 }
 
-if [ ! -f $vars_file ]
+if  [ -z $1 ]
+then
+  echo $usage
+elif [ ! -f $vars_file ]
 then
   echo $vars_file does not exist. 
 else

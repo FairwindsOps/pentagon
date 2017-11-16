@@ -4,14 +4,14 @@ metadata:
   name: {{ cluster_name }}
 spec:
   {%- if additional_policies %}
-  additional_policies: |
+  additional_policies:
    {{ additional_policies|indent(4) }}
   {%- endif %}
   api:
     loadBalancer:
       type: Public
   authorization:
-    {{ authorization }}
+    {{ authorization|indent(2) }}
   channel: stable
   cloudProvider: aws
   configBase: s3://{{ kops_state_store_bucket }}/{{ cluster_name }}
@@ -36,21 +36,20 @@ spec:
   networkCIDR: {{ network_cidr }}
   networkID: {{ vpc_id }}
   networking:
-    weave:
-      mtu: 8912
+    {{ networking|indent(2) }}
   nonMasqueradeCIDR: 100.64.0.0/10
   sshAccess:
   - 0.0.0.0/0
   subnets:
   {%- for az in availability_zones %}
-  - cidr: {{ network_cidr_base|string + "." + ((third_octet|int)+loop.index-1)|string + ".0/" + network_mask|string }}
+  - cidr: {{ network_cidr_base|string + "." + ((third_octet|int) + (loop.index - 1) * third_octet_increment)|string + ".0/" + network_mask|string }}
     name: {{ az }}
     type: Private
     zone: {{ az }}
-    egress: {{ nat_gateways[loop.index] }}
+    egress: {{ nat_gateways[loop.index-1] }}
   {%- endfor -%}
   {%- for az in availability_zones %}
-  - cidr: {{ network_cidr_base|string + "." + ((third_octet|int)+loop.index-1+(third_octet_increment*4))|string + ".0/" + network_mask|string }}
+  - cidr: {{ network_cidr_base|string + "." + ((third_octet|int + 4 * third_octet_increment) + (loop.index - 1) * third_octet_increment)|string + ".0/" + network_mask|string }}
     name: utility-{{ az }}
     type: Utility
     zone: {{ az }}

@@ -21,7 +21,8 @@ class PentagonDefaults(object):
         'network_mask': 24,
         'third_octet': 16,
         'third_octet_increment': 1,
-        'authorizatin': 'alwaysAllow'
+        'authorization': {'alwaysAllow': {}},
+        'networking': {'flannel': {}},
     }
 
     vpc = {

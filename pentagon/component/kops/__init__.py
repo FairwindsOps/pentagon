@@ -6,6 +6,7 @@ import traceback
 import sys
 import re
 import subprocess
+import yaml
 
 from pentagon.component import ComponentBase
 from pentagon.helpers import render_template
@@ -16,13 +17,15 @@ class Cluster(ComponentBase):
     _path = os.path.dirname(__file__)
 
     def add(self, destination):
-        print self._data
         for key in PentagonDefaults.kubernetes:
             if not self._data.get(key):
                 self._data[key] = PentagonDefaults.kubernetes[key]
 
         if not self._data.get('network_cidr_base'):
             self._data['network_cidr_base'] = PentagonDefaults.vpc['cidr_base']
+
+        for key in ['authorization', 'networking']:
+            self._data[key] = yaml.dump(self._data[key])
 
         return super(Cluster, self).add(destination)
 
