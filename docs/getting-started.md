@@ -42,7 +42,8 @@ Pentagon is “batteries included”- not only does one get a network with a clu
 
 #### Manual steps
 * `pip install -r requirements.txt`
-* `source config/local/env-vars.sh`
+* `. yam_source config/local/vars.yml`
+* `. yam_source config/private/secrets.yml`
   * Sources environment variables required for the following steps. This will be required each time you work with the infrastructure repository or if you move the repository to another location.
 * `bash config/local/local-config-init`
 
@@ -75,7 +76,7 @@ This creates a AWS instance running [OpenVPN](https://openvpn.net/). Read more a
 ### Configure a Kubernetes Cluster
 Pentagon used Kops to create clusters in AWS. The default layout creates configurations for two Kubernetes clusters: `working` and `production`. See [Overview](overview.md) for a more comprehensive description of the directory layout.
 
-* Make sure your KOPS variables are set correctly with `source default/account/vars.sh`
+* Make sure your KOPS variables are set correctly with `. yam_source config/local/vars.yml && . yam_source config/private/secrets.yml`
 * Move into to the path for the cluster you want to work on with `cd default/clusters/<production|working>`
 * Run `bash cluster-config/kops.sh` to create a cluster.spec file for this cluster. This does not create any resources in AWS.
 
