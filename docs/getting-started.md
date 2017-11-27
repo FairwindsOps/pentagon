@@ -8,7 +8,7 @@ Pentagon is “batteries included”- not only does one get a network with a clu
 - A highly-available network, built across multiple Availability Zones
 
 ## How does it work?
- **Pentagon produces a directory.** The directory defines a basic set of configurations for [Ansible](https://www.ansible.com/), [Terraform](https://www.terraform.io/), and [kops](https://github.com/kubernetes/kops). When these tools are run in a specific order the result is a VPC with a VPN and a Kubernetes cluster in AWS. (GKE Support is in the works). Pentagon is designed to be customizable but has defaults that fit most software infrastructure needs. 
+ **Pentagon produces a directory.** The directory defines a basic set of configurations for [Ansible](https://www.ansible.com/), [Terraform](https://www.terraform.io/), and [kops](https://github.com/kubernetes/kops). When these tools are run in a specific order the result is a VPC with a VPN and a Kubernetes cluster in AWS. (GKE Support is in the works). Pentagon is designed to be customizable but has defaults that fit most software infrastructure needs.
 
 # Getting Started with Pentagon
 
@@ -35,7 +35,7 @@ Pentagon is “batteries included”- not only does one get a network with a clu
   * Arguments may also be set using environment variable in the format `PENTAGON_<argument_name_with_underscores>`.
 * `cd <project-name>-infrastructure`
 
-#### Automatic 
+#### Automatic
 * `make all`
   * conducts all following steps up short of Kubernets Cluster Creation
 * skip to [Create Kubernetes Cluster](#create-kubernetes-cluster)
@@ -80,8 +80,8 @@ Pentagon used Kops to create clusters in AWS. The default layout creates configu
 * Run `bash cluster-config/kops.sh` to create a cluster.spec file for this cluster. This does not create any resources in AWS.
 
 ### Create Kubernetes Cluster
-* Use the Kops component to create your cluster. [components#kops.cluster]
-* By default a `vars.yml` will be created at `default/clusters/working` and `default/clusters/production`. Those files are sufficient to create a cluster using the kops.cluster though, if you are not using `make all` from above you will need to enter `nat_gateways` and `vpc-id` as described in [kops component documentation](components.md#kops-cluster)
+* Use the [Kops component](components.md#kopscluster) to create your cluster.
+* By default a `vars.yml` will be created at `default/clusters/working` and `default/clusters/production`. Those files are sufficient to create a cluster using the kops.cluster though, if you are not using `make all` from above you will need to enter `nat_gateways` and `vpc-id` as described in [kops component documentation](components.md#kopscluster)
 
 * Use [kops](https://github.com/kubernetes/kops/blob/master/docs/cli/kops.md) to manage the cluster if necessary.
   * Run `kops edit cluster <clustername>` to view or edit the `cluster.spec`
