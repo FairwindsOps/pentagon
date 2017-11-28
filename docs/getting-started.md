@@ -37,7 +37,7 @@ Pentagon is “batteries included”- not only does one get a network with a clu
 
 #### Automatic
 * `make all`
-  * conducts all following steps up short of Kubernets Cluster Creation
+  * conducts all following steps short of Kubernetes Cluster Creation
 * skip to [Create Kubernetes Cluster](#create-kubernetes-cluster)
 
 #### Manual steps
