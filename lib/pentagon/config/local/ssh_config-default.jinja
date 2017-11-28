@@ -38,5 +38,6 @@ Host 172.20.0.* 172.20.1.* 172.20.2.* 172.20.3.* 172.20.4.* 172.20.5.* 172.20.6.
 Host *
   User ubuntu
   IdentityFile __INFRA_REPO_PATH__/config/private/{{ admin_vpn_key }}
+  IdentitiesOnly yes
   StrictHostKeyChecking no
   UserKnownHostsFile=/dev/null
