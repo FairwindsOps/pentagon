@@ -14,7 +14,7 @@ destroy: destroy_vpn destroy_vpn_bucket destroy_working_cluster destroy_producti
 install_requirements:
 	source yaml_source config/local/vars.yml; \
 	pip install -r requirements.txt; \
-	ansible-galaxy install -r ansible-requirements.yml;
+	ansible-galaxy install -r ansible-requirements.yml -p roles;
 
 local_config_init:
 	export INFRASTRUCTURE_REPO=$(INFRASTRUCTURE_REPO); \
