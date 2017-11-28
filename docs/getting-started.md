@@ -42,8 +42,8 @@ Pentagon is “batteries included”- not only does one get a network with a clu
 
 #### Manual steps
 * `pip install -r requirements.txt`
-* `. yam_source config/local/vars.yml`
-* `. yam_source config/private/secrets.yml`
+* `. yaml_source config/local/vars.yml`
+* `. yaml_source config/private/secrets.yml`
   * Sources environment variables required for the following steps. This will be required each time you work with the infrastructure repository or if you move the repository to another location.
 * `bash config/local/local-config-init`
 
@@ -76,7 +76,7 @@ This creates a AWS instance running [OpenVPN](https://openvpn.net/). Read more a
 ### Configure a Kubernetes Cluster
 Pentagon used Kops to create clusters in AWS. The default layout creates configurations for two Kubernetes clusters: `working` and `production`. See [Overview](overview.md) for a more comprehensive description of the directory layout.
 
-* Make sure your KOPS variables are set correctly with `. yam_source config/local/vars.yml && . yam_source config/private/secrets.yml`
+* Make sure your KOPS variables are set correctly with `. yaml_source config/local/vars.yml && . yaml_source config/private/secrets.yml`
 * Move into to the path for the cluster you want to work on with `cd default/clusters/<production|working>`
 * Run `bash cluster-config/kops.sh` to create a cluster.spec file for this cluster. This does not create any resources in AWS.
 
@@ -97,7 +97,7 @@ Pentagon used Kops to create clusters in AWS. The default layout creates configu
 
 Typically infrastructure will be required outside of your Kubernetes cluster. Other EC2, RDS, or Elasticache instances, etc are often require for an application.
 
-Pentagon convention suggests you use Ansible to create these resources and that the Ansible playbooks can be saved in the `default/resources/` or the `default/clusters/<cluster>/resoures/` directory. This depends on the scope with which the play book will be utilized. If the resources are not specific to either cluster, then we suggest you save it at the `default/resources/` level. Likewise, if it is a resource that will only be used by one cluster, such as a staging database or a production database, then we suggest writing the Ansible playbook at the `default/cluster/<cluster>/resources/` level. Writing Ansible roles can be very helpful to DRY up your resource configurations.
+Pentagon convention suggests you use Ansible to create these resources and that the Ansible playbooks can be saved in the `default/resources/` or the `default/clusters/<cluster>/resources/` directory. This depends on the scope with which the play book will be utilized. If the resources are not specific to either cluster, then we suggest you save it at the `default/resources/` level. Likewise, if it is a resource that will only be used by one cluster, such as a staging database or a production database, then we suggest writing the Ansible playbook at the `default/cluster/<cluster>/resources/` level. Writing Ansible roles can be very helpful to DRY up your resource configurations.
 
 
 ======================================
@@ -138,7 +138,7 @@ If you wish to utilize the templating ability of the `pentagon start-project` co
   * **--configure / --no-configure:**:
     * Configure project with default settings
     * Default to True
-    * If you choose `--no-configure`, placeholder values will be used in stead of defaults and you will have to manually edit the configuration files
+    * If you choose `--no-configure`, placeholder values will be used instead of defaults and you will have to manually edit the configuration files
   * **--force / --no-force**:
     * Ignore existing directories and copy project anyway
     * Defaults to False
@@ -173,7 +173,7 @@ If you wish to utilize the templating ability of the `pentagon start-project` co
   * **--create-keys / --no-create-keys**:
     * Create SSH keys or not
     * Defaults to True
-    * Keys are saved to `<workspace>/<repsitory-name>/config/private`
+    * Keys are saved to `<workspace>/<repository-name>/config/private`
     * 5 keys will be created:
       * `admin_vpn`: key for the VPN instances
       * `working_kube`: key for working Kubernetes instances
