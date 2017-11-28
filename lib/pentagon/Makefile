@@ -71,7 +71,7 @@ nat_gateways:
 	  do echo "  - $$ng" >> ../clusters/nat_gateways.yml; \
 	done; \
 	cd ../clusters; \
-	cat nat_gateways.yml >> working/vars.yml
+	cat nat_gateways.yml >> working/vars.yml; \
 	cat nat_gateways.yml >> production/vars.yml
 
 vpn:
