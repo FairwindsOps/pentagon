@@ -12,9 +12,10 @@ all: local_config_init install_requirements vpc vpc_id nat_gateways configure_wo
 destroy: destroy_vpn destroy_vpn_bucket destroy_working_cluster destroy_production_cluster destroy_vpc destroy_vpc_bucket
 
 install_requirements:
+	export INFRASTRUCTURE_REPO=$(INFRASTRUCTURE_REPO); \
 	source yaml_source config/local/vars.yml; \
 	pip install -r requirements.txt; \
-	ansible-galaxy install -r ansible-requirements.yml -p roles;
+	ansible-galaxy install -r ansible-requirements.yml;
 
 local_config_init:
 	export INFRASTRUCTURE_REPO=$(INFRASTRUCTURE_REPO); \
