@@ -76,6 +76,7 @@ nat_gateways:
 	cat nat_gateways.yml >> production/vars.yml
 
 vpn:
+	export INFRASTRUCTURE_REPO=$(INFRASTRUCTURE_REPO); \
 	source yaml_source config/local/vars.yml; \
 	source yaml_source config/private/secrets.yml; \
 	ansible-galaxy install -r ansible-requirements.yml; \
