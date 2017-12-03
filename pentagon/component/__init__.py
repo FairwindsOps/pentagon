@@ -14,10 +14,18 @@ class ComponentBase(object):
     """ Base class for Pentagon Components. """
     _required_parameters = []
 
+# List of environment variables to use.
+# If set, they should override other data sources.
+# Lower Case here will find upper case environment variables.
+# If a dictionary is passed, the key is the variable name used in context,
+# and the value is the environment variable name.
+    _environment = []
+
     def __init__(self, data, additional_args=None, **kwargs):
 
         self._data = data
         self._additional_args = additional_args
+        self._process_env_vars()
 
         missing_parameters = []
         for item in self._required_parameters:
@@ -37,6 +45,18 @@ class ComponentBase(object):
     @property
     def _files_directory(self):
         return sys.modules[self.__module__].__path__[0] + "/files"
+
+    def _process_env_vars(self):
+        logging.debug('Fetching environment variables')
+        for item in self._environment:
+            if type(item) is dict:
+                context_var = item.keys()[0]
+                env_var = os.environ.get(item.values()[0])
+            else:
+                context_var = item.lower()
+                env_var = os.environ.get(item.upper())
+            logging.debug("Setting component variable {}: {}".format(context_var, env_var))
+            self._data[context_var] = env_var
 
     def add(self, destination):
         """ Copies files and templates from <component>/files and templates the *.jinja files """

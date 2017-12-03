@@ -1,6 +1,6 @@
 # Pentagon Components
 
-The functionality of Pentagon can be extended with components. Currently only two commands are accepted `add` and `get`. Data is passed to the compenent in `Key=Value` pairs and `-D` flag or from a datafile in yml or json format.
+The functionality of Pentagon can be extended with components. Currently only two commands are accepted `add` and `get`. Data is passed to the compenent in `Key=Value` pairs and `-D` flag or from a datafile in yml or json format. For some components, environment variables may also be used. See documentation for the particular component.
 
 Global options for both `get` and `add` component commands:
 
