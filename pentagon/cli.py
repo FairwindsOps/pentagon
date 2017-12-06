@@ -100,7 +100,7 @@ def get(ctx, component_path, additional_args, **kwargs):
 
 def _run(action, component_path, additional_args, options):
     logging.basicConfig(level=options.get('log_level'))
-    logging.debug("Importing module Pentagon{}".format(component_path))
+    logging.debug("Importing module Pentagon {}".format(component_path))
     logging.debug("with options: {}".format(options))
     logging.debug("and additional arguments: {}".format(additional_args))
 
@@ -147,10 +147,16 @@ def get_component_class(component_path):
         component_name = component_path
         component_class_name = component_path.title()
 
+    logging.debug('Seeking pentagon.component.{}.{}'.format(component_name, component_class_name))
+
     # Find Class if it exists
     component_class = locate("pentagon.component.{}.{}".format(component_name, component_class_name))
     if component_class is None:
+        logging.debug('pentagon.component.{}.{} not found'.format(component_name, component_class_name))
+        logging.debug('Seeking pentagon.{}.{}'.format(component_name, component_class_name))
         component_class = locate("pentagon_{}.{}".format(component_name, component_class_name))
+
+    logging.debug("Found {}".format(component_class))
 
     return component_class
 
