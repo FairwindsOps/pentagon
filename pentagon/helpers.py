@@ -5,23 +5,35 @@ import jinja2
 import yaml
 
 
-def render_template(template_name, template_path, target, context):
+def render_template(template_name, template_path, target, context, delete_template=True, overwrite=False):
+        """
+        Helper function to write out DRY up templating. Accepts template name (string),
+        path (string), target directory (string), context (dictionary) and delete_template (boolean)
+        Default behavior is to use the key of the dictionary as the template variable names, replace
+        them with the value in the tempalate and delete the template if delete_template is
+        True
+        """
+
         logging.info("Writing {}".format(target))
         logging.debug("Template Context: {}".format(context))
-        if os.path.isfile(target):
+        logging.debug("Overwrite is {}".format(overwrite))
+        if os.path.isfile(target) and overwrite is not True:
             logging.warn("Cowardly refusing to overwrite existing file {}".format(target))
             return False
 
+        logging.debug("Attempting to write {} from template {}{}".format(target, template_path, template_name))
+
         with open(target, 'w+') as vars_file:
             try:
-                template = jinja2.Environment(loader=jinja2.FileSystemLoader(template_path)).get_template(template_name)
+                template = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.normpath(template_path))).get_template(os.path.normpath(template_name))
                 vars_file.write(template.render(context))
             except Exception, e:
                 logging.error("Error writing {}. {}".format(target, traceback.print_exc(e)))
                 return False
 
-        logging.debug("Removing {}/{}".format(template_path, template_name))
-        os.remove("{}/{}".format(template_path, template_name))
+        if delete_template:
+            logging.debug("Removing {}/{}".format(template_path, template_name))
+            os.remove("{}/{}".format(template_path, template_name))
 
 
 def write_yaml_file(filename, dict):

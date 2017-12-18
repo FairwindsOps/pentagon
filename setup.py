@@ -25,7 +25,7 @@ except ImportError:
           "pip install setuptools).")
     sys.exit(1)
 
-__version__ = '1.0-beta'
+__version__ = '1.2.0'
 __author__ = 'ReactiveOps, Inc.'
 
 setup(name='pentagon',
@@ -36,8 +36,6 @@ setup(name='pentagon',
       url='http://reactiveops.com/',
       license='Apache2.0',
       include_package_data=True,
-      # Changes to requirements here may need to be updated in
-      # lib/pentagon/requirements.txt and requirements.txt as well
       install_requires=[
         "click==6.7",
         "GitPython==2.1.3",
