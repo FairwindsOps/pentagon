@@ -4,3 +4,4 @@
 *.pem
 *.pub
 *secret*.yml
+roles

@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Removed
 - env-vars.sh script
+- untracked roles directory for ansible
 
 ### Updated 
 - makefile to support `yaml_source` change
