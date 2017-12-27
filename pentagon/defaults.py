@@ -26,7 +26,7 @@ class PentagonDefaults(object):
     }
 
     vpc = {
-        'name': datetime.datetime.today().strftime('%Y%m%d'),
-        'cidr_base': '172.20',
-        'aws_availability_zones_count': 3,
+        'vpc_name': datetime.datetime.today().strftime('%Y%m%d'),
+        'vpc_cidr_base': '172.20',
+        'aws_availability_zone_count': 3,
     }

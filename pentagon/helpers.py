@@ -3,6 +3,7 @@ import os
 import traceback
 import jinja2
 import yaml
+from Crypto.PublicKey import RSA
 
 
 def render_template(template_name, template_path, target, context, delete_template=True, overwrite=False):
@@ -47,3 +48,20 @@ def write_yaml_file(filename, d):
 
     with open(filename, "w") as f:
         f.write(yaml.safe_dump(d, default_flow_style=False))
+
+
+def create_rsa_key(name, path, bits=2048):
+    """ creates an ssh key pair. Accepts name, path and bits. Name is the name of the key pair to generate at Path. Bits defaults to 2048 """
+
+    key = RSA.generate(bits)
+
+    private_key = "{}{}".format(path, name)
+    public_key = "{}{}.pub".format(path, name)
+
+    with open(private_key, 'w') as content_file:
+        os.chmod(private_key, 0600)
+        content_file.write(key.exportKey('PEM'))
+
+    pubkey = key.publickey()
+    with open(public_key, 'w') as content_file:
+        content_file.write(pubkey.exportKey('OpenSSH'))

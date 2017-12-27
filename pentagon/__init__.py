@@ -18,7 +18,7 @@ from Crypto.PublicKey import RSA
 
 import pentagon.component.vpc as aws_vpc
 import pentagon.component.kops as kops
-from pentagon.helpers import render_template, write_yaml_file
+from pentagon.helpers import render_template, write_yaml_file, create_rsa_key
 from pentagon.defaults import PentagonDefaults
 
 
@@ -382,20 +382,6 @@ class PentagonProject(object):
             else:
                 logging.warn("Cannot get ami-id without AWS Key, Secret and Default Region set")
 
-    def __create_key(self, name, path, bits=2048):
-        key = RSA.generate(bits)
-
-        private_key = "{}{}".format(path, name)
-        public_key = "{}{}.pub".format(path, name)
-
-        with open(private_key, 'w') as content_file:
-            os.chmod(private_key, 0600)
-            content_file.write(key.exportKey('PEM'))
-
-        pubkey = key.publickey()
-        with open(public_key, 'w') as content_file:
-            content_file.write(pubkey.exportKey('OpenSSH'))
-
     def __directory_check(self):
         if not self.__workspace_directory_exists():
             msg = "Workspace directory `{0}` does not exist.".format(self._workspace_directory)
@@ -444,7 +430,7 @@ class PentagonProject(object):
                 logging.debug("Creating ssh key {}".format(key))
                 key_name = "{}".format(self._ssh_keys[key])
                 if not os.path.isfile("{}{}".format(key_path, key_name)):
-                    self.__create_key(key_name, key_path)
+                    create_rsa_key(key_name, key_path)
                 else:
                     logging.warn("Key {}{} exist!".format(key_path, key_name))
 
