@@ -10,6 +10,7 @@ import os
 import re
 import boto3
 import sys
+import traceback
 
 from git import Repo, Git
 from shutil import copytree, ignore_patterns
@@ -159,14 +160,20 @@ class PentagonProject(object):
 
     def __write_config_file(self):
         logging.info("Writing arguments to file for Posterity: {}".format(self._outfile))
-        config = self._args
+        config = {}
+
         if 'output_file' in config:
             config.pop('output_file')
 
+        for key, value in self._args.items():
+            if value and key != "aws_access_key" and key != "aws_secret_key":
+                config[key] = value
+
+        logging.debug(config)
         try:
-            with open(self._outfile, "w") as f:
-                return yaml.dump(config, f, default_flow_style=False)
+            write_yaml_file(self._repository_directory + "/" + self._outfile, config)
         except Exception as e:
+            logging.debug(traceback.format_exc(e))
             logging.error("Failed to write arguments to file")
             logging.error(e)
 
@@ -395,6 +402,7 @@ class PentagonProject(object):
             raise PentagonException(msg)
 
     def start(self):
+        
         self.__directory_check()
 
         if not self.__repository_directory_exists() or self._force:

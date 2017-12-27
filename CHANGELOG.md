@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Updated 
 - makefile to support `yaml_source` change
+- added distutil.dir_util to allow overwriting exisint directories
+- added exit on failure for ComponentBase class
+- added default config out file for Pentaong start-project
+- updated config file output to sanitize and not include blank values
 
 ## [1.2.0] - 2017-11-8
 ### Added

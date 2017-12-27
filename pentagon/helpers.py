@@ -36,9 +36,8 @@ def render_template(template_name, template_path, target, context, delete_templa
             os.remove("{}/{}".format(template_path, template_name))
 
 
-def write_yaml_file(filename, dict):
+def write_yaml_file(filename, d):
     """ Accepts  filepath,  dictionary. Writes dictionary in yaml to file path, recursively creating path if necessary """
-
     if not os.path.exists(os.path.dirname(filename)):
         try:
             os.makedirs(os.path.dirname(filename))
@@ -47,4 +46,4 @@ def write_yaml_file(filename, dict):
                 raise
 
     with open(filename, "w") as f:
-        f.write(yaml.safe_dump(dict))
+        f.write(yaml.safe_dump(d, default_flow_style=False))

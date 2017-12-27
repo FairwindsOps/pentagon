@@ -91,7 +91,12 @@ class ComponentBase(object):
         self._destination = destination
         self._overwrite = overwrite
         try:
-            shutil.copytree(self._files_directory, self._destination_directory_name)
+            if self._overwrite:
+                from distutils.dir_util import copy_tree
+            else:
+                from shutil import copytree as copy_tree
+
+            copy_tree(self._files_directory, self._destination_directory_name)
 
             self._remove_init_file()
             self._render_directory_templates()
@@ -100,3 +105,4 @@ class ComponentBase(object):
             logging.error("Error occured configuring component")
             logging.error(e)
             logging.debug(traceback.format_exc(e))
+            sys.exit(1)
