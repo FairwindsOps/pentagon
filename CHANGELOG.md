@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Environment variables are now checked in ComponentBase class
 - Defaults to component
 - overwrite to template rendering
+- added inventory component
 
 ### Removed
 - env-vars.sh script
