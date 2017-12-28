@@ -51,7 +51,7 @@ class ComponentBase(object):
 
     def _process_env_vars(self):
         logging.debug('Fetching environment variables')
-        environ_data= {}
+        environ_data = {}
         for item in self._environment:
             if type(item) is dict:
                 context_var = item.keys()[0]
