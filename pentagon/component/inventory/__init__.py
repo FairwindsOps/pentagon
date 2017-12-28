@@ -6,6 +6,7 @@ import traceback
 
 from pentagon.component import ComponentBase
 from pentagon.component.vpc import Vpc
+from pentagon.component.vpn import Vpn
 from pentagon.helpers import create_rsa_key
 from pentagon.defaults import PentagonDefaults
 
@@ -45,6 +46,7 @@ class Inventory(ComponentBase):
                 self._merge_data(self._ssh_keys)
                 self.__create_keys()
                 Aws(self._data).add(self._destination)
+                Vpn(self._data).add("{}/resources".format(self._destination), overwrite=True)
 
             if self._data['type'].lower() == 'gcp':
                 Gcp(self._data).add(self._destination)

@@ -7,7 +7,7 @@
   pre_tasks:
     - include_vars: "{{ item }}"
       with_items:
-        - ../../account/vars.yml
+        - ../../config/local/vars.yml
         - env.yml
       tags: always
   
@@ -25,7 +25,7 @@
   pre_tasks:
     - include_vars: "{{ item }}"
       with_items:
-        - ../../account/vars.yml
+        - ../../config/local/vars.yml
         - env.yml
       tags: always
 
@@ -40,7 +40,7 @@
   pre_tasks:
     - include_vars: "{{ item }}"
       with_items:
-        - ../../account/vars.yml
+        - ../../config/local/vars.yml
         - env.yml
 
   roles:
