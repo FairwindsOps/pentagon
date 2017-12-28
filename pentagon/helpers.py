@@ -4,6 +4,7 @@ import traceback
 import jinja2
 import yaml
 from Crypto.PublicKey import RSA
+from stat import *
 
 
 def render_template(template_name, template_path, target, context, delete_template=True, overwrite=False):
@@ -24,13 +25,19 @@ def render_template(template_name, template_path, target, context, delete_templa
 
         logging.debug("Attempting to write {} from template {}{}".format(target, template_path, template_name))
 
+        template_path = os.path.normpath(template_path)
+        template_name = os.path.normpath(template_name)
+        template_permissions = os.stat(template_path + '/' + template_name).st_mode
+
         with open(target, 'w+') as vars_file:
             try:
-                template = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.normpath(template_path))).get_template(os.path.normpath(template_name))
+                template = jinja2.Environment(loader=jinja2.FileSystemLoader(template_path)).get_template(template_name)
                 vars_file.write(template.render(context))
             except Exception, e:
                 logging.error("Error writing {}. {}".format(target, traceback.print_exc(e)))
                 return False
+
+        os.chmod(target, template_permissions)
 
         if delete_template:
             logging.debug("Removing {}/{}".format(template_path, template_name))

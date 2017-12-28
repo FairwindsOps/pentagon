@@ -239,6 +239,7 @@ class PentagonProject(object):
             'production_private_key': self._ssh_keys['production_private_key'],
             'working_private_key': self._ssh_keys['working_private_key'],
             'admin_vpn_key': self._ssh_keys['admin_vpn_key'],
+            'account': 'default',
         }
 
     def __add_kops_working_cluster(self):

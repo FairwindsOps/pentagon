@@ -7,4 +7,4 @@ hash_behavior = merge
 
 [ssh_connection]
 # this needs the path defined without the use of ENV variables
-ssh_args = -F __INFRA_REPO_PATH__/config/private/ssh_config
+ssh_args = -F __INFRA_REPO_PATH__/inventory/{{ account }}/config/private/ssh_config
