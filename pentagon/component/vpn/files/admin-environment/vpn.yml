@@ -15,7 +15,7 @@
     - ec2_key:
         name: "{{ aws_key_name }}"
         key_material: "{{ item }}"
-      with_file: "../../../config/private/{{ aws_key_name }}.pub"
+      with_file: "../../config/private/{{ aws_key_name }}.pub"
 
 - name:  set up vpn prerequisites
   hosts: localhost

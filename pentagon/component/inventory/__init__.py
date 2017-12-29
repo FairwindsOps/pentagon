@@ -14,6 +14,7 @@ from pentagon.defaults import PentagonDefaults
 class Inventory(ComponentBase):
 
     _defaults = {'type': 'aws'}
+    _required_parameters = ['account']
 
     def __init__(self, data, additional_args=None, **kwargs):
         super(Inventory, self).__init__(data, additional_args, **kwargs)
