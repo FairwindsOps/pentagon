@@ -49,40 +49,40 @@ Pentagon is “batteries included”- not only does one get a network with a clu
 
 ### Create a VPC
 This creates the VPC and private, public, and admin subnets in that VPC for non Kubernetes resources. Read more about networking [here](network.md).
-* `cd default/vpc`
+* `cd inventory/default/vpc`
 * Edit `terraform.tfvars`and verify the generated `aws_azs` actually exist in `aws_region`
 * `make all`
-* In `default/clusters/*/vars.sh`, set `VPC_ID` using the newly created VPC ID. You can find that ID in Terraform output or using the AWS web console.
+* In `inventory/default/clusters/*/vars.yml`, set `VPC_ID` using the newly created VPC ID. You can find that ID in Terraform output or using the AWS web console.
 
 ### Configure DNS and Route53
 If you don't already have a Route53 Hosted Zone configured, do that now.
 * Create a Route53 Hosted Zone (e.g. `pentagon.mycompany.com`)
-* In `default/account/vars.yml` set `canonical_zone` to match your Hosted Zone
-* In `default/clusters/*/vars.sh`
+* In `inventory/default/account/vars.yml` set `canonical_zone` to match your Hosted Zone
+* In `inventory/default/clusters/*/vars.yml`
   * Set `CLUSTER_NAME` to a hostname that ends with your hosted zone (e.g. `working-1.pentagon.mycompany.com`)
   * Set `DNS_ZONE` to your Hosted Zone (e.g. `pentagon.mycompany.com`)
 
 ### Setup a VPN
 This creates a AWS instance running [OpenVPN](https://openvpn.net/). Read more about the VPN [here](vpn.md).
 * From the root of your project run `ansible-galaxy install -r ansible-requirements.yml`
-* `cd default/resources/admin-environment`
+* `cd inventory/default/resources/admin-environment`
 * In `env.yml`, set the list of user names that should have access to the VPN under `openvpn_clients`. You can add more later.
 * Run Ansible a few times
   * Run `ansible-playbook vpn.yml` until it fails on `VPN security groups`
   * Run `ansible-playbook vpn.yml` until it fails `Gathering Facts` after you agree to trust the SSH key for the host.
   * Run `ansible-playbook vpn.yml` one last time and it will succeed.
-  * Edit `config/private/ssh_config` and add the IP address from the SSH key prompt to the `#VPN instance` section.
+  * Edit `inventory/config/private/ssh_config` and add the IP address from the SSH key prompt to the `#VPN instance` section.
 
 ### Configure a Kubernetes Cluster
 Pentagon used Kops to create clusters in AWS. The default layout creates configurations for two Kubernetes clusters: `working` and `production`. See [Overview](overview.md) for a more comprehensive description of the directory layout.
 
-* Make sure your KOPS variables are set correctly with `. yaml_source config/local/vars.yml && . yaml_source config/private/secrets.yml`
-* Move into to the path for the cluster you want to work on with `cd default/clusters/<production|working>`
+* Make sure your KOPS variables are set correctly with `. yaml_source inventory/default/config/local/vars.yml && . yaml_source inventory/default/config/private/secrets.yml`
+* Move into to the path for the cluster you want to work on with `cd inventory/default/clusters/<production|working>`
 * Run `bash cluster-config/kops.sh` to create a cluster.spec file for this cluster. This does not create any resources in AWS.
 
 ### Create Kubernetes Cluster
 * Use the [Kops component](components.md#kopscluster) to create your cluster.
-* By default a `vars.yml` will be created at `default/clusters/working` and `default/clusters/production`. Those files are sufficient to create a cluster using the kops.cluster though, if you are not using `make all` from above you will need to enter `nat_gateways` and `vpc-id` as described in [kops component documentation](components.md#kopscluster)
+* By default a `vars.yml` will be created at `inventory/default/clusters/working` and `inventory/default/clusters/production`. Those files are sufficient to create a cluster using the kops.cluster though, if you are not using `make all` from above you will need to enter `nat_gateways` and `vpc-id` as described in [kops component documentation](components.md#kopscluster)
 
 * Use [kops](https://github.com/kubernetes/kops/blob/master/docs/cli/kops.md) to manage the cluster if necessary.
   * Run `kops edit cluster <clustername>` to view or edit the `cluster.spec`
