@@ -167,6 +167,17 @@ Options:
       pentagon get kops.cluster -Dname=working-1.cluster.reactiveops.io -Dkops_state_store=reactiveops.io-infrastructure
       ```
 
+### inventory
+- add:
+    - Creates account configuration directory. Creates all necessary files in `config`, `clusters` and `resources`. Depending on `type` it may also add a `vpc` component and `vpn` component under `resources`. Creates `clusters` directory but does not create cluster configuration. Use the cluster component for that.
+    - `bash ./<nodepool_name>/create_nodepool.sh` will create the nodepool as configured
+    - Arguments:
+      - `name`: name of account to add to inventory
+      - `type`: type of account to add to inventory aws or gcp (required). 
+    - If a `-f` file is passed in, data are merged with `-D` values ovveriding the file values
+    
+
+
 ## Writing your own components
 
 Component modules must be named `pentagon<component_name>`. Classes are subclasses of the `pentagon.component.ComponentBase` class and they must be named <Component> (note the capital first letter).  The `pentagon add <component_name>` command will prefer built in components to external components so ensure your component name is not already in use. The <component_name> argument can be a dot separated module path ie `gcp.cluster` where the last parameter is the lowercase class name. For example. `gcp.cluster` finds the Cluster class in the cluster module in the gcp module.
