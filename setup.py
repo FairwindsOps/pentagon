@@ -28,6 +28,15 @@ except ImportError:
 __version__ = '1.2.0'
 __author__ = 'ReactiveOps, Inc.'
 
+def package_files(directory):
+    paths = []
+    for (path, directories, filenames) in os.walk(directory):
+        for filename in filenames:
+            paths.append(os.path.join('..', path, filename))
+    return paths
+
+extra_files = package_files('pentagon/component')
+
 setup(name='pentagon',
       version=__version__,
       description='Radically simple kubernetes',
@@ -70,4 +79,6 @@ setup(name='pentagon',
       scripts=[
          'bin/yaml_source',
          ],
+      #package_data={'': extra_files},
+      data_files=[],
       )

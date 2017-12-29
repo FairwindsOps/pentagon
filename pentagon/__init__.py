@@ -17,6 +17,7 @@ from shutil import copytree, ignore_patterns
 
 import pentagon.component.kops as kops
 import pentagon.component.inventory as inventory
+import pentagon.component.core as core
 from pentagon.helpers import render_template, write_yaml_file, create_rsa_key
 from pentagon.defaults import PentagonDefaults
 
@@ -314,7 +315,7 @@ class PentagonProject(object):
         if not self.__repository_directory_exists() or self._force:
             if not self._git_repo:
                 logging.info("Copying project files...")
-                self.__copy_project_tree()
+                self.__create_repo_core()
                 self.__git_init()
                 self.__configure_default_project()
                 if self._outfile is not None:
@@ -341,10 +342,7 @@ class PentagonProject(object):
             self.__add_kops_working_cluster()
             self.__add_kops_production_cluster()
 
-
-    def __copy_project_tree(self):
-
-        self._project_source = "{}/../lib/pentagon/".format(os.path.dirname(__file__))
-        logging.debug(self._project_source)
+    def __create_repo_core(self):
         logging.debug(self._repository_directory)
-        copytree(self._project_source, self._repository_directory, symlinks=True)
+        core.Core({}).add('{}'.format(self._repository_directory))
+    

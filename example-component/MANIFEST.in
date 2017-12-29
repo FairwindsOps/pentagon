@@ -1,2 +1,2 @@
-recursive-include pentagoncomponent/templates/ *
+recursive-include pentagoncomponent/files/ *
 
