@@ -5,3 +5,4 @@
 *.pub
 *secret*.yml
 roles
+helm
