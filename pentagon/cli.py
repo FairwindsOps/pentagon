@@ -9,6 +9,8 @@ import pentagon
 
 from pydoc import locate
 from pentagon import PentagonException
+from pentagon import migration
+
 from meta import __version__, __author__
 
 
@@ -95,6 +97,14 @@ def add(ctx, component_path, additional_args, **kwargs):
 @click.argument('additional-args', nargs=-1, default=None)
 def get(ctx, component_path, additional_args, **kwargs):
     _run('get', component_path, additional_args, kwargs)
+
+
+@cli.command()
+@click.pass_context
+@click.option("--dry-run/--no-dry-run", default=False, help="Test migration before applying")
+def migrate(ctx, **kwargs):
+    """ Update Infrastructure Repository to the latest configuration """
+    migration.migrate()
 
 
 def _run(action, component_path, additional_args, options):
