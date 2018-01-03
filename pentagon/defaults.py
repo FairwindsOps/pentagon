@@ -17,7 +17,7 @@ class PentagonDefaults(object):
         'node_root_volume_size': 200,
         'v_log_level': 10,
         'network_cidr': '172.20.0.0/16',
-        'version': '1.5.7',
+        'version': '1.8.4',
         'network_mask': 24,
         'third_octet': 16,
         'third_octet_increment': 1,
