@@ -25,7 +25,7 @@ except ImportError:
           "pip install setuptools).")
     sys.exit(1)
 
-__version__ = '1.2.0'
+__version__ = '2.0.0'
 __author__ = 'ReactiveOps, Inc.'
 
 def package_files(directory):
