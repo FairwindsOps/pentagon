@@ -22,7 +22,7 @@ def cli(ctx):
 @click.pass_context
 @click.argument('name')
 @click.option('-f', '--config-file', help='File to read configuration options from. File supercedes command line options.')
-@click.option('-o', '--output-file', help='File to write options to after completion')
+@click.option('-o', '--output-file', default='config.yml', help='File to write options to after completion')
 @click.option('--workspace-directory', help='Directory to place new project, defaults to ./')
 @click.option('--repository-name', help='Name of the folder to initialize the infrastructure repository')
 @click.option('--configure/--no-configure', default=True, help='Configure project with default settings')

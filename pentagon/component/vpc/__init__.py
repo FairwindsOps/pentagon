@@ -3,4 +3,5 @@ import os
 
 
 class Vpc(ComponentBase):
-    pass
+
+    _required_parameters = ['aws_region']

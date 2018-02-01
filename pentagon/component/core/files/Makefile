@@ -7,37 +7,37 @@ INFRASTRUCTURE_BUCKET := $(notdir ${INFRASTRUCTURE_REPO})
 BASENAME := $(notdir ${INFRASTRUCTURE_REPO})
 VPN_BUCKET := $(subst infrastructure,vpn,$(BASENAME))
 
-all: local_config_init install_requirements vpc vpc_id nat_gateways configure_working_cluster configure_production_cluster vpn
+all: local_config_init install_requirements vpc vpc_id nat_gateways configure_working_cluster #configure_production_cluster vpn
 
 destroy: destroy_vpn destroy_vpn_bucket destroy_working_cluster destroy_production_cluster destroy_vpc destroy_vpc_bucket
 
 install_requirements:
 	export INFRASTRUCTURE_REPO=$(INFRASTRUCTURE_REPO); \
-	source yaml_source config/local/vars.yml; \
+	source yaml_source inventory/default/config/local/vars.yml; \
 	pip install -r requirements.txt; \
 	ansible-galaxy install -r ansible-requirements.yml;
 
 local_config_init:
 	export INFRASTRUCTURE_REPO=$(INFRASTRUCTURE_REPO); \
-	source yaml_source config/local/vars.yml; \
-	source yaml_source config/private/secrets.yml; \
-	config/local/local-config-init
+	source yaml_source inventory/default/config/local/vars.yml; \
+	source yaml_source inventory/default/config/private/secrets.yml; \
+	inventory/default/config/local/local-config-init
 
 vpc:
-	source yaml_source config/local/vars.yml; \
-	source yaml_source config/private/secrets.yml; \
-	cd default/vpc ; \
+	source yaml_source inventory/default/config/local/vars.yml; \
+	source yaml_source inventory/default/config/private/secrets.yml; \
+	cd inventory/default/vpc ; \
 	make all
 
 destroy_vpc:
-	source yaml_source config/local/vars.yml; \
-	source yaml_source config/private/secrets.yml; \
-	cd default/vpc ; \
+	source yaml_source inventory/default/config/local/vars.yml; \
+	source yaml_source inventory/default/config/private/secrets.yml; \
+	cd inventory/default/vpc ; \
 	make destroy
 
 destroy_vpc_bucket:
-	source yaml_source config/local/vars.yml; \
-	source yaml_source config/private/secrets.yml; \
+	source yaml_source inventory/default/config/local/vars.yml; \
+	source yaml_source inventory/default/config/private/secrets.yml; \
 	aws s3 ls s3://${INFRASTRUCTURE_BUCKET} || exit 0 && \
 	aws s3api list-object-versions --bucket  ${INFRASTRUCTURE_BUCKET} | jq -r '.Versions[] | .VersionId + " " + .Key' > .tmp && \
 	while read version ; do echo $$version ; vid=$$(echo $$version | awk '{ print $$1 }') ; key=$$(echo $$version | awk '{ print $$2 }') && \
@@ -52,22 +52,22 @@ destroy_vpc_bucket:
 	rm .tmp &&\
 	aws s3api delete-bucket --bucket $(INFRASTRUCTURE_BUCKET)
 
-VPC_ID = "$(shell  source yaml_source config/local/vars.yml; source yaml_source config/private/secrets.yml;  cd default/vpc ; terraform output aws_vpc_id)"
+VPC_ID = "$(shell  source yaml_source inventory/default/config/local/vars.yml; source yaml_source inventory/default/config/private/secrets.yml;  cd inventory/default/vpc ; terraform output aws_vpc_id)"
 vpc_id:
-	source yaml_source config/local/vars.yml; \
-	source yaml_source config/private/secrets.yml; \
-	grep -v "vpc_id" default/clusters/working/vars.yml > default/clusters/working/vars.yml.tmp && \
-	mv default/clusters/working/vars.yml.tmp default/clusters/working/vars.yml; \
-	grep -v "vpc_id" default/clusters/production/vars.yml > default/clusters/production/vars.yml.tmp && \
-	mv default/clusters/production/vars.yml.tmp default/clusters/production/vars.yml; \
-	echo "vpc_id: $(VPC_ID)" >> default/clusters/working/vars.yml; \
-	echo "vpc_id: $(VPC_ID)" >> default/clusters/production/vars.yml;
+	source yaml_source inventory/default/config/local/vars.yml; \
+	source yaml_source inventory/default/config/private/secrets.yml; \
+	grep -v "vpc_id" inventory/default/clusters/working/vars.yml > inventory/default/clusters/working/vars.yml.tmp && \
+	mv inventory/default/clusters/working/vars.yml.tmp inventory/default/clusters/working/vars.yml; \
+	grep -v "vpc_id" inventory/default/clusters/production/vars.yml > inventory/default/clusters/production/vars.yml.tmp && \
+	mv inventory/default/clusters/production/vars.yml.tmp inventory/default/clusters/production/vars.yml; \
+	echo "vpc_id: $(VPC_ID)" >> inventory/default/clusters/working/vars.yml; \
+	echo "vpc_id: $(VPC_ID)" >> inventory/default/clusters/production/vars.yml;
 
 nat_gateways:
-	source yaml_source config/local/vars.yml; \
-	source yaml_source config/private/secrets.yml; \
-	echo "nat_gateways:" > default/clusters/nat_gateways.yml; \
-	cd default/vpc; \
+	source yaml_source inventory/default/config/local/vars.yml; \
+	source yaml_source inventory/default/config/private/secrets.yml; \
+	echo "nat_gateways:" > inventory/default/clusters/nat_gateways.yml; \
+	cd inventory/default/vpc; \
 	for ng in `terraform output -json aws_nat_gateway_ids |jq -r '.value[]' `; \
 	  do echo "  - $$ng" >> ../clusters/nat_gateways.yml; \
 	done; \
@@ -77,24 +77,24 @@ nat_gateways:
 
 vpn:
 	export INFRASTRUCTURE_REPO=$(INFRASTRUCTURE_REPO); \
-	source yaml_source config/local/vars.yml; \
-	source yaml_source config/private/secrets.yml; \
+	source yaml_source inventory/default/config/local/vars.yml; \
+	source yaml_source inventory/default/config/private/secrets.yml; \
 	ansible-galaxy install -r ansible-requirements.yml; \
-	cd default/resources/admin-environment; \
+	cd inventory/default/resources/admin-environment; \
 	ansible-playbook vpn.yml || true; \
 	ansible-playbook vpn.yml
 
 destroy_vpn: 
-	source yaml_source config/local/vars.yml; \
-	source yaml_source config/private/secrets.yml; \
-	cd default/resources/admin-environment; \
+	source yaml_source inventory/default/config/local/vars.yml; \
+	source yaml_source inventory/default/config/private/secrets.yml; \
+	cd inventory/default/resources/admin-environment; \
 	ansible-playbook destroy.yml || true; \
 	ansible-playbook destroy.yml || true; \
 	ansible-playbook destroy.yml
 
 destroy_vpn_bucket:
-	source yaml_source config/local/vars.yml; \
-	source yaml_source config/private/secrets.yml; \
+	source yaml_source inventory/default/config/local/vars.yml; \
+	source yaml_source inventory/default/config/private/secrets.yml; \
 	aws s3 ls s3://$(VPN_BUCKET) || exit 0 && \
 	aws s3api list-object-versions --bucket  $(VPN_BUCKET) | jq -r '.Versions[] | .VersionId + " " + .Key' > .tmp && \
 	while read version ; do echo $$version ; vid=$$(echo $$version | awk '{ print $$1 }') ; key=$$(echo $$version | awk '{ print $$2 }') ;\
@@ -123,47 +123,43 @@ test_connect_vpn:
 	grep "Initialization Sequence Completed" openvpn.out
 
 configure_working_cluster:
-	source yaml_source config/local/vars.yml; \
-	source yaml_source config/private/secrets.yml; \
+	source yaml_source inventory/default/config/local/vars.yml; \
+	source yaml_source inventory/default/config/private/secrets.yml; \
 	export INFRASTRUCTURE_REPO=$(INFRASTRUCTURE_REPO); \
-	cd default/clusters/working; \
+	cd inventory/default/clusters/working; \
 	pentagon add kops.cluster -f vars.yml -D"name=cluster-config"; \
 	cd cluster-config; \
 	source ./kops.sh || true
 
 configure_production_cluster:
-	source yaml_source config/local/vars.yml; \
-	source yaml_source config/private/secrets.yml; \
+	source yaml_source inventory/default/config/local/vars.yml; \
+	source yaml_source inventory/default/config/private/secrets.yml; \
 	export INFRASTRUCTURE_REPO=$(INFRASTRUCTURE_REPO); \
-	cd default/clusters/production; \
+	cd inventory/default/clusters/production; \
 	pentagon add kops.cluster -f vars.yml -D"name=cluster-config"; \
 	cd cluster-config; \
 	source ./kops.sh || true
 
 update_working_cluster:
-	source yaml_source config/local/vars.yml; \
-	source yaml_source config/private/secrets.yml; \
-	source default/account/vars.sh; \
-	cd default/clusters/working/cluster-config; \
+	source yaml_source inventory/default/config/local/vars.yml; \
+	source yaml_source inventory/default/config/private/secrets.yml; \
+	cd inventory/default/clusters/working/cluster-config; \
 	kops update cluster `cat ../vars.yml | shyaml get-value cluster_name` --yes
 
 update_production_cluster:
-	source yaml_source config/local/vars.yml; \
-	source yaml_source config/private/secrets.yml; \
-	source default/account/vars.sh; \
-	cd default/clusters/production/cluster-config; \
+	source yaml_source inventory/default/config/local/vars.yml; \
+	source yaml_source inventory/default/config/private/secrets.yml; \
+	cd inventory/default/clusters/production/cluster-config; \
 	kops update cluster `cat ../vars.yml | shyaml get-value cluster_name` --yes
 
 destroy_working_cluster:
-	source yaml_source config/local/vars.yml; \
-	source yaml_source config/private/secrets.yml; \
-	source default/account/vars.sh; \
-	cd default/clusters/working; \
+	source yaml_source inventory/default/config/local/vars.yml; \
+	source yaml_source inventory/default/config/private/secrets.yml; \
+	cd inventory/default/clusters/working; \
 	kops delete cluster `cat vars.yml | shyaml get-value cluster_name` --yes
 
 destroy_production_cluster:
-	source yaml_source config/local/vars.yml; \
-	source yaml_source config/private/secrets.yml; \
-	source default/account/vars.sh; \
-	cd default/clusters/production; \
+	source yaml_source inventory/default/config/local/vars.yml; \
+	source yaml_source inventory/default/config/private/secrets.yml; \
+	cd inventory/default/clusters/production; \
 	kops delete cluster `cat vars.yml | shyaml get-value cluster_name` --yes

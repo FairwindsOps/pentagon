@@ -10,14 +10,15 @@ import os
 import re
 import boto3
 import sys
+import traceback
 
 from git import Repo, Git
 from shutil import copytree, ignore_patterns
-from Crypto.PublicKey import RSA
 
-import pentagon.component.vpc as aws_vpc
 import pentagon.component.kops as kops
-from pentagon.helpers import render_template, write_yaml_file
+import pentagon.component.inventory as inventory
+import pentagon.component.core as core
+from pentagon.helpers import render_template, write_yaml_file, create_rsa_key
 from pentagon.defaults import PentagonDefaults
 
 
@@ -97,7 +98,15 @@ class PentagonProject(object):
             self._workspace_directory,
             self._repository_name)
 
-        self._private_path = "config/private"
+        self._private_path = "inventory/default/config/private"
+
+        self._ssh_keys = {
+            'admin_vpn_key': self.get_arg('admin_vpn_key', PentagonDefaults.ssh['admin_vpn_key']),
+            'working_kube_key': self.get_arg('working_kube_key', PentagonDefaults.ssh['working_kube_key']),
+            'production_kube_key': self.get_arg('production_kube_key', PentagonDefaults.ssh['production_kube_key']),
+            'working_private_key': self.get_arg('working_private_key', PentagonDefaults.ssh['working_private_key']),
+            'production_private_key': self.get_arg('production_private_key', PentagonDefaults.ssh['production_private_key']),
+        }
 
         if self._configure_project:
             # AWS Specific Stuff
@@ -105,7 +114,7 @@ class PentagonProject(object):
             self._aws_secret_key = self.get_arg('aws_secret_key', self._aws_secret_key_placeholder)
             if self.get_arg('aws_default_region'):
                 self._aws_default_region = self.get_arg('aws_default_region')
-                self._aws_availability_zone_count = int(self.get_arg('aws_availability_zone_count', PentagonDefaults.vpc['aws_availability_zones_count']))
+                self._aws_availability_zone_count = int(self.get_arg('aws_availability_zone_count', PentagonDefaults.vpc['aws_availability_zone_count']))
                 self._aws_availability_zones = self.get_arg('aws_availability_zones', self.__default_aws_availability_zones())
             else:
                 self._aws_default_region = self._aws_default_region_placeholder
@@ -113,8 +122,8 @@ class PentagonProject(object):
                 self._aws_availability_zones = self._aws_availability_zones_placeholder
 
             # VPC information
-            self._vpc_name = self.get_arg('vpc_name', PentagonDefaults.vpc['name'])
-            self._vpc_cidr_base = self.get_arg('vpc_cidr_base', PentagonDefaults.vpc['cidr_base'])
+            self._vpc_name = self.get_arg('vpc_name', PentagonDefaults.vpc['vpc_name'])
+            self._vpc_cidr_base = self.get_arg('vpc_cidr_base', PentagonDefaults.vpc['vpc_cidr_base'])
             self._vpc_id = self.get_arg('vpc_id', self._vpc_id)
 
             # DNS
@@ -148,25 +157,22 @@ class PentagonProject(object):
             self._production_kubernetes_v_log_level = self.get_arg('production_kubernetes_v_log_level', PentagonDefaults.kubernetes['v_log_level'])
             self._production_kubernetes_network_cidr = self.get_arg('production_kubernetes_network_cidr', PentagonDefaults.kubernetes['network_cidr'])
 
-        # SSH Keys
-        self._ssh_keys = {
-                          'admin_vpn': self.get_arg('admin_vpn_key', PentagonDefaults.ssh['admin_vpn_key']),
-                          'working_kube': self.get_arg('working_kube_key', PentagonDefaults.ssh['working_kube_key']),
-                          'production_kube': self.get_arg('production_kube_key', PentagonDefaults.ssh['production_kube_key']),
-                          'working_private': self.get_arg('working_private_key', PentagonDefaults.ssh['working_private_key']),
-                          'production_private': self.get_arg('production_private_key', PentagonDefaults.ssh['production_private_key']),
-                         }
-
     def __write_config_file(self):
         logging.info("Writing arguments to file for Posterity: {}".format(self._outfile))
-        config = self._args
+        config = {}
+
         if 'output_file' in config:
             config.pop('output_file')
 
+        for key, value in self._args.items():
+            if value and key != "aws_access_key" and key != "aws_secret_key":
+                config[key] = value
+
+        logging.debug(config)
         try:
-            with open(self._outfile, "w") as f:
-                return yaml.dump(config, f, default_flow_style=False)
+            write_yaml_file(self._repository_directory + "/" + self._outfile, config)
         except Exception as e:
+            logging.debug(traceback.format_exc(e))
             logging.error("Failed to write arguments to file")
             logging.error(e)
 
@@ -192,12 +198,6 @@ class PentagonProject(object):
 
         return (", ").join(azs)
 
-    def __workspace_directory_exists(self):
-        logging.debug("Verifying workspace {}".format(self._workspace_directory))
-        if os.path.isdir(self._workspace_directory):
-            return True
-        return False
-
     def __repository_directory_exists(self):
         logging.debug("Verifying repository {}".format(self._repository_directory))
         if os.path.isdir(self._repository_directory):
@@ -211,58 +211,44 @@ class PentagonProject(object):
         else:
             return Repo.init(self._repository_directory)
 
-    def __prepare_config_private_secrets(self):
-        template_name = "secrets.yml.jinja"
-        template_path = "{}/config/private".format(self._repository_directory)
-        target = "{}/config/private/secrets.yml".format(self._repository_directory)
-        context = {
+    def __prepare_context(self):
+        self._context = {
             'aws_secret_key': self._aws_secret_key,
-            'aws_access_key': self._aws_access_key
-                   }
-        return render_template(template_name, template_path, target, context)
-
-    def __prepare_config_local_vars(self):
-        template_name = "vars.yml.jinja"
-        template_path = "{}/config/local".format(self._repository_directory)
-        target = "{}/config/local/vars.yml".format(self._repository_directory)
-        context = {
+            'aws_access_key': self._aws_access_key,
             'org_name': self._name,
             'vpc_name': self._vpc_name,
             'aws_default_region': self._aws_default_region,
             'aws_availability_zones': self._aws_availability_zones,
             'aws_availability_zone_count': self._aws_availability_zone_count,
-            'infrastructure_bucket': self._infrastructure_bucket
-            }
-        return render_template(template_name, template_path, target, context)
-
-    def __add_default_aws_vpc(self):
-        context = {
+            'infrastructure_bucket': self._infrastructure_bucket,
             'vpc_name': self._vpc_name,
             'vpc_cidr_base': self._vpc_cidr_base,
             'aws_availability_zones': self._aws_availability_zones,
             'aws_availability_zone_count': self._aws_availability_zone_count,
             'aws_region': self._aws_default_region,
-            'infrastructure_bucket': self._infrastructure_bucket
-        }
-        aws_vpc.Vpc(context).add("{}/default/vpc".format(self._repository_directory))
-
-    def __prepare_tf_vpc_module_root(self):
-        template_name = "main.tf.jinja"
-        template_path = "{}/default/vpc".format(self._repository_directory)
-        target = "{}/default/vpc/main.tf".format(self._repository_directory)
-        context = {
+            'infrastructure_bucket': self._infrastructure_bucket,
             'vpc_name': self._vpc_name,
             'infrastructure_bucket': self._infrastructure_bucket,
-            'aws_region': self._aws_default_region
+            'aws_region': self._aws_default_region,
+            'KOPS_STATE_STORE_BUCKET': self._infrastructure_bucket,
+            'org_name': self._name,
+            'vpc_name': self._vpc_name,
+            'dns_zone': self._dns_zone,
+            'vpn_ami_id': self._vpn_ami_id,
+            'production_kube_key': self._ssh_keys['production_kube_key'],
+            'working_kube_key': self._ssh_keys['working_kube_key'],
+            'production_private_key': self._ssh_keys['production_private_key'],
+            'working_private_key': self._ssh_keys['working_private_key'],
+            'admin_vpn_key': self._ssh_keys['admin_vpn_key'],
+            'account': 'default',
         }
-        return render_template(template_name, template_path, target, context)
 
     def __add_kops_working_cluster(self):
         context = {
             'cluster_name': self._working_kubernetes_cluster_name,
             'availability_zones': re.sub(" ", "", self._aws_availability_zones).split(","),
             'vpc_id': self._vpc_id,
-            'ssh_key_path': "${{INFRASTRUCTURE_REPO}}/{}/{}.pub".format(self._private_path, self._ssh_keys['working_kube']),
+            'ssh_key_path': "${{INFRASTRUCTURE_REPO}}/{}/{}.pub".format(self._private_path, self._ssh_keys['working_kube_key']),
             'kubernetes_version': self._kubernetes_version,
             'ig_max_size': self._working_kubernetes_node_count,
             'ig_min_size': self._working_kubernetes_node_count,
@@ -275,14 +261,14 @@ class PentagonProject(object):
             'network_cidr_base': self._vpc_cidr_base,
             'kops_state_store_bucket': self._infrastructure_bucket
         }
-        write_yaml_file("{}/default/clusters/working/vars.yml".format(self._repository_directory), context)
+        write_yaml_file("{}/inventory/default/clusters/working/vars.yml".format(self._repository_directory), context)
 
     def __add_kops_production_cluster(self):
         context = {
             'cluster_name': self._production_kubernetes_cluster_name,
             'availability_zones': re.sub(" ", "", self._aws_availability_zones).split(","),
             'vpc_id': self._vpc_id,
-            'ssh_key_path': "${{INFRASTRUCTURE_REPO}}/{}/{}.pub".format(self._private_path, self._ssh_keys['production_kube']),
+            'ssh_key_path': "${{INFRASTRUCTURE_REPO}}/{}/{}.pub".format(self._private_path, self._ssh_keys['production_kube_key']),
             'kubernetes_version': self._kubernetes_version,
             'ig_max_size': self._production_kubernetes_node_count,
             'ig_min_size': self._production_kubernetes_node_count,
@@ -295,58 +281,7 @@ class PentagonProject(object):
             'network_cidr_base': self._vpc_cidr_base,
             'kops_state_store_bucket': self._infrastructure_bucket,
         }
-        write_yaml_file("{}/default/clusters/production/vars.yml".format(self._repository_directory), context)
-
-    def __prepare_account_vars_sh(self):
-        template_name = "vars.sh.jinja"
-        template_path = "{}/default/account/".format(self._repository_directory)
-        target = "{}/default/account/vars.sh".format(self._repository_directory)
-        context = {
-            'KOPS_STATE_STORE_BUCKET': self._infrastructure_bucket
-        }
-        return render_template(template_name, template_path, target, context)
-
-    def __prepare_account_vars_yml(self):
-        template_name = "vars.yml.jinja"
-        template_path = "{}/default/account/".format(self._repository_directory)
-        target = "{}/default/account/vars.yml".format(self._repository_directory)
-        context = {
-            'org_name': self._name,
-            'vpc_name': self._vpc_name,
-            'dns_zone': self._dns_zone,
-        }
-        return render_template(template_name, template_path, target, context)
-
-    def __prepare_ssh_config_vars(self):
-        template_name = "ssh_config-default.jinja"
-        template_path = "{}/config/local".format(self._repository_directory)
-        target = "{}/config/local/ssh_config-default".format(self._repository_directory)
-        context = {
-            'production_kube_key': self._ssh_keys['production_kube'],
-            'working_kube_key': self._ssh_keys['working_kube'],
-            'production_private_key': self._ssh_keys['production_private'],
-            'working_private_key': self._ssh_keys['working_private'],
-            'admin_vpn_key': self._ssh_keys['admin_vpn'],
-        }
-        return render_template(template_name, template_path, target, context)
-
-    def __prepare_ansible_cfg_vars(self):
-        template_name = "ansible.cfg-default.jinja"
-        template_path = "{}/config/local".format(self._repository_directory)
-        target = "{}/config/local/ansible.cfg-default".format(self._repository_directory)
-        context = {}
-        return render_template(template_name, template_path, target, context)
-
-    def __prepare_vpn_cfg_vars(self):
-        self.__get_vpn_ami_id()
-        template_name = "env.yml.jinja"
-        template_path = "{}/default/resources/admin-environment".format(self._repository_directory)
-        target = "{}/default/resources/admin-environment/env.yml".format(self._repository_directory)
-        context = {
-            'admin_vpn_key': self._ssh_keys['admin_vpn'],
-            'vpn_ami_id': self._vpn_ami_id
-        }
-        return render_template(template_name, template_path, target, context)
+        write_yaml_file("{}/inventory/default/clusters/production/vars.yml".format(self._repository_directory), context)
 
     def __get_vpn_ami_id(self):
 
@@ -375,74 +310,39 @@ class PentagonProject(object):
             else:
                 logging.warn("Cannot get ami-id without AWS Key, Secret and Default Region set")
 
-    def __create_key(self, name, path, bits=2048):
-        key = RSA.generate(bits)
-
-        private_key = "{}{}".format(path, name)
-        public_key = "{}{}.pub".format(path, name)
-
-        with open(private_key, 'w') as content_file:
-            os.chmod(private_key, 0600)
-            content_file.write(key.exportKey('PEM'))
-
-        pubkey = key.publickey()
-        with open(public_key, 'w') as content_file:
-            content_file.write(pubkey.exportKey('OpenSSH'))
-
-    def __directory_check(self):
-        if not self.__workspace_directory_exists():
-            msg = "Workspace directory `{0}` does not exist.".format(self._workspace_directory)
-            raise PentagonException(msg)
-
     def start(self):
-        self.__directory_check()
 
         if not self.__repository_directory_exists() or self._force:
             if not self._git_repo:
                 logging.info("Copying project files...")
-                self.__copy_project_tree()
+                self.__create_repo_core()
                 self.__git_init()
-                self.__render_templates()
-                if self._create_keys:
-                    self.__create_keys()
+                self.__configure_default_project()
                 if self._outfile is not None:
                     self.__write_config_file()
         else:
             raise PentagonException('Project path exists. Cowardly refusing to overwrite existing project.')
 
-    def configure_project(self):
-        self.__configure_project()
-
     def delete(self):
         self.__delete()
 
-    def __render_templates(self):
+    def __configure_default_project(self):
+            self.__get_vpn_ami_id()
+            self.__prepare_context()
 
-            self.__prepare_config_private_secrets()
-            self.__prepare_config_local_vars()
-            self.__prepare_ssh_config_vars()
-            self.__prepare_ansible_cfg_vars()
-            self.__add_default_aws_vpc()
-            self.__prepare_vpn_cfg_vars()
-            self.__prepare_account_vars_yml()
-            self.__prepare_account_vars_sh()
+            inventory.Inventory(self._context).add('{}/inventory/default'.format(self._repository_directory))
+            # self.__prepare_config_private_secrets()
+            # self.__prepare_config_local_vars()
+            # self.__prepare_ssh_config_vars()
+            # self.__prepare_ansible_cfg_vars()
+            # self.__prepare_vpn_cfg_vars()
+            # self.__prepare_account_vars_yml()
+            # self.__prepare_account_vars_sh()
 
             self.__add_kops_working_cluster()
             self.__add_kops_production_cluster()
 
-    def __create_keys(self):
-            key_path = "{}/{}/".format(self._repository_directory, self._private_path)
-            for key in self._ssh_keys:
-                logging.debug("Creating ssh key {}".format(key))
-                key_name = "{}".format(self._ssh_keys[key])
-                if not os.path.isfile("{}{}".format(key_path, key_name)):
-                    self.__create_key(key_name, key_path)
-                else:
-                    logging.warn("Key {}{} exist!".format(key_path, key_name))
-
-    def __copy_project_tree(self):
-
-        self._project_source = "{}/../lib/pentagon/".format(os.path.dirname(__file__))
-        logging.debug(self._project_source)
+    def __create_repo_core(self):
         logging.debug(self._repository_directory)
-        copytree(self._project_source, self._repository_directory, symlinks=True)
+        core.Core({}).add('{}'.format(self._repository_directory))
+    

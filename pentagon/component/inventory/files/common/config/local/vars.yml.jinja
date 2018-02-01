@@ -1,0 +1,23 @@
+VPC_NAME: "{{ vpc_name }}"
+
+AWS_DEFAULT_REGION:  "{{ aws_default_region }}"
+AWS_AVAILABILITY_ZONES: "{{ aws_availability_zones }}"
+AWS_AVAILABILITY_ZONE_COUNT: "{{ aws_availability_zone_count }}"
+
+ANSIBLE_CONFIG: '$INFRASTRUCTURE_REPO/inventory/{{ account }}/config/private/ansible.cfg'
+KUBECONFIG: '$INFRASTRUCTURE_REPO/inventory/{{ account }}/config/private/kube_config'
+AWS_INVENTORY_PATH: '$INFRASTRUCTURE_REPO/plugins/'
+
+INFRASTRUCTURE_BUCKET: "{{ infrastructure_bucket }}"
+
+KOPS_STATE_STORE_BUCKET: "{{ KOPS_STATE_STORE_BUCKET }}"
+KOPS_STATE_STORE: "s3://${KOPS_STATE_STORE_BUCKET}"
+
+vpc_tag_name: "{{ vpc_name }}"
+org_name: "{{ org_name }}"
+{% raw -%}
+org: "{{ org_name }}" 
+{%- endraw %}
+canonical_zone: "{{ dns_zone }}"
+vpn_bucket: "{{org_name}}-vpn"
+secrets_bucket: "{{org_name}}-secrets"

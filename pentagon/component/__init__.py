@@ -8,6 +8,7 @@ import sys
 import re
 
 from pentagon.helpers import render_template
+from pentagon.defaults import PentagonDefaults
 
 
 class ComponentBase(object):
@@ -50,6 +51,7 @@ class ComponentBase(object):
 
     def _process_env_vars(self):
         logging.debug('Fetching environment variables')
+        environ_data = {}
         for item in self._environment:
             if type(item) is dict:
                 context_var = item.keys()[0]
@@ -57,27 +59,36 @@ class ComponentBase(object):
             else:
                 context_var = item.lower()
                 env_var = os.environ.get(item.upper())
-            logging.debug("Setting component variable {}: {}".format(context_var, env_var))
-            self._data[context_var] = env_var
+
+            environ_data[context_var] = env_var
+
+        self._merge_data(environ_data)
 
     def _process_defaults(self):
-        """ Use _defaults from class and add them to missing values on the _data dict """
+        """ Use _defaults from global pentagon defaults, then class and add them to missing values on the _data dict """
+
         logging.debug('Processing Defaults')
-        for key, value in self._defaults.items():
-            try:
-                self._data[key]
-            except KeyError, e:
-                logging.debug("Setting component variable with default {}: {}".format(key, value))
-                self._data[key] = value
+        self._merge_data(self._defaults)
+
+        try:
+            class_name = self.__class__.__name__.lower()
+            pentagon_defaults = getattr(PentagonDefaults, class_name)
+            logging.debug("Adding Pentagon Defaults Last {}".format(pentagon_defaults))
+            self._merge_data(pentagon_defaults)
+        except AttributeError, e:
+            logging.info("No top level defaults for Pentagon component {} ".format(class_name.lower()))
 
     def _render_directory_templates(self):
         """ Loop and use render_template helper method on all templates in destination directory  """
-        for template in glob.glob(self._destination_directory_name + "/*.jinja"):
-            template_file_name = template.split('/')[-1]
-            path = '/'.join(template.split('/')[0:-1])
-            target_file_name = re.sub(r'\.jinja$', '', template_file_name)
-            target = self._destination_directory_name + "/" + target_file_name
-            render_template(template_file_name, path, target, self._data, overwrite=self._overwrite)
+        logging.debug("Rendering Templates: ")
+        for folder, dirnames, files in os.walk(self._destination_directory_name):
+            for template in glob.glob(folder + "/*.jinja"):
+                logging.debug("Rendering {}".format(template))
+                template_file_name = template.split('/')[-1]
+                path = '/'.join(template.split('/')[0:-1])
+                target_file_name = re.sub(r'\.jinja$', '', template_file_name)
+                target = folder + "/" + target_file_name
+                render_template(template_file_name, path, target, self._data, overwrite=self._overwrite)
 
     def _remove_init_file(self):
         """ delete init file, if it exists from template target directory """
@@ -86,17 +97,31 @@ class ComponentBase(object):
         if os.path.isfile(init_file):
             os.remove(init_file)
 
+    def _merge_data(self, new_data, clobber=False):
+        """ accepts new_data (dict) and clobbber (boolean). Merges dictionary with existing instance dictionsery _data. If clobber is True, overwrites value. Defaults to false """
+        for key, value in new_data.items():
+            if self._data.get(key) is None or clobber:
+                logging.debug("Setting component data {}: {}".format(key, value))
+                self._data[key] = value
+
     def add(self, destination, overwrite=False):
-        """ Copies files and templates from <component>/files and templates the *.jinja files """
         self._destination = destination
         self._overwrite = overwrite
         try:
-            shutil.copytree(self._files_directory, self._destination_directory_name)
-
+            self._add_files()
             self._remove_init_file()
             self._render_directory_templates()
-
         except Exception as e:
             logging.error("Error occured configuring component")
             logging.error(e)
             logging.debug(traceback.format_exc(e))
+            sys.exit(1)
+
+    def _add_files(self):
+        """ Copies files and templates from <component>/files """
+        if self._overwrite:
+            from distutils.dir_util import copy_tree
+        else:
+            from shutil import copytree as copy_tree
+
+        copy_tree(self._files_directory, self._destination_directory_name)
