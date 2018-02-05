@@ -93,12 +93,14 @@ class ComponentBase(object):
     def _remove_init_file(self):
         """ delete init file, if it exists from template target directory """
 
-        init_file = self._destination_directory_name + "/__init__.py"
-        if os.path.isfile(init_file):
-            os.remove(init_file)
+        for root, dirs, files in os.walk(self._destination_directory_name):
+            for name in files:
+                if "__init__.py" == name:
+                    logging.debug('Removing: {}'.format(os.path.join(root, name)))
+                    os.remove(os.path.join(root, name))
 
     def _merge_data(self, new_data, clobber=False):
-        """ accepts new_data (dict) and clobbber (boolean). Merges dictionary with existing instance dictionsery _data. If clobber is True, overwrites value. Defaults to false """
+        """ accepts new_data (dict) and clobbber (boolean). Merges dictionary with existing instance dictionary _data. If clobber is True, overwrites value. Defaults to false """
         for key, value in new_data.items():
             if self._data.get(key) is None or clobber:
                 logging.debug("Setting component data {}: {}".format(key, value))

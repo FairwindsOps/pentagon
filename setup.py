@@ -55,6 +55,7 @@ setup(name='pentagon',
         "boto3==1.4.4",
         "google-api-python-client==1.6.2",
         "pyaml==17.12.1"
+        "yamlord==0.4"
       ],
       classifiers=[
           'Development Status :: 5 - Production/Stable',

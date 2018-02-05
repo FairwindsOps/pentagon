@@ -2,9 +2,10 @@ import logging
 import os
 import traceback
 import jinja2
-import yaml
+import yamlord
 from Crypto.PublicKey import RSA
 from stat import *
+from collections import OrderedDict
 
 
 def render_template(template_name, template_path, target, context, delete_template=True, overwrite=False):
@@ -44,17 +45,20 @@ def render_template(template_name, template_path, target, context, delete_templa
             os.remove("{}/{}".format(template_path, template_name))
 
 
-def write_yaml_file(filename, d):
+def write_yaml_file(filename, d, overwrite=False):
     """ Accepts  filepath,  dictionary. Writes dictionary in yaml to file path, recursively creating path if necessary """
-    if not os.path.exists(os.path.dirname(filename)):
+    if not os.path.exists(os.path.dirname(filename)) and overwrite is False:
         try:
             os.makedirs(os.path.dirname(filename))
         except OSError as exc:
             if exc.errno != errno.EEXIST:
                 raise
-
-    with open(filename, "w") as f:
-        f.write(yaml.safe_dump(d, default_flow_style=False))
+    print type(d)
+    logging.debug("Writing yaml file {}".format(filename))
+    logging.debug(d)
+#    with open(filename, "w") as f:
+#        f.write(yaml.safe_dump(d, default_flow_style=False))
+    yamlord.write_yaml(d, filename)
 
 
 def create_rsa_key(name, path, bits=2048):
