@@ -53,11 +53,8 @@ def write_yaml_file(filename, d, overwrite=False):
         except OSError as exc:
             if exc.errno != errno.EEXIST:
                 raise
-    print type(d)
     logging.debug("Writing yaml file {}".format(filename))
     logging.debug(d)
-#    with open(filename, "w") as f:
-#        f.write(yaml.safe_dump(d, default_flow_style=False))
     yamlord.write_yaml(d, filename)
 
 
