@@ -30,9 +30,9 @@ class Migration(migration.Migration):
             logging.debug('Inventory Path: {}'.format(inventory_path))
 
             if os.path.exists('{}/account/vars.yml'.format(self._infrastructure_repository)):
-                account_vars = self.YamlEditor('{}/account/vars.yml'.format(inventory_path)).get()
+                account_vars_yml = self.YamlEditor('{}/account/vars.yml'.format(inventory_path)).get()
             else:
-                account_vars = OrderedDict()
+                account_vars_yml = OrderedDict()
 
             if os.path.exists('{}/account/vars.sh'.format(self._infrastructure_repository)):
                 account_vars_sh = self.get_file_content('{}/account/vars.sh'.format(inventory_path)).get()
@@ -46,11 +46,11 @@ class Migration(migration.Migration):
                 account_vars = OrderedDict()
 
             config_vars_yml = self.YamlEditor('{}/config/local/vars.yml'.format(inventory_path))
-            config_vars_yml.update(account_vars)
+            config_vars_yml.update(account_vars_yml)
             config_vars_yml.update(account_vars)
 
-            config_vars_yml['ANSIBLE_CONFIG'] = config_vars_yml['ANSIBLE_CONFIG'].replace('config', 'inventory/{}/config'.format(item))
-            config_vars_yml['KUBECONFIG'] = "$INFRASTRUCTURE_REPO/inventory/{item}/config/private/kubeconfig".format(item=item)
+            config_vars_yml['ANSIBLE_CONFIG'] = '${{INFRASTRUCTURE_REPO}}/inventory/{}/config'.format(item)
+            config_vars_yml['KUBECONFIG'] = "${{INFRASTRUCTURE_REPO}}/inventory/{item}/config/private/kubeconfig".format(item=item)
 
             config_vars_yml.write()
             self.delete('{}/account'.format(inventory_path))

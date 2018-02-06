@@ -23,7 +23,7 @@ version_file = '.version'
 
 
 def migrate(branch='migration'):
-    """ Find applicabale migrations and run then """
+    """ Find applicabale migrations and run them """
     migrations = migrations_to_run(current_version(), available_migrations())
     if migrations:
         for migration in migrations:
@@ -100,7 +100,7 @@ class Migration(object):
             self.data.update(nd)
 
         def remove(self, keys):
-            """ appects a list of keys to remove from yaml """
+            """ accepts a list of keys to remove from yaml """
             for key in keys:
                 if key in self.data.keys():
                     del self.data[key]
@@ -174,7 +174,6 @@ class Migration(object):
             mode = os.stat(path).st_mode
             mode |= (mode & 0o444) >> 2    # copy R bits to X
             os.chmod(path, mode)
-
 
     def create_dir(self, path):
         """ Recursively create a directory """
