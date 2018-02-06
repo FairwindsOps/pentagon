@@ -130,7 +130,7 @@ class Migration(object):
             return self
 
         def __exit__(self, type, value, traceback):
-            print("in __exit__")
+            pass
 
     def __init__(self, branch_name):
         self._infrastructure_repository = infrastructure_repository()
@@ -160,18 +160,21 @@ class Migration(object):
         logging.info("Moving {} -> {}".format(self.real_path(source), self.real_path(destination)))
         return os.rename(self.real_path(source), self.real_path(destination))
 
-    def overwrite_file(self, path, content, file_type=None):
+    def overwrite_file(self, path, content, executable=False):
         """ alias create_file """
-        self.create_file(path, content, file_type)
+        self.create_file(path, content, executable)
 
-    def create_file(self, path, content, file_type=None):
+    def create_file(self, path, content, executable=False):
         """ Create a new file """
-        if file_type == 'yaml':
-            print type(content)
-            write_yaml_file("{}/{}".format(self._infrastructure_repository, path), content, True)
-        else:
-            with open("{}/{}".format(self._infrastructure_repository, path), 'w') as f:
-                f.write(content)
+        path = "{}/{}".format(self._infrastructure_repository, path)
+        with open(path, 'w') as f:
+            f.write(content)
+
+        if executable is True:
+            mode = os.stat(path).st_mode
+            mode |= (mode & 0o444) >> 2    # copy R bits to X
+            os.chmod(path, mode)
+
 
     def create_dir(self, path):
         """ Recursively create a directory """

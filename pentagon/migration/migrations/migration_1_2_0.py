@@ -55,6 +55,11 @@ class Migration(migration.Migration):
             config_vars_yml.write()
             self.delete('{}/account'.format(inventory_path))
 
+            if os.path.exists("inventory/{item}/config/local/1password.yml".format(item=item)):
+                with self.YamlEditor("inventory/{item}/config/local/1password.yml".format(item=item)) as secrets_yml:
+                    secrets_yml['path'] = "inventory/{item}/config/private/".format(item=item)
+                    secrets_yml.write()
+
             # fix ansible path vars
             for file in ['vpn.yml', 'destroy.yml']:
                 p = "{}/resources/admin-environment/{}".format(inventory_path, file)
@@ -72,7 +77,7 @@ elif [ ! -d "${{INFRASTRUCTURE_REPO}}" ]; then
   exit 1
 fi
 
-cd "${{INFRASTRUCTURE_REPO}}/inventory/{item}/config/private" || exit 1
+cd "${{INFRASTRUCTURE_REPO}}/inventory/{item}/config/local" || exit 1
 
 for default_file in *-default; do
   out_file="../private/${{default_file//-default}}"
@@ -86,8 +91,8 @@ for default_file in *-default; do
   fi
 done
 '''.format(item=item)
-            
-            self.overwrite_file('{}/config/local/local-config-init'.format(inventory_path), local_config_init)
+
+            self.overwrite_file('{}/config/local/local-config-init'.format(inventory_path), local_config_init, True)
 
             ansible_cfg_default = '''
 [defaults]
