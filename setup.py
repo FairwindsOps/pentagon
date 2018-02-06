@@ -17,6 +17,7 @@
 import os
 import sys
 from setuptools import setup, find_packages
+import pentagon
 
 try:
     from setuptools import setup, find_packages
@@ -25,8 +26,6 @@ except ImportError:
           "pip install setuptools).")
     sys.exit(1)
 
-__version__ = '2.0.0'
-__author__ = 'ReactiveOps, Inc.'
 
 def package_files(directory):
     paths = []
@@ -38,9 +37,9 @@ def package_files(directory):
 extra_files = package_files('pentagon/component')
 
 setup(name='pentagon',
-      version=__version__,
+      version=pentagon.__version__,
       description='Radically simple kubernetes',
-      author=__author__,
+      author=pentagon.__author__,
       author_email='reactive@reactiveops.com',
       url='http://reactiveops.com/',
       license='Apache2.0',

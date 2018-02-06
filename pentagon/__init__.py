@@ -22,6 +22,10 @@ from pentagon.helpers import render_template, write_yaml_file, create_rsa_key
 from pentagon.defaults import PentagonDefaults
 
 
+__version__ = "2.0.0"
+__author__ = 'ReactiveOps, Inc.'
+
+
 class PentagonException(Exception):
     pass
 
@@ -156,6 +160,9 @@ class PentagonProject(object):
             self._production_kubernetes_worker_node_type = self.get_arg('production_kubernetes_worker_node_type', PentagonDefaults.kubernetes['worker_node_type'])
             self._production_kubernetes_v_log_level = self.get_arg('production_kubernetes_v_log_level', PentagonDefaults.kubernetes['v_log_level'])
             self._production_kubernetes_network_cidr = self.get_arg('production_kubernetes_network_cidr', PentagonDefaults.kubernetes['network_cidr'])
+
+        with open('{}/.version'.format(self._repository_directory)) as f:
+            f.write(__version__)
 
     def __write_config_file(self):
         logging.info("Writing arguments to file for Posterity: {}".format(self._outfile))

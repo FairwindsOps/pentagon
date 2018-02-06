@@ -3,13 +3,14 @@ import sys
 import click
 import logging
 import traceback
-import pentagon
 import yaml
 import json
+import pentagon
+
 
 from pydoc import locate
-
 from pentagon import PentagonException
+from pentagon import __version__
 
 
 @click.group()
@@ -87,7 +88,6 @@ def add(ctx, component_path, additional_args, **kwargs):
 
 
 @click.command()
-@click.pass_context
 @click.argument('component_path')
 @click.option('--data', '-D', multiple=True, help='Individual Key=Value pairs used by the component')
 @click.option('--file', '-f', help='File to read Key=Value pair from (yaml or json are supported)')
@@ -96,6 +96,14 @@ def add(ctx, component_path, additional_args, **kwargs):
 @click.argument('additional-args', nargs=-1, default=None)
 def get(ctx, component_path, additional_args, **kwargs):
     _run('get', component_path, additional_args, kwargs)
+
+
+@click.command()
+@click.pass_context
+def version(ctx):
+    """ Print version and exit """
+    print "Pentagon: v{}".format(__version__)
+    sys.exit(0)
 
 
 def _run(action, component_path, additional_args, options):
@@ -135,6 +143,7 @@ def _run(action, component_path, additional_args, options):
 cli.add_command(start_project, "start-project")
 cli.add_command(add, "add")
 cli.add_command(get, "get")
+cli.add_command(version, "version")
 
 
 def get_component_class(component_path):
