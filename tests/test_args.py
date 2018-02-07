@@ -1,5 +1,5 @@
 import unittest
-import pentagon
+import pentagon.pentagon as pentagon
 import os
 import logging
 from tests.test_base import TestPentagonProject

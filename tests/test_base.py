@@ -1,6 +1,6 @@
 
 import unittest
-import pentagon
+import pentagon.pentagon as pentagon
 import os
 import logging
 
