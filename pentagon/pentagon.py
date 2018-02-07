@@ -181,7 +181,7 @@ class PentagonProject(object):
         logging.info("Reading config file: {}".format(self._config_file))
         try:
             with open(self._config_file, "r") as cf:
-                config = yaml.load(cf.read())
+                config = yaml.load(cf.read(), Loader=yaml.loader.BaseLoader)
                 logging.debug("Config values: {}".format(config))
                 return config
         except Exception, e:
