@@ -17,7 +17,7 @@
 import os
 import sys
 from setuptools import setup, find_packages
-import pentagon
+from pentagon.meta import __version__, __author__
 
 try:
     from setuptools import setup, find_packages
@@ -37,9 +37,9 @@ def package_files(directory):
 extra_files = package_files('pentagon/component')
 
 setup(name='pentagon',
-      version=pentagon.__version__,
+      version=__version__,
       description='Radically simple kubernetes',
-      author=pentagon.__author__,
+      author=__author__,
       author_email='reactive@reactiveops.com',
       url='http://reactiveops.com/',
       license='Apache2.0',
@@ -53,7 +53,8 @@ setup(name='pentagon',
         "shyaml==0.5.0",
         "ansible==2.3.0.0",
         "boto3==1.4.4",
-        "google-api-python-client==1.6.2"
+        "google-api-python-client==1.6.2",
+        "pyaml==17.12.1"
       ],
       classifiers=[
           'Development Status :: 5 - Production/Stable',

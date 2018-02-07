@@ -7,10 +7,9 @@ import yaml
 import json
 import pentagon
 
-
 from pydoc import locate
 from pentagon import PentagonException
-from pentagon import __version__
+from meta import __version__, __author__
 
 
 @click.group()
@@ -136,7 +135,6 @@ def _run(action, component_path, additional_args, options):
 cli.add_command(start_project, "start-project")
 cli.add_command(add, "add")
 cli.add_command(get, "get")
-cli.add_command(version, "version")
 
 
 def get_component_class(component_path):
