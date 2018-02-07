@@ -78,7 +78,7 @@ def start_project(ctx, name, **kwargs):
 @click.command()
 @click.pass_context
 @click.argument('component_path')
-@click.option('--data', '-D', multiple=True, help='Individual Key=Value pairs used by the component')
+@click.option('--data', '-D', multiple=True, help='Individual Key=Value pairs used by the component. There should be no spaces surrounding the `=`')
 @click.option('--file', '-f', help='File to read Key=Value pair from (yaml or json are supported)')
 @click.option('--out', '-o', default='./', help="Path to output module result, if any")
 @click.option('--log-level', default="INFO", help="Log Level DEBUG,INFO,WARN,ERROR")
