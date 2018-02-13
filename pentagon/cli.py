@@ -14,8 +14,10 @@ from meta import __version__, __author__
 
 @click.group()
 @click.version_option(__version__)
+@click.option('--log-level', default="INFO", help="Log Level DEBUG,INFO,WARN,ERROR")
 @click.pass_context
-def cli(ctx):
+def cli(ctx, log_level, *args, **kwargs):
+    logging.basicConfig(level=log_level)
     pass
 
 
@@ -64,7 +66,6 @@ def cli(ctx):
 @click.option('--production-kubernetes-network-cidr', help="Network cidr of the kubernetes working cluster")
 @click.option('--configure-vpn/--no-configure-vpn', default=True, help="Whether or not to configure the vpn.")
 @click.option('--vpn-ami-id', help="ami-id to use for the VPN instance")
-@click.option('--log-level', default="INFO", help="Log Level DEBUG,INFO,WARN,ERROR")
 def start_project(ctx, name, **kwargs):
     try:
         logging.basicConfig(level=kwargs.get('log_level'))
@@ -81,7 +82,6 @@ def start_project(ctx, name, **kwargs):
 @click.option('--data', '-D', multiple=True, help='Individual Key=Value pairs used by the component')
 @click.option('--file', '-f', help='File to read Key=Value pair from (yaml or json are supported)')
 @click.option('--out', '-o', default='./', help="Path to output module result, if any")
-@click.option('--log-level', default="INFO", help="Log Level DEBUG,INFO,WARN,ERROR")
 @click.argument('additional-args', nargs=-1, default=None)
 def add(ctx, component_path, additional_args, **kwargs):
     _run('add', component_path, additional_args, kwargs)
@@ -92,7 +92,6 @@ def add(ctx, component_path, additional_args, **kwargs):
 @click.option('--data', '-D', multiple=True, help='Individual Key=Value pairs used by the component')
 @click.option('--file', '-f', help='File to read Key=Value pair from (yaml or json are supported)')
 @click.option('--out', '-o', default='./', help="Path to output module result, if any")
-@click.option('--log-level', default="INFO", help="Log Level DEBUG,INFO,WARN,ERROR")
 @click.argument('additional-args', nargs=-1, default=None)
 def get(ctx, component_path, additional_args, **kwargs):
     _run('get', component_path, additional_args, kwargs)
@@ -153,7 +152,7 @@ def get_component_class(component_path):
     component_class = locate("pentagon.component.{}.{}".format(component_name, component_class_name))
     if component_class is None:
         logging.debug('pentagon.component.{}.{} not found'.format(component_name, component_class_name))
-        logging.debug('Seeking pentagon.{}.{}'.format(component_name, component_class_name))
+        logging.debug('Seeking pentagon_{}.{}'.format(component_name, component_class_name))
         component_class = locate("pentagon_{}.{}".format(component_name, component_class_name))
 
     logging.debug("Found {}".format(component_class))

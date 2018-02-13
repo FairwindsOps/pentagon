@@ -23,7 +23,7 @@ def render_template(template_name, template_path, target, context, delete_templa
             logging.warn("Cowardly refusing to overwrite existing file {}".format(target))
             return False
 
-        logging.debug("Attempting to write {} from template {}{}".format(target, template_path, template_name))
+        logging.debug("Attempting to write {} from template {}/{}".format(target, template_path, template_name))
 
         template_path = os.path.normpath(template_path)
         template_name = os.path.normpath(template_name)
