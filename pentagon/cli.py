@@ -9,7 +9,7 @@ import pentagon
 
 from pydoc import locate
 from pentagon import PentagonException
-from pentagon import migration
+import migration
 
 from meta import __version__, __author__
 

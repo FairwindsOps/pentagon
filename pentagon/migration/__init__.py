@@ -12,7 +12,7 @@ import yamlord
 from collections import OrderedDict
 
 from pentagon.migration import migrations
-from pentagon import PentagonException
+from pentagon.pentagon import PentagonException
 from pentagon.helpers import write_yaml_file
 
 from pydoc import locate
