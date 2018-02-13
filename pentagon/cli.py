@@ -173,7 +173,7 @@ def parse_infile(file):
         data_file.seek(0)
 
         try:
-            data = yaml.load(data_file)
+            data = yaml.load(data_file, Loader=yaml.loader.BaseLoader)
             logging.debug("Data parsed from file {}: {}".format(file, data))
             return data
         except yaml.YAMLError as yaml_error:
