@@ -102,7 +102,7 @@ Options:
       - `kubernetes_version`: Version of Kubernetes Kops will install (required)
       - `nat_gateways`: List of AWS ids of the nat-gateways the Private Kops subnets will use as egress. Must be in the same order as the `availability_zones` from above. (required)
       - `master_node_type`: AWS instance type the masters should be (required)
-      - `node_type`: AWS instance type the default node group should be (required)
+      - `worker_node_type`: AWS instance type the default node group should be (required)
       - `ig_max_size`: Max number of instance in the default node group. (default: 3)
       - `ig_min_size`: Min number of instance in the default node group. (default: 3)
       - `ssh_key_path`: Path of public key for ssh access to nodes. (required)
