@@ -23,6 +23,7 @@ class PentagonDefaults(object):
         'third_octet_increment': 1,
         'authorization': {'alwaysAllow': {}},
         'networking': {'flannel': {}},
+        'node_additional_policies': '[{"Effect": "Allow","Action": ["autoscaling:DescribeAutoScalingGroups", "autoscaling:DescribeAutoScalingInstances", "autoscaling:DescribeTags", "autoscaling:SetDesiredCapacity", "autoscaling:TerminateInstanceInAutoScalingGroup"],"Resource": "*"}]',
     }
 
     vpc = {
