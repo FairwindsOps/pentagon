@@ -13,7 +13,7 @@ INFRASTRUCTURE_BUCKET: "{{ infrastructure_bucket }}"
 KOPS_STATE_STORE_BUCKET: "{{ KOPS_STATE_STORE_BUCKET }}"
 KOPS_STATE_STORE: "s3://${KOPS_STATE_STORE_BUCKET}"
 
-HELM_HOME: "${INFRASTRUCTURE_REPO}"/helm
+HELM_HOME: "${INFRASTRUCTURE_REPO}/helm"
 
 vpc_tag_name: "{{ vpc_name }}"
 org_name: "{{ org_name }}"
