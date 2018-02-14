@@ -8,7 +8,7 @@ Global options for both `get` and `add` component commands:
 Usage: pentagon [add|get] [OPTIONS] COMPONENT_PATH [ADDITIONAL_ARGS]...
 
 Options:
-  -D, --data TEXT   Individual Key=Value pairs used by the component
+  -D, --data TEXT   Individual Key=Value pairs used by the component. There should be no spaces surrounding the `=`
   -f, --file TEXT   File to read Key=Value pair from (yaml or json are
                     supported)
   -o, --out TEXT    Path to output module result, if any
