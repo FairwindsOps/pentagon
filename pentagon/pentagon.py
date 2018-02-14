@@ -241,7 +241,7 @@ class PentagonProject(object):
             'production_private_key': self._ssh_keys['production_private_key'],
             'working_private_key': self._ssh_keys['working_private_key'],
             'admin_vpn_key': self._ssh_keys['admin_vpn_key'],
-            'account': 'default',
+            'name': 'default',
         }
 
     def __add_kops_working_cluster(self):
@@ -335,13 +335,6 @@ class PentagonProject(object):
             self.__prepare_context()
 
             inventory.Inventory(self._context).add('{}/inventory/default'.format(self._repository_directory))
-            # self.__prepare_config_private_secrets()
-            # self.__prepare_config_local_vars()
-            # self.__prepare_ssh_config_vars()
-            # self.__prepare_ansible_cfg_vars()
-            # self.__prepare_vpn_cfg_vars()
-            # self.__prepare_account_vars_yml()
-            # self.__prepare_account_vars_sh()
 
             self.__add_kops_working_cluster()
             self.__add_kops_production_cluster()
@@ -349,4 +342,3 @@ class PentagonProject(object):
     def __create_repo_core(self):
         logging.debug(self._repository_directory)
         core.Core({}).add('{}'.format(self._repository_directory))
-    

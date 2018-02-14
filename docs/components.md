@@ -172,7 +172,7 @@ Options:
     - Creates account configuration directory. Creates all necessary files in `config`, `clusters` and `resources`. Depending on `type` it may also add a `vpc` component and `vpn` component under `resources`. Creates `clusters` directory but does not create cluster configuration. Use the cluster component for that.
     - `bash ./<nodepool_name>/create_nodepool.sh` will create the nodepool as configured
     - Arguments:
-      - `name`: name of account to add to inventory
+      - `name`: name of account to add to inventory (required)
       - `type`: type of account to add to inventory aws or gcp (required). 
     - If a `-f` file is passed in, data are merged with `-D` values ovveriding the file values
     

@@ -14,7 +14,7 @@ from pentagon.defaults import PentagonDefaults
 class Inventory(ComponentBase):
 
     _defaults = {'type': 'aws'}
-    _required_parameters = ['account']
+    _required_parameters = ['name']
 
     def __init__(self, data, additional_args=None, **kwargs):
         super(Inventory, self).__init__(data, additional_args, **kwargs)
@@ -33,7 +33,7 @@ class Inventory(ComponentBase):
     def add(self, destination, overwrite=False):
         """Inventory version of Component.add Copies files and templates from <component>/files and templates the *.jinja files """
         if destination == './':
-            self._destination = './default'
+            self._destination = self._data.get('name', './default')
         else:
             self._destination = destination
 
