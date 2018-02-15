@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import sys
+import os
 import click
 import logging
 import traceback
@@ -29,49 +30,83 @@ def cli(ctx, log_level, *args, **kwargs):
 @click.option('-f', '--config-file', help='File to read configuration options from. File supercedes command line options.')
 @click.option('-o', '--output-file', default='config.yml', help='File to write options to after completion')
 @click.option('--workspace-directory', help='Directory to place new project, defaults to ./')
-@click.option('--repository-name', help='Name of the folder to initialize the infrastructure repository')
 @click.option('--configure/--no-configure', default=True, help='Configure project with default settings')
 @click.option('--force/--no-force', help="Ignore existing directories and copy project")
-@click.option('--aws-access-key', help="AWS access key")
-@click.option('--aws-secret-key', help="AWS secret key")
-@click.option('--aws-default-region', help="AWS default region")
-@click.option('--aws-availability-zones', help="AWS availability zones as a comma delimited with spaces. Default to region a, region b, ... region z")
-@click.option('--aws-availability-zone-count', help="Number of availability zones to use")
-@click.option('--infrastructure-bucket', help="Name of S3 Bucket to store state")
-@click.option('--dns-zone', help="DNS zone to configure DNS records in")
-@click.option('--git-repo', help="Existing git repository to clone")
-@click.option('--create-keys/--no-create-keys', default=True, help="Create ssh keys or not")
-@click.option('--admin-vpn-key', help="Name of the ssh key for the admin user of the VPN instance")
-@click.option('--working-kube-key', help="Name of the ssh key for the working kubernetes cluster")
-@click.option('--production-kube-key', help="Name of the ssh key for the production kubernetes cluster")
-@click.option('--working-private-key', help="Name of the ssh key for the working non kubernetes instances")
-@click.option('--production-private-key', help="Name of the ssh key for the production non kubernetes instances")
+@click.option('--cloud', default="aws", help="Cloud providor to create default inventory. Defaults to 'aws'. [aws,gcp,none]")
+@click.option('--hash-type', default="aws", type=click.Choice(['aws', 'gcp']), help="Type cloud project to create. Defaults to 'aws'")
+
+# Currently only AWS but we can should add GCP later
+@click.option('--configure-vpn/--no-configure-vpn', default=True, help="Whether or not to configure the vpn.")
 @click.option('--vpc-name', help="Name of VPC to create")
 @click.option('--vpc-cidr-base', help="First two octets of the VPC ip space")
 @click.option('--vpc-id', help="AWS VPC id to create the kubernetes clusters in")
+@click.option('--admin-vpn-key', help="Name of the ssh key for the admin user of the VPN instance")
+@click.option('--vpn-ami-id', help="ami-id to use for the VPN instance")
+
+# General Kubernetes options
 @click.option('--kubernetes-version', help="Version of kubernetes to use for cluster nodes")
+@click.option('--default-region', help="Default region for Kubernetes Cluster")
+@click.option('--availability-zones', help="Availability zones as a comma delimited list")
+@click.option('--disk-size', help="")
+
+# Working
 @click.option('--working-kubernetes-cluster-name', help="Name of the working kubernetes cluster nodes")
 @click.option('--working-kubernetes-node-count', help="Name of the working kubernetes cluster nodes")
-@click.option('--working-kubernetes-master-aws-zone', help="Availability zone to place the kube master in")
-@click.option('--working-kubernetes-master-node-type', help="Node type of the kube master")
 @click.option('--working-kubernetes-worker-node-type', help="Node type of the kube workers")
-@click.option('--working-kubernetes-dns-zone', help="DNS Zone of the kubernetes working cluster")
-@click.option('--working-kubernetes-v-log-level', help="V Log Level kubernetes working cluster")
 @click.option('--working-kubernetes-network-cidr', help="Network cidr of the kubernetes working cluster")
+
+# Production
 @click.option('--production-kubernetes-cluster-name', help="Name of the production kubernetes cluster nodes")
 @click.option('--production-kubernetes-node-count', help="Name of the production kubernetes cluster nodes")
-@click.option('--production-kubernetes-master-aws-zone', help="Availability zone to place the kube master in")
-@click.option('--production-kubernetes-master-node-type', help="Node type of the kube master")
 @click.option('--production-kubernetes-worker-node-type', help="Node type of the kube workers")
+@click.option('--production-kubernetes-network-cidr', help="Network cidr of the kubernetes working cluster")
+
+# AWS Cloud options
+@click.option('--aws-access-key', default=lambda: os.environ.get('PENTAGON_aws_access_key'), help="AWS access key")
+@click.option('--aws-secret-key', default=lambda: os.environ.get('PENTAGON_aws_secret_key'), help="AWS secret key")
+@click.option('--aws-default-region', help="[Deprecated] Use \"--default-region\". AWS default region")
+@click.option('--aws-availability-zones', help="[Deprecated] Use \"--availability-zones\". AWS availability zones as a comma delimited with spaces. Default to region a, region b, ... region z")
+@click.option('--aws-availability-zone-count', help="Number of availability zones to use")
+@click.option('--infrastructure-bucket', help="Name of S3 Bucket to store state")
+@click.option('--dns-zone', help="DNS zone to configure DNS records in")
+@click.option('--create-keys/--no-create-keys', default=True, help="Create ssh keys or not")
+
+# AWS only Kubernetes options
+# Working
+@click.option('--working-kubernetes-master-aws-zone', help="Availability zone to place the kube master in")
+@click.option('--working-kubernetes-master-node-type', help="AWS only. Node type of the kube master")
+@click.option('--working-kube-key', help="Name of the ssh key for the working kubernetes cluster")
+@click.option('--working-private-key', help="Name of the ssh key for the working non kubernetes instances")
+@click.option('--working-kubernetes-dns-zone', help="DNS Zone of the kubernetes working cluster")
+@click.option('--working-kubernetes-v-log-level', help="V Log Level kubernetes working cluster")
+
+# Poduction
+@click.option('--production-kubernetes-master-aws-zone', help="Availability zone to place the kube master in")
+@click.option('--production-kubernetes-master-node-type', help=" AWS only. Node type of the kube master")
+@click.option('--production-kube-key', help="Name of the ssh key for the production kubernetes cluster")
+@click.option('--production-private-key', help="Name of the ssh key for the production non kubernetes instances")
 @click.option('--production-kubernetes-dns-zone', help="DNS Zone of the kubernetes production cluster")
 @click.option('--production-kubernetes-v-log-level', help="V Log Level kubernetes production cluster")
 @click.option('--production-kubernetes-network-cidr', help="Network cidr of the kubernetes working cluster")
 @click.option('--configure-vpn/--no-configure-vpn', default=True, help="Whether or not to configure the vpn.")
 @click.option('--vpn-ami-id', help="ami-id to use for the VPN instance")
 def start_project(ctx, name, **kwargs):
+    """ Create an infrastructure project from scratch with the configured options """
     try:
         logging.basicConfig(level=kwargs.get('log_level'))
-        project = pentagon.PentagonProject(name, kwargs)
+        file_data = {}
+        if kwargs.get('config-file'):
+            file_data = parse_infile(kwargs.get('config_file'))
+        kwargs.update(file_data)
+        cloud = kwargs.get('cloud')
+        if cloud.lower() == 'aws':
+            project = pentagon.AWSPentagonProject(name, kwargs)
+        elif cloud.lower() == 'gcp':
+            project = pentagon.GCPPentagonProject(name, kwargs)
+        elif cloud.lower() == 'none':
+            project = pentagon.PentagonProject(name, kwargs)
+        else:
+            raise PentagonException("Value passed for option --cloud not 'aws' or 'gcp'")
         project.start()
     except Exception as e:
         logging.error(e)
