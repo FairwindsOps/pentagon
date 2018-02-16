@@ -141,8 +141,8 @@ class AWSPentagonProject(PentagonProject):
 
     availability_zone_designations = list(string.ascii_lowercase)
 
-    def _process_data(self):
-
+    def __init__(self, name, data={}):
+        super(AWSPentagonProject, self).__init__(name, data)
         self._create_keys = self.get_data('create_keys')
 
         self._ssh_keys = {
@@ -153,54 +153,53 @@ class AWSPentagonProject(PentagonProject):
             'production_private_key': self.get_data('production_private_key', self.PentagonDefaults.ssh['production_private_key']),
         }
 
-        if self._configure_project:
-            # AWS Specific Stuff
-            self._aws_access_key = self.get_data('aws_access_key', self._aws_access_key_placeholder)
-            self._aws_secret_key = self.get_data('aws_secret_key', self._aws_secret_key_placeholder)
-            if self.get_data('aws_default_region'):
-                self._aws_default_region = self.get_data('aws_default_region')
-                self._aws_availability_zone_count = int(self.get_data('aws_availability_zone_count', self.PentagonDefaults.vpc['aws_availability_zone_count']))
-                self._aws_availability_zones = self.get_data('aws_availability_zones', self.__default_aws_availability_zones())
-            else:
-                self._aws_default_region = self._aws_default_region_placeholder
-                self._aws_availability_zone_count = self._aws_availability_zone_count_placeholder
-                self._aws_availability_zones = self._aws_availability_zones_placeholder
+        # AWS Specific Stuff
+        self._aws_access_key = self.get_data('aws_access_key', self._aws_access_key_placeholder)
+        self._aws_secret_key = self.get_data('aws_secret_key', self._aws_secret_key_placeholder)
+        if self.get_data('aws_default_region'):
+            self._aws_default_region = self.get_data('aws_default_region')
+            self._aws_availability_zone_count = int(self.get_data('aws_availability_zone_count', self.PentagonDefaults.vpc['aws_availability_zone_count']))
+            self._aws_availability_zones = self.get_data('aws_availability_zones', self.__default_aws_availability_zones())
+        else:
+            self._aws_default_region = self._aws_default_region_placeholder
+            self._aws_availability_zone_count = self._aws_availability_zone_count_placeholder
+            self._aws_availability_zones = self._aws_availability_zones_placeholder
 
-            # VPC information
-            self._vpc_name = self.get_data('vpc_name', self.PentagonDefaults.vpc['vpc_name'])
-            self._vpc_cidr_base = self.get_data('vpc_cidr_base', self.PentagonDefaults.vpc['vpc_cidr_base'])
-            self._vpc_id = self.get_data('vpc_id', self._vpc_id)
+        # VPC information
+        self._vpc_name = self.get_data('vpc_name', self.PentagonDefaults.vpc['vpc_name'])
+        self._vpc_cidr_base = self.get_data('vpc_cidr_base', self.PentagonDefaults.vpc['vpc_cidr_base'])
+        self._vpc_id = self.get_data('vpc_id', self._vpc_id)
 
-            # DNS
-            self._dns_zone = self.get_data('dns_zone', '{}.com'.format(self._name))
+        # DNS
+        self._dns_zone = self.get_data('dns_zone', '{}.com'.format(self._name))
 
-            # KOPS:
-            self._infrastructure_bucket = self.get_data('infrastructure_bucket', self._repository_name)
+        # KOPS:
+        self._infrastructure_bucket = self.get_data('infrastructure_bucket', self._repository_name)
 
-            # Kubernetes version
-            self._kubernetes_version = self.get_data('kubernetes_version', self.PentagonDefaults.kubernetes['version'])
+        # Kubernetes version
+        self._kubernetes_version = self.get_data('kubernetes_version', self.PentagonDefaults.kubernetes['version'])
 
-            # Working Kubernetes
-            self._working_kubernetes_cluster_name = self.get_data('working_kubernetes_cluster_name', 'working-1.{}'.format(self._dns_zone))
-            self._working_kubernetes_dns_zone = self.get_data('working_kubernetes_dns_zone', '{}'.format(self._dns_zone))
+        # Working Kubernetes
+        self._working_kubernetes_cluster_name = self.get_data('working_kubernetes_cluster_name', 'working-1.{}'.format(self._dns_zone))
+        self._working_kubernetes_dns_zone = self.get_data('working_kubernetes_dns_zone', '{}'.format(self._dns_zone))
 
-            self._working_kubernetes_node_count = self.get_data('working_kubernetes_node_count', self.PentagonDefaults.kubernetes['node_count'])
-            self._working_kubernetes_master_aws_zones = self.get_data('working_kubernetes_master_aws_zones', self._aws_availability_zones)
-            self._working_kubernetes_master_node_type = self.get_data('working_kubernetes_master_node_type', self.PentagonDefaults.kubernetes['master_node_type'])
-            self._working_kubernetes_worker_node_type = self.get_data('working_kubernetes_worker_node_type', self.PentagonDefaults.kubernetes['worker_node_type'])
-            self._working_kubernetes_v_log_level = self.get_data('working_kubernetes_v_log_level', self.PentagonDefaults.kubernetes['v_log_level'])
-            self._working_kubernetes_network_cidr = self.get_data('working_kubernetes_network_cidr', self.PentagonDefaults.kubernetes['network_cidr'])
+        self._working_kubernetes_node_count = self.get_data('working_kubernetes_node_count', self.PentagonDefaults.kubernetes['node_count'])
+        self._working_kubernetes_master_aws_zones = self.get_data('working_kubernetes_master_aws_zones', self._aws_availability_zones)
+        self._working_kubernetes_master_node_type = self.get_data('working_kubernetes_master_node_type', self.PentagonDefaults.kubernetes['master_node_type'])
+        self._working_kubernetes_worker_node_type = self.get_data('working_kubernetes_worker_node_type', self.PentagonDefaults.kubernetes['worker_node_type'])
+        self._working_kubernetes_v_log_level = self.get_data('working_kubernetes_v_log_level', self.PentagonDefaults.kubernetes['v_log_level'])
+        self._working_kubernetes_network_cidr = self.get_data('working_kubernetes_network_cidr', self.PentagonDefaults.kubernetes['network_cidr'])
 
-            # Production Kubernetes
-            self._production_kubernetes_cluster_name = self.get_data('production_kubernetes_cluster_name', 'production-1.{}'.format(self._dns_zone))
-            self._production_kubernetes_dns_zone = self.get_data('production_kubernetes_dns_zone', '{}'.format(self._dns_zone))
+        # Production Kubernetes
+        self._production_kubernetes_cluster_name = self.get_data('production_kubernetes_cluster_name', 'production-1.{}'.format(self._dns_zone))
+        self._production_kubernetes_dns_zone = self.get_data('production_kubernetes_dns_zone', '{}'.format(self._dns_zone))
 
-            self._production_kubernetes_node_count = self.get_data('production_kubernetes_node_count', self.PentagonDefaults.kubernetes['node_count'])
-            self._production_kubernetes_master_aws_zones = self.get_data('production_kubernetes_master_aws_zones', self._aws_availability_zones)
-            self._production_kubernetes_master_node_type = self.get_data('production_kubernetes_master_node_type', self.PentagonDefaults.kubernetes['master_node_type'])
-            self._production_kubernetes_worker_node_type = self.get_data('production_kubernetes_worker_node_type', self.PentagonDefaults.kubernetes['worker_node_type'])
-            self._production_kubernetes_v_log_level = self.get_data('production_kubernetes_v_log_level', self.PentagonDefaults.kubernetes['v_log_level'])
-            self._production_kubernetes_network_cidr = self.get_data('production_kubernetes_network_cidr', self.PentagonDefaults.kubernetes['network_cidr'])
+        self._production_kubernetes_node_count = self.get_data('production_kubernetes_node_count', self.PentagonDefaults.kubernetes['node_count'])
+        self._production_kubernetes_master_aws_zones = self.get_data('production_kubernetes_master_aws_zones', self._aws_availability_zones)
+        self._production_kubernetes_master_node_type = self.get_data('production_kubernetes_master_node_type', self.PentagonDefaults.kubernetes['master_node_type'])
+        self._production_kubernetes_worker_node_type = self.get_data('production_kubernetes_worker_node_type', self.PentagonDefaults.kubernetes['worker_node_type'])
+        self._production_kubernetes_v_log_level = self.get_data('production_kubernetes_v_log_level', self.PentagonDefaults.kubernetes['v_log_level'])
+        self._production_kubernetes_network_cidr = self.get_data('production_kubernetes_network_cidr', self.PentagonDefaults.kubernetes['network_cidr'])
 
     def __default_aws_availability_zones(self):
         azs = []
