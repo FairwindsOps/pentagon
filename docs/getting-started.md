@@ -29,11 +29,15 @@ Pentagon is “batteries included”- not only does one get a network with a clu
   * Not necessary, but we suggest installing Pentagon into a [VirtualEnv](https://virtualenv.pypa.io/en/stable/)
 
 ## Quick Start
-### Create a Pentagon Project
+### Create a AWS Pentagon Project
 * `pentagon start-project <project-name> --aws-access-key <aws-access-key> --aws-secret-key <aws-secret-key> --aws-default-region <aws-default-region>`
-  * With the above basic options set, defaults will be set for you. See [Advanced Project Initialization](#advanced-project-initialization) for more options.
+### Create a GCP/GKE Pentagon Project
+* `pentagon --log-level=DEBUG start-project --cloud=gcp  <project-name> --gcp-zones=<zone_1>,<zone_2>,..,<zone_n> --gcp-project <gcp_project_name>`
+### 
+* With the above basic options set, defaults will be set for you. See [Advanced Project Initialization](#advanced-project-initialization) for more options.
   * Arguments may also be set using environment variable in the format `PENTAGON_<argument_name_with_underscores>`.
 * `cd <project-name>-infrastructure`
+
 
 #### Automatic
 * `make all`
@@ -46,6 +50,8 @@ Pentagon is “batteries included”- not only does one get a network with a clu
 * `. yaml_source config/private/secrets.yml`
   * Sources environment variables required for the following steps. This will be required each time you work with the infrastructure repository or if you move the repository to another location.
 * `bash config/local/local-config-init`
+
+## AWS
 
 ### Create a VPC
 This creates the VPC and private, public, and admin subnets in that VPC for non Kubernetes resources. Read more about networking [here](network.md).
@@ -93,11 +99,16 @@ Pentagon used Kops to create clusters in AWS. The default layout creates configu
 * Run `kops update cluster <clustername> --yes` to create the cluster
 * While waiting for the cluster to create, consult the [kops documentation](https://github.com/kubernetes/kops/blob/master/docs/README.md) for more information about using Kops and interacting with your new cluster
 
+## GCP/GKE
+
+### Create Kubernetes Cluster
+* Use the [Gcp component](components.md#gcp.cluster) to create your cluster.
+
 ### Creating Resources Outside of Kubernetes
 
 Typically infrastructure will be required outside of your Kubernetes cluster. Other EC2, RDS, or Elasticache instances, etc are often require for an application.
 
-Pentagon convention suggests you use Ansible to create these resources and that the Ansible playbooks can be saved in the `default/resources/` or the `default/clusters/<cluster>/resources/` directory. This depends on the scope with which the play book will be utilized. If the resources are not specific to either cluster, then we suggest you save it at the `default/resources/` level. Likewise, if it is a resource that will only be used by one cluster, such as a staging database or a production database, then we suggest writing the Ansible playbook at the `default/cluster/<cluster>/resources/` level. Writing Ansible roles can be very helpful to DRY up your resource configurations.
+Pentagon convention suggests you use Ansible to create these resources and that the Ansible playbooks can be saved in the `inventory/default/resources/` or the `inventory/default/clusters/<cluster>/resources/` directory. This depends on the scope with which the play book will be utilized. If the resources are not specific to either cluster, then we suggest you save it at the `default/resources/` level. Likewise, if it is a resource that will only be used by one cluster, such as a staging database or a production database, then we suggest writing the Ansible playbook at the `default/cluster/<cluster>/resources/` level. Writing Ansible roles can be very helpful to DRY up your resource configurations.
 
 
 ======================================
@@ -129,9 +140,9 @@ If you wish to utilize the templating ability of the `pentagon start-project` co
     * ***File supercedes command line options.***
   * **-o, --output-file**:
     * No default
-  * **--workspace-directory**:
-    * Directory to place new project
-    * Defaults to `./`
+  * **--cloud**:
+    * Cloud provider to create default inventory.
+    * Defaults to 'aws'. [aws,gcp,none]
   * **--repository-name**:
     * Name of the folder to initialize the infrastructure repository
     * Defaults to `<project-name>-infrastructure`
@@ -261,3 +272,9 @@ If you wish to utilize the templating ability of the `pentagon start-project` co
     * Defaults to INFO
   * **--help**:
     * Show help message and exit.
+  * **--gcp-project**
+    * Google Cloud Project to create clusters in
+    * This argument required when --cloud=gcp
+  * **--gcp-zones**
+    * Google Cloud Project zones to create clusters in. Comma separated list. 
+    * This argument required when --cloud=gcp
