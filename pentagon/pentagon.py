@@ -20,7 +20,6 @@ import component.inventory as inventory
 import component.core as core
 import component.gcp as gcp
 from helpers import render_template, write_yaml_file, create_rsa_key
-from defaults import PentagonDefaults
 from meta import __version__, __author__
 
 
@@ -29,7 +28,7 @@ class PentagonException(Exception):
 
 
 class PentagonProject(object):
-
+    from defaults import AWSPentagonDefaults as PentagonDefaults
     keys_to_sanitize = ['aws_access_key', 'aws_secret_key', 'output_file']
 
     def __init__(self, name, data={}):
@@ -49,7 +48,6 @@ class PentagonProject(object):
             self._repository_name)
 
         self._private_path = "inventory/default/config/private"
-
 
     def get_data(self, name, default=None):
         """ Get argument name from click arguments, if it exists, or return default.
@@ -148,11 +146,11 @@ class AWSPentagonProject(PentagonProject):
         self._create_keys = self.get_data('create_keys')
 
         self._ssh_keys = {
-            'admin_vpn_key': self.get_data('admin_vpn_key', PentagonDefaults.ssh['admin_vpn_key']),
-            'working_kube_key': self.get_data('working_kube_key', PentagonDefaults.ssh['working_kube_key']),
-            'production_kube_key': self.get_data('production_kube_key', PentagonDefaults.ssh['production_kube_key']),
-            'working_private_key': self.get_data('working_private_key', PentagonDefaults.ssh['working_private_key']),
-            'production_private_key': self.get_data('production_private_key', PentagonDefaults.ssh['production_private_key']),
+            'admin_vpn_key': self.get_data('admin_vpn_key', self.PentagonDefaults.ssh['admin_vpn_key']),
+            'working_kube_key': self.get_data('working_kube_key', self.PentagonDefaults.ssh['working_kube_key']),
+            'production_kube_key': self.get_data('production_kube_key', self.PentagonDefaults.ssh['production_kube_key']),
+            'working_private_key': self.get_data('working_private_key', self.PentagonDefaults.ssh['working_private_key']),
+            'production_private_key': self.get_data('production_private_key', self.PentagonDefaults.ssh['production_private_key']),
         }
 
         if self._configure_project:
@@ -161,7 +159,7 @@ class AWSPentagonProject(PentagonProject):
             self._aws_secret_key = self.get_data('aws_secret_key', self._aws_secret_key_placeholder)
             if self.get_data('aws_default_region'):
                 self._aws_default_region = self.get_data('aws_default_region')
-                self._aws_availability_zone_count = int(self.get_data('aws_availability_zone_count', PentagonDefaults.vpc['aws_availability_zone_count']))
+                self._aws_availability_zone_count = int(self.get_data('aws_availability_zone_count', self.PentagonDefaults.vpc['aws_availability_zone_count']))
                 self._aws_availability_zones = self.get_data('aws_availability_zones', self.__default_aws_availability_zones())
             else:
                 self._aws_default_region = self._aws_default_region_placeholder
@@ -169,8 +167,8 @@ class AWSPentagonProject(PentagonProject):
                 self._aws_availability_zones = self._aws_availability_zones_placeholder
 
             # VPC information
-            self._vpc_name = self.get_data('vpc_name', PentagonDefaults.vpc['vpc_name'])
-            self._vpc_cidr_base = self.get_data('vpc_cidr_base', PentagonDefaults.vpc['vpc_cidr_base'])
+            self._vpc_name = self.get_data('vpc_name', self.PentagonDefaults.vpc['vpc_name'])
+            self._vpc_cidr_base = self.get_data('vpc_cidr_base', self.PentagonDefaults.vpc['vpc_cidr_base'])
             self._vpc_id = self.get_data('vpc_id', self._vpc_id)
 
             # DNS
@@ -180,29 +178,29 @@ class AWSPentagonProject(PentagonProject):
             self._infrastructure_bucket = self.get_data('infrastructure_bucket', self._repository_name)
 
             # Kubernetes version
-            self._kubernetes_version = self.get_data('kubernetes_version', PentagonDefaults.kubernetes['version'])
+            self._kubernetes_version = self.get_data('kubernetes_version', self.PentagonDefaults.kubernetes['version'])
 
             # Working Kubernetes
             self._working_kubernetes_cluster_name = self.get_data('working_kubernetes_cluster_name', 'working-1.{}'.format(self._dns_zone))
             self._working_kubernetes_dns_zone = self.get_data('working_kubernetes_dns_zone', '{}'.format(self._dns_zone))
 
-            self._working_kubernetes_node_count = self.get_data('working_kubernetes_node_count', PentagonDefaults.kubernetes['node_count'])
+            self._working_kubernetes_node_count = self.get_data('working_kubernetes_node_count', self.PentagonDefaults.kubernetes['node_count'])
             self._working_kubernetes_master_aws_zones = self.get_data('working_kubernetes_master_aws_zones', self._aws_availability_zones)
-            self._working_kubernetes_master_node_type = self.get_data('working_kubernetes_master_node_type', PentagonDefaults.kubernetes['master_node_type'])
-            self._working_kubernetes_worker_node_type = self.get_data('working_kubernetes_worker_node_type', PentagonDefaults.kubernetes['worker_node_type'])
-            self._working_kubernetes_v_log_level = self.get_data('working_kubernetes_v_log_level', PentagonDefaults.kubernetes['v_log_level'])
-            self._working_kubernetes_network_cidr = self.get_data('working_kubernetes_network_cidr', PentagonDefaults.kubernetes['network_cidr'])
+            self._working_kubernetes_master_node_type = self.get_data('working_kubernetes_master_node_type', self.PentagonDefaults.kubernetes['master_node_type'])
+            self._working_kubernetes_worker_node_type = self.get_data('working_kubernetes_worker_node_type', self.PentagonDefaults.kubernetes['worker_node_type'])
+            self._working_kubernetes_v_log_level = self.get_data('working_kubernetes_v_log_level', self.PentagonDefaults.kubernetes['v_log_level'])
+            self._working_kubernetes_network_cidr = self.get_data('working_kubernetes_network_cidr', self.PentagonDefaults.kubernetes['network_cidr'])
 
             # Production Kubernetes
             self._production_kubernetes_cluster_name = self.get_data('production_kubernetes_cluster_name', 'production-1.{}'.format(self._dns_zone))
             self._production_kubernetes_dns_zone = self.get_data('production_kubernetes_dns_zone', '{}'.format(self._dns_zone))
 
-            self._production_kubernetes_node_count = self.get_data('production_kubernetes_node_count', PentagonDefaults.kubernetes['node_count'])
+            self._production_kubernetes_node_count = self.get_data('production_kubernetes_node_count', self.PentagonDefaults.kubernetes['node_count'])
             self._production_kubernetes_master_aws_zones = self.get_data('production_kubernetes_master_aws_zones', self._aws_availability_zones)
-            self._production_kubernetes_master_node_type = self.get_data('production_kubernetes_master_node_type', PentagonDefaults.kubernetes['master_node_type'])
-            self._production_kubernetes_worker_node_type = self.get_data('production_kubernetes_worker_node_type', PentagonDefaults.kubernetes['worker_node_type'])
-            self._production_kubernetes_v_log_level = self.get_data('production_kubernetes_v_log_level', PentagonDefaults.kubernetes['v_log_level'])
-            self._production_kubernetes_network_cidr = self.get_data('production_kubernetes_network_cidr', PentagonDefaults.kubernetes['network_cidr'])
+            self._production_kubernetes_master_node_type = self.get_data('production_kubernetes_master_node_type', self.PentagonDefaults.kubernetes['master_node_type'])
+            self._production_kubernetes_worker_node_type = self.get_data('production_kubernetes_worker_node_type', self.PentagonDefaults.kubernetes['worker_node_type'])
+            self._production_kubernetes_v_log_level = self.get_data('production_kubernetes_v_log_level', self.PentagonDefaults.kubernetes['v_log_level'])
+            self._production_kubernetes_network_cidr = self.get_data('production_kubernetes_network_cidr', self.PentagonDefaults.kubernetes['network_cidr'])
 
     def __default_aws_availability_zones(self):
         azs = []
@@ -227,7 +225,6 @@ class AWSPentagonProject(PentagonProject):
             'vpc_cidr_base': self._vpc_cidr_base,
             'aws_availability_zones': self._aws_availability_zones,
             'aws_availability_zone_count': self._aws_availability_zone_count,
-            'aws_region': self._aws_default_region,
             'infrastructure_bucket': self._infrastructure_bucket,
             'vpc_name': self._vpc_name,
             'infrastructure_bucket': self._infrastructure_bucket,
@@ -318,3 +315,46 @@ class AWSPentagonProject(PentagonProject):
             inventory.Inventory(self.context).add('{}/inventory/default'.format(self._repository_directory))
             self.__add_kops_working_cluster()
             self.__add_kops_production_cluster()
+
+
+class GCPPentagonProject(PentagonProject):
+    from defaults import GCPPentagonDefaults as PentagonDefaults
+    context = {'name': 'default', 'create_keys': False, 'cloud': 'gcp'}
+
+    local_defaults = {
+        'working_cluster_name': 'working',
+        'prod_cluster_name': 'production',
+    }
+
+    def __init__(self, name, data={}):
+        super(GCPPentagonProject, self).__init__(name, data)
+        self.default_context = self.PentagonDefaults.kubernetes
+        if type(self.default_context['scopes']) == str:
+            self.default_context['scopes'] = self.default_context['scopes'].split(',')
+        self._data['zones'] = self.get_data('gcp_zones').split(',')
+        self.default_context['project'] = self.get_data('gcp_project')
+
+    def add_working_cluster(self):
+        context = self.default_context
+        context.update({
+            'labels': 'cluster=working',
+            'zone': self.get_data('zones')[0],
+            'node_locations': self.get_data('zones'),
+            'name': self.local_defaults.get('working_cluster_name')
+            })
+        gcp.Cluster(context).add('{}/inventory/default/clusters/working'.format(self._repository_directory))
+
+    def add_production_cluster(self):
+        context = self.default_context
+        context.update({
+            'labels': 'cluster=production',
+            'zone': self.get_data('zones')[0],
+            'locations': self.get_data('zones'),
+            'name': self.local_defaults.get('prod_cluster_name')
+            })
+        gcp.Cluster(context).add('{}/inventory/default/clusters/production'.format(self._repository_directory))
+
+    def configure_default_project(self):
+        inventory.Inventory(self.context).add('{}/inventory/default'.format(self._repository_directory))
+        self.add_working_cluster()
+        self.add_production_cluster()

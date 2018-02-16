@@ -8,12 +8,12 @@ from pentagon.component import ComponentBase
 from pentagon.component.vpc import Vpc
 from pentagon.component.vpn import Vpn
 from pentagon.helpers import create_rsa_key
-from pentagon.defaults import PentagonDefaults
+from pentagon.defaults import AWSPentagonDefaults as PentagonDefaults
 
 
 class Inventory(ComponentBase):
 
-    _defaults = {'type': 'aws'}
+    _defaults = {'cloud': 'aws'}
     _required_parameters = ['name']
 
     def __init__(self, data, additional_args=None, **kwargs):
@@ -42,14 +42,14 @@ class Inventory(ComponentBase):
         try:
             self._add_files()
 
-            if self._data['type'].lower() == 'aws':
+            if self._data['cloud'].lower() == 'aws':
                 self._data['aws_region'] = self._data.get('aws_default_region')
                 self._merge_data(self._ssh_keys)
                 self.__create_keys()
                 Aws(self._data).add(self._destination)
                 Vpn(self._data).add("{}/resources".format(self._destination), overwrite=True)
 
-            if self._data['type'].lower() == 'gcp':
+            if self._data['cloud'].lower() == 'gcp':
                 Gcp(self._data).add(self._destination)
 
             self._remove_init_file()

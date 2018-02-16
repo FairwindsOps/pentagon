@@ -15,6 +15,28 @@ import migration
 from meta import __version__, __author__
 
 
+class RequiredIf(click.Option):
+
+    def __init__(self, *args, **kwargs):
+        self.required_if = kwargs.pop('required_if').split('=')
+        self.required_option = self.required_if[0]
+        self.required_value = self.required_if[1]
+        assert self.required_if, "'required_if' parameter required"
+        kwargs['help'] = (kwargs.get('help', '') +
+            ' NOTE: This argument required when --%s=%s' %
+            (self.required_option, self.required_value)
+        ).strip()
+        super(RequiredIf, self).__init__(*args, **kwargs)
+
+    def handle_parse_result(self, ctx, opts, args):
+        other_present = self.required_option in opts
+        if not other_present or opts[self.required_option] != self.required_value:
+            self.prompt = None
+
+        return super(RequiredIf, self).handle_parse_result(
+            ctx, opts, args)
+
+
 @click.group()
 @click.version_option(__version__)
 @click.option('--log-level', default="INFO", help="Log Level DEBUG,INFO,WARN,ERROR")
@@ -27,6 +49,7 @@ def cli(ctx, log_level, *args, **kwargs):
 @click.command()
 @click.pass_context
 @click.argument('name')
+# General directory and file name options
 @click.option('-f', '--config-file', help='File to read configuration options from. File supercedes command line options.')
 @click.option('-o', '--output-file', default='config.yml', help='File to write options to after completion')
 @click.option('--workspace-directory', help='Directory to place new project, defaults to ./')
@@ -35,7 +58,10 @@ def cli(ctx, log_level, *args, **kwargs):
 @click.option('--cloud', default="aws", help="Cloud providor to create default inventory. Defaults to 'aws'. [aws,gcp,none]")
 @click.option('--hash-type', default="aws", type=click.Choice(['aws', 'gcp']), help="Type cloud project to create. Defaults to 'aws'")
 
-# Currently only AWS but we can should add GCP later
+# General Cloud Options
+@click.option('--zones', help="Availability zones as a comma delimited list", cls=RequiredIf, required_if='cloud=gcp')
+
+# Currently only AWS but maybe we can/should add GCP later
 @click.option('--configure-vpn/--no-configure-vpn', default=True, help="Whether or not to configure the vpn.")
 @click.option('--vpc-name', help="Name of VPC to create")
 @click.option('--vpc-cidr-base', help="First two octets of the VPC ip space")
@@ -45,26 +71,24 @@ def cli(ctx, log_level, *args, **kwargs):
 
 # General Kubernetes options
 @click.option('--kubernetes-version', help="Version of kubernetes to use for cluster nodes")
-@click.option('--default-region', help="Default region for Kubernetes Cluster")
-@click.option('--availability-zones', help="Availability zones as a comma delimited list")
-@click.option('--disk-size', help="")
+@click.option('--disk-size', help="Size disk to provision on the kubernetes vms")
 
 # Working
 @click.option('--working-kubernetes-cluster-name', help="Name of the working kubernetes cluster nodes")
 @click.option('--working-kubernetes-node-count', help="Name of the working kubernetes cluster nodes")
-@click.option('--working-kubernetes-worker-node-type', help="Node type of the kube workers")
+@click.option('--working-kubernetes-node-type', help="Node type of the kube workers")
 @click.option('--working-kubernetes-network-cidr', help="Network cidr of the kubernetes working cluster")
 
 # Production
 @click.option('--production-kubernetes-cluster-name', help="Name of the production kubernetes cluster nodes")
 @click.option('--production-kubernetes-node-count', help="Name of the production kubernetes cluster nodes")
-@click.option('--production-kubernetes-worker-node-type', help="Node type of the kube workers")
+@click.option('--production-kubernetes-node-type', help="Node type of the kube workers")
 @click.option('--production-kubernetes-network-cidr', help="Network cidr of the kubernetes working cluster")
 
 # AWS Cloud options
-@click.option('--aws-access-key', default=lambda: os.environ.get('PENTAGON_aws_access_key'), help="AWS access key")
-@click.option('--aws-secret-key', default=lambda: os.environ.get('PENTAGON_aws_secret_key'), help="AWS secret key")
-@click.option('--aws-default-region', help="[Deprecated] Use \"--default-region\". AWS default region")
+@click.option('--aws-access-key', prompt=True, default=lambda: os.environ.get('PENTAGON_aws_access_key'), help="AWS access key", cls=RequiredIf, required_if='cloud=aws')
+@click.option('--aws-secret-key', prompt=True, default=lambda: os.environ.get('PENTAGON_aws_secret_key'), help="AWS secret key", cls=RequiredIf, required_if='cloud=aws')
+@click.option('--aws-default-region', help="AWS default region", cls=RequiredIf, required_if='cloud=aws')
 @click.option('--aws-availability-zones', help="[Deprecated] Use \"--availability-zones\". AWS availability zones as a comma delimited with spaces. Default to region a, region b, ... region z")
 @click.option('--aws-availability-zone-count', help="Number of availability zones to use")
 @click.option('--infrastructure-bucket', help="Name of S3 Bucket to store state")
@@ -74,7 +98,7 @@ def cli(ctx, log_level, *args, **kwargs):
 # AWS only Kubernetes options
 # Working
 @click.option('--working-kubernetes-master-aws-zone', help="Availability zone to place the kube master in")
-@click.option('--working-kubernetes-master-node-type', help="AWS only. Node type of the kube master")
+@click.option('--working-kubernetes-master-type', help="AWS only. Node type of the kube master")
 @click.option('--working-kube-key', help="Name of the ssh key for the working kubernetes cluster")
 @click.option('--working-private-key', help="Name of the ssh key for the working non kubernetes instances")
 @click.option('--working-kubernetes-dns-zone', help="DNS Zone of the kubernetes working cluster")
@@ -82,22 +106,25 @@ def cli(ctx, log_level, *args, **kwargs):
 
 # Poduction
 @click.option('--production-kubernetes-master-aws-zone', help="Availability zone to place the kube master in")
-@click.option('--production-kubernetes-master-node-type', help=" AWS only. Node type of the kube master")
+@click.option('--production-kubernetes-master-type', help=" AWS only. Node type of the kube master")
 @click.option('--production-kube-key', help="Name of the ssh key for the production kubernetes cluster")
 @click.option('--production-private-key', help="Name of the ssh key for the production non kubernetes instances")
 @click.option('--production-kubernetes-dns-zone', help="DNS Zone of the kubernetes production cluster")
 @click.option('--production-kubernetes-v-log-level', help="V Log Level kubernetes production cluster")
-@click.option('--production-kubernetes-network-cidr', help="Network cidr of the kubernetes working cluster")
-@click.option('--configure-vpn/--no-configure-vpn', default=True, help="Whether or not to configure the vpn.")
-@click.option('--vpn-ami-id', help="ami-id to use for the VPN instance")
+
+# GCP Cloud options
+@click.option('--gcp-project', prompt=True, help="Google Cloud Project to create clusters in", cls=RequiredIf, required_if='cloud=gcp')
+@click.option('--gcp-zones', prompt=True, help="Google Cloud Project zones to create clusters in. Comma separated list.", cls=RequiredIf, required_if='cloud=gcp')
 def start_project(ctx, name, **kwargs):
     """ Create an infrastructure project from scratch with the configured options """
     try:
+
         logging.basicConfig(level=kwargs.get('log_level'))
         file_data = {}
         if kwargs.get('config-file'):
             file_data = parse_infile(kwargs.get('config_file'))
         kwargs.update(file_data)
+        logging.debug(kwargs)
         cloud = kwargs.get('cloud')
         if cloud.lower() == 'aws':
             project = pentagon.AWSPentagonProject(name, kwargs)
@@ -107,6 +134,7 @@ def start_project(ctx, name, **kwargs):
             project = pentagon.PentagonProject(name, kwargs)
         else:
             raise PentagonException("Value passed for option --cloud not 'aws' or 'gcp'")
+        logging.debug('Creating {} project {} with {}'.format(cloud.upper(), name, kwargs))
         project.start()
     except Exception as e:
         logging.error(e)
