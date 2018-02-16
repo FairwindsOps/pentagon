@@ -103,7 +103,7 @@ class PentagonProject(object):
 
     def __create_repo_core(self):
         logging.debug(self._repository_directory)
-        core.Core({}).add('{}'.format(self._repository_directory))
+        core.Core(self._data).add('{}'.format(self._repository_directory))
 
 
 class AWSPentagonProject(PentagonProject):
@@ -323,7 +323,7 @@ class GCPPentagonProject(PentagonProject):
 
     local_defaults = {
         'working_cluster_name': 'working',
-        'prod_cluster_name': 'production',
+        'production_cluster_name': 'production',
     }
 
     def __init__(self, name, data={}):
@@ -340,7 +340,8 @@ class GCPPentagonProject(PentagonProject):
             'labels': 'cluster=working',
             'zone': self.get_data('zones')[0],
             'node_locations': self.get_data('zones'),
-            'name': self.local_defaults.get('working_cluster_name')
+            'name': self.local_defaults.get('working_cluster_name'),
+            'cluster_ipv4_cidr': self.PentagonDefaults.kubernetes['working_cluster_ipv4_cidr']
             })
         gcp.Cluster(context).add('{}/inventory/default/clusters/working'.format(self._repository_directory))
 
@@ -350,7 +351,8 @@ class GCPPentagonProject(PentagonProject):
             'labels': 'cluster=production',
             'zone': self.get_data('zones')[0],
             'locations': self.get_data('zones'),
-            'name': self.local_defaults.get('prod_cluster_name')
+            'name': self.local_defaults.get('production_cluster_name'),
+            'cluster_ipv4_cidr': self.PentagonDefaults.kubernetes['production_cluster_ipv4_cidr']
             })
         gcp.Cluster(context).add('{}/inventory/default/clusters/production'.format(self._repository_directory))
 
