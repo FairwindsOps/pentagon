@@ -9,7 +9,7 @@ class TestPentagonProjectWithoutArgs(TestPentagonProject):
     name = 'test_pentagon_without_args'
 
     def setUp(self):
-        self.p = pentagon.PentagonProject(self.name)
+        self.p = pentagon.AWSPentagonProject(self.name)
 
     def tearDown(self):
         self.p = None
@@ -21,7 +21,6 @@ class TestPentagonProjectWithAllArgs(TestPentagonProject):
         'configure': True,
 
         # 'repository_name': 'test-repository-name',
-        # 'workspace_directory': 'test-workspace-direcotry',
 
         # need to test some of these without all of them
         'aws_access_key': 'test-aws-key',
@@ -63,7 +62,7 @@ class TestPentagonProjectWithAllArgs(TestPentagonProject):
         }
 
     def setUp(self):
-        self.p = pentagon.PentagonProject(self.name, self.args)
+        self.p = pentagon.AWSPentagonProject(self.name, self.args)
 
     def tearDown(self):
         self.p = None
@@ -72,6 +71,7 @@ class TestPentagonProjectWithAllArgs(TestPentagonProject):
         self.assertEqual(self.p._configure_project, True)
 
     def test_aws_availability_zones(self):
+        logging.debug(self.p._aws_availability_zone_count)
         self.assertIsInstance(self.p._aws_availability_zone_count, int)
         self.assertEqual(self.p._aws_default_region, self.args['aws_default_region'])
         self.assertEqual(self.p._aws_availability_zones, self.args['aws_availability_zones'])
@@ -117,7 +117,7 @@ class TestPentagonProjectWithMinimalArgs(TestPentagonProject):
         }
 
     def setUp(self):
-        self.p = pentagon.PentagonProject(self.name, self.args)
+        self.p = pentagon.AWSPentagonProject(self.name, self.args)
 
     def tearDown(self):
         self.p = None
@@ -141,4 +141,4 @@ class TestPentagon(TestPentagonProject):
             'aws_availability_zone_count': 'not_an_integer'
         }
         with self.assertRaises(ValueError):
-            p = pentagon.PentagonProject(self.name, args)
+            p = pentagon.AWSPentagonProject(self.name, args)

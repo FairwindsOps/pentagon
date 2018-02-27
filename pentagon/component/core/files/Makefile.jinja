@@ -3,13 +3,18 @@
 SHELL = bash
 
 INFRASTRUCTURE_REPO := $(shell `basename pwd`)
-INFRASTRUCTURE_BUCKET := $(notdir ${INFRASTRUCTURE_REPO})
 BASENAME := $(notdir ${INFRASTRUCTURE_REPO})
+{%- if cloud | lower == 'aws' %}
 VPN_BUCKET := $(subst infrastructure,vpn,$(BASENAME))
-
-all: local_config_init install_requirements vpc vpc_id nat_gateways configure_working_cluster #configure_production_cluster vpn
+INFRASTRUCTURE_BUCKET := $(notdir ${INFRASTRUCTURE_REPO})
+all: local_config_init install_requirements vpc vpc_id nat_gateways configure_working_cluster configure_production_cluster vpn
 
 destroy: destroy_vpn destroy_vpn_bucket destroy_working_cluster destroy_production_cluster destroy_vpc destroy_vpc_bucket
+{%- else %}	
+
+all: local_config_init install_requirements create_working_cluster create_production_cluster
+
+{%- endif %}
 
 install_requirements:
 	export INFRASTRUCTURE_REPO=$(INFRASTRUCTURE_REPO); \
@@ -22,7 +27,7 @@ local_config_init:
 	source yaml_source inventory/default/config/local/vars.yml; \
 	source yaml_source inventory/default/config/private/secrets.yml; \
 	inventory/default/config/local/local-config-init
-
+{%- if cloud | lower == 'aws' %}
 vpc:
 	source yaml_source inventory/default/config/local/vars.yml; \
 	source yaml_source inventory/default/config/private/secrets.yml; \
@@ -103,25 +108,6 @@ destroy_vpn_bucket:
 	rm .tmp &&\
 	aws s3api delete-bucket --bucket $(VPN_BUCKET)
 
-
-make_tunnel:
-	#Experimental
-	# When running in docker container
-	mkdir -p /dev/net
-	mknod /dev/net/tun c 10 200 && chmod 600 /dev/net/tun || true
-	cat /dev/net/tun 2>&1 | grep "bad state"  # testing the /dev/net/tun is accessible. "cat: /dev/net/tun: File descriptor in bad state" is considered success
-
-test_connect_vpn:
-	cd /tmp
-	aws s3 cp s3://$(VPN_BUCKET)/stacks/vpn/keys/vpn-user1.tar.gz ./
-	tar -xzvf vpn-user1.tar.gz 
-
-	openvpn --config /tmp/vpn-user1.ovpn | tee openvpn.out &
-	sleep 5
-	kill %1
-	ls
-	grep "Initialization Sequence Completed" openvpn.out
-
 configure_working_cluster:
 	source yaml_source inventory/default/config/local/vars.yml; \
 	source yaml_source inventory/default/config/private/secrets.yml; \
@@ -163,3 +149,39 @@ destroy_production_cluster:
 	source yaml_source inventory/default/config/private/secrets.yml; \
 	cd inventory/default/clusters/production; \
 	kops delete cluster `cat vars.yml | shyaml get-value cluster_name` --yes
+
+{%- else %}
+
+create_working_cluster:
+	source yaml_source inventory/default/config/local/vars.yml; \
+	source yaml_source inventory/default/config/private/secrets.yml; \
+	export INFRASTRUCTURE_REPO=$(INFRASTRUCTURE_REPO); \
+	cd inventory/default/clusters/working; \
+	source ./create_cluster.sh || true
+
+create_production_cluster:
+	source yaml_source inventory/default/config/local/vars.yml; \
+	source yaml_source inventory/default/config/private/secrets.yml; \
+	export INFRASTRUCTURE_REPO=$(INFRASTRUCTURE_REPO); \
+	cd inventory/default/clusters/production; \
+	source ./create_cluster.sh || true
+
+{%- endif %}
+
+make_tunnel:
+	#Experimental
+	# When running in docker container
+	mkdir -p /dev/net
+	mknod /dev/net/tun c 10 200 && chmod 600 /dev/net/tun || true
+	cat /dev/net/tun 2>&1 | grep "bad state"  # testing the /dev/net/tun is accessible. "cat: /dev/net/tun: File descriptor in bad state" is considered success
+
+test_connect_vpn:
+	cd /tmp
+	aws s3 cp s3://$(VPN_BUCKET)/stacks/vpn/keys/vpn-user1.tar.gz ./
+	tar -xzvf vpn-user1.tar.gz 
+
+	openvpn --config /tmp/vpn-user1.ovpn | tee openvpn.out &
+	sleep 5
+	kill %1
+	ls
+	grep "Initialization Sequence Completed" openvpn.out

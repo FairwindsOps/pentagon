@@ -10,7 +10,7 @@ import yaml
 
 from pentagon.component import ComponentBase
 from pentagon.helpers import render_template
-from pentagon.defaults import PentagonDefaults
+from pentagon.defaults import AWSPentagonDefaults as PentagonDefaults
 
 
 class Cluster(ComponentBase):

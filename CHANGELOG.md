@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Updated
 - Version handling in setup.py
 - Updated yaml loader for config file reading to force string behavior
+- Inventory component will use -D name= as the targe directory instead needing -o. 
+- Inventory -D account replaced with -D name
 
 
 ## [2.0.0] - 2018-2-1

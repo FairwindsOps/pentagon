@@ -18,7 +18,7 @@ elif [ ! -d "${INFRASTRUCTURE_REPO}" ]; then
   exit 1
 fi
 
-cd "${INFRASTRUCTURE_REPO}/inventory/{{ account }}/config/local" || exit 1
+cd "${INFRASTRUCTURE_REPO}/inventory/{{ name }}/config/local" || exit 1
 
 for default_file in *-default; do
   out_file="${OUT_DIR}/${default_file//-default}"

@@ -9,7 +9,7 @@ class TestPentagonProject(unittest.TestCase):
     name = "test-pentagon-base"
 
     def setUp(self):
-        self.p = pentagon.PentagonProject(self.name)
+        self.p = pentagon.AWSPentagonProject(self.name)
 
     def tearDown(self):
         self.p = None
@@ -25,7 +25,4 @@ class TestPentagonProject(unittest.TestCase):
         self.assertEqual(self.p._repository_name, '{}-infrastructure'.format(self.name))
 
     def test_repository_directory(self):
-        self.assertEqual(self.p._repository_directory, "{}/{}".format(self.p._workspace_directory, self.p._repository_name))
-
-    def test_workspace_directory(self):
-        self.assertEqual(self.p._workspace_directory, os.path.expanduser('.'))
+        self.assertEqual(self.p._repository_directory, self.p._repository_name)

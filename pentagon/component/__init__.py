@@ -8,7 +8,7 @@ import sys
 import re
 
 from pentagon.helpers import render_template
-from pentagon.defaults import PentagonDefaults
+from pentagon.defaults import AWSPentagonDefaults as PentagonDefaults
 
 
 class ComponentBase(object):
@@ -125,5 +125,5 @@ class ComponentBase(object):
             from distutils.dir_util import copy_tree
         else:
             from shutil import copytree as copy_tree
-
+        logging.debug("Destination: {}".format(self._destination_directory_name))
         copy_tree(self._files_directory, self._destination_directory_name)
