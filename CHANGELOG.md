@@ -6,9 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [2.1.0] - 2018-2-27
+
 ## Added
 - `--version` flag to output version
 - added cluster auto scaling iam policies by default
+- added `--cloud` flag and supporting flags to create GCP/GKE infrastructure
 
 ### Updated
 - Version handling in setup.py
