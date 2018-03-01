@@ -309,7 +309,6 @@ class AWSPentagonProject(PentagonProject):
                 logging.warn("Cannot get ami-id without AWS Key, Secret and Default Region set")
 
     def configure_default_project(self):
-            self._process_data()
             self.__get_vpn_ami_id()
             inventory.Inventory(self.context).add('{}/inventory/default'.format(self._repository_directory))
             self.__add_kops_working_cluster()
