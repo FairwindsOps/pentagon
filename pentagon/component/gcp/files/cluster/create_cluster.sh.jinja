@@ -8,7 +8,7 @@ clusters create {{ cluster_name }} \
 --cluster-version={{ cluster_version }} \
 {%- endif %}
 --zone={{ zone }} \
---node-locations={{ node_locations }} \
+--node-locations={{ node_locations|join(',') }} \
 {%- if disk_size %}
 --disk-size={{ disk_size }} \
 {%- endif %}
