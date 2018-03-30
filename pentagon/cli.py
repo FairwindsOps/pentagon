@@ -215,26 +215,31 @@ cli.add_command(get, "get")
 
 def get_component_class(component_path):
     """ Construct Class path from component input """
+
     component_path_list = component_path.split(".")
+    possible_component_paths = []
     if len(component_path_list) > 1:
         component_name = ".".join(component_path.split(".")[0:-1])
-        component_class_name = component_path.split(".")[-1].title()
+        component_class_name = component_path.split(".")[-1]
     else:
         component_name = component_path
-        component_class_name = component_path.title()
+        component_class_name = component_path
 
-    logging.debug('Seeking pentagon.component.{}.{}'.format(component_name, component_class_name))
+    # Compile list of possible class paths
+    possible_component_paths.append('{}.{}'.format(component_name, component_class_name))
+    possible_component_paths.append('{}.{}'.format(component_name, component_class_name.title()))
+    possible_component_paths.append('pentagon.component.{}.{}'.format(component_name, component_class_name))
+    possible_component_paths.append('pentagon_{}.{}'.format(component_name, component_class_name))
 
     # Find Class if it exists
-    component_class = locate("pentagon.component.{}.{}".format(component_name, component_class_name))
-    if component_class is None:
-        logging.debug('pentagon.component.{}.{} not found'.format(component_name, component_class_name))
-        logging.debug('Seeking pentagon_{}.{}'.format(component_name, component_class_name))
-        component_class = locate("pentagon_{}.{}".format(component_name, component_class_name))
+    for class_path in possible_component_paths:
+        logging.debug('Seeking {}'.format(class_path))
+        component_class = locate(class_path)
+        if component_class is not None:
+            logging.debug("Found {}".format(component_class))
+            return component_class
 
-    logging.debug("Found {}".format(component_class))
-
-    return component_class
+        logging.debug('{} Not found'.format(class_path))
 
 
 def parse_infile(file):
