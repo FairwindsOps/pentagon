@@ -31,9 +31,12 @@ unset_vars() {
 if  [ -z $1 ]
 then
   echo $usage
-elif [ ! -f $vars_file ]
+elif [ ! -f "${vars_file}" ]
 then
-  echo $vars_file does not exist. 
+  echo $vars_file does not exist.
+elif [ ! -s "${vars_file}" ]
+then
+  echo $vars_file is empty
 else
   if  [[  $2 == 'unset' ]] ; then
     unset_vars
