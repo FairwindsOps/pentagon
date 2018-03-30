@@ -32,7 +32,7 @@ Pentagon is “batteries included”- not only does one get a network with a clu
 ### Create a AWS Pentagon Project
 * `pentagon start-project <project-name> --aws-access-key <aws-access-key> --aws-secret-key <aws-secret-key> --aws-default-region <aws-default-region>`
 ### Create a GCP/GKE Pentagon Project
-* `pentagon --log-level=DEBUG start-project --cloud=gcp  <project-name> --gcp-zones=<zone_1>,<zone_2>,..,<zone_n> --gcp-project <gcp_project_name>`
+* `pentagon --log-level=DEBUG start-project --cloud=gcp  <project-name> --gcp-zones=<zone_1>,<zone_2>,..,<zone_n> --gcp-project <gcp_project_name> --gcp-region <gcp_region>`
 ### 
 * With the above basic options set, defaults will be set for you. See [Advanced Project Initialization](#advanced-project-initialization) for more options.
   * Arguments may also be set using environment variable in the format `PENTAGON_<argument_name_with_underscores>`.
@@ -277,4 +277,7 @@ If you wish to utilize the templating ability of the `pentagon start-project` co
     * This argument required when --cloud=gcp
   * **--gcp-zones**
     * Google Cloud Project zones to create clusters in. Comma separated list. 
+    * This argument required when --cloud=gcp
+  * **--gcp-region**
+    * Google Cloud region to create resoures in. 
     * This argument required when --cloud=gcp

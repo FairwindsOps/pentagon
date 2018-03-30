@@ -47,6 +47,8 @@ class PentagonProject(object):
         self._repository_directory = "{}".format(
             self._repository_name)
 
+        self._infrastructure_bucket = self.get_data('infrastructure_bucket', self._repository_name)
+
         self._private_path = "inventory/default/config/private"
 
     def get_data(self, name, default=None):
@@ -171,10 +173,7 @@ class AWSPentagonProject(PentagonProject):
         self._vpc_id = self.get_data('vpc_id', self._vpc_id)
 
         # DNS
-        self._dns_zone = self.get_data('dns_zone', '{}.com'.format(self._name))
-
-        # KOPS:
-        self._infrastructure_bucket = self.get_data('infrastructure_bucket', self._repository_name)
+        self._dns_zone = self.get_data('dns_zone', '{}.com'.format(self._name))      
 
         # Kubernetes version
         self._kubernetes_version = self.get_data('kubernetes_version', self.PentagonDefaults.kubernetes['version'])
@@ -317,7 +316,6 @@ class AWSPentagonProject(PentagonProject):
 
 class GCPPentagonProject(PentagonProject):
     from defaults import GCPPentagonDefaults as PentagonDefaults
-    context = {'name': 'default', 'create_keys': False, 'cloud': 'gcp'}
 
     local_defaults = {
         'working_cluster_name': 'working',
@@ -332,13 +330,23 @@ class GCPPentagonProject(PentagonProject):
         self._data['zones'] = self.get_data('gcp_zones').split(',')
         self.default_context['project'] = self.get_data('gcp_project')
 
+        context = {
+            'name': 'default',
+            'create_keys': False,
+            'cloud': 'gcp',
+            'infrastructure_bucket': self._infrastructure_bucket,
+            'gcp_zone': self.get_data('zones')[0],
+        }
+
+        self._context = merge_dict(self._data, merge_dict(context, self.default_context))
+
     def add_working_cluster(self):
         context = self.default_context
         context.update({
             'labels': 'cluster=working',
             'zone': self.get_data('zones')[0],
             'node_locations': self.get_data('zones'),
-            'name': self.local_defaults.get('working_cluster_name'),
+            'cluster_name': self.local_defaults.get('working_cluster_name'),
             'cluster_ipv4_cidr': self.PentagonDefaults.kubernetes['working_cluster_ipv4_cidr']
             })
         gcp.Cluster(context).add('{}/inventory/default/clusters/working'.format(self._repository_directory))
@@ -349,12 +357,12 @@ class GCPPentagonProject(PentagonProject):
             'labels': 'cluster=production',
             'zone': self.get_data('zones')[0],
             'locations': self.get_data('zones'),
-            'name': self.local_defaults.get('production_cluster_name'),
+            'cluster_name': self.local_defaults.get('production_cluster_name'),
             'cluster_ipv4_cidr': self.PentagonDefaults.kubernetes['production_cluster_ipv4_cidr']
             })
         gcp.Cluster(context).add('{}/inventory/default/clusters/production'.format(self._repository_directory))
 
     def configure_default_project(self):
-        inventory.Inventory(self.context).add('{}/inventory/default'.format(self._repository_directory))
+        inventory.Inventory(self._context).add('{}/inventory/default'.format(self._repository_directory))
         self.add_working_cluster()
         self.add_production_cluster()
