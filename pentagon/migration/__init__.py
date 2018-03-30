@@ -158,7 +158,7 @@ class Migration(object):
     def move(self, source, destination):
         """ move files and directories with extreme predjudice """
         logging.info("Moving {} -> {}".format(self.real_path(source), self.real_path(destination)))
-        return os.rename(self.real_path(source), self.real_path(destination))
+        return shutil.move(self.real_path(source), self.real_path(destination))
 
     def overwrite_file(self, path, content, executable=False):
         """ alias create_file """

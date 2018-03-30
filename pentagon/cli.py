@@ -3,6 +3,7 @@ import sys
 import os
 import click
 import logging
+import coloredlogs
 import traceback
 import yaml
 import json
@@ -42,8 +43,7 @@ class RequiredIf(click.Option):
 @click.option('--log-level', default="INFO", help="Log Level DEBUG,INFO,WARN,ERROR")
 @click.pass_context
 def cli(ctx, log_level, *args, **kwargs):
-    logging.basicConfig(level=log_level)
-    pass
+    coloredlogs.install(level=log_level)
 
 
 @click.command()
