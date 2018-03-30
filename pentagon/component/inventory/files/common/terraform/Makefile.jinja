@@ -1,0 +1,39 @@
+#Makefile
+.ONESHELL:
+SHELL = bash
+
+.PHONY: all bucket plan apply destroy clean
+
+all: bucket plan apply
+
+bucket:
+{%- if cloud | lower == 'aws' %}
+	aws s3 ls s3://$${INFRASTRUCTURE_BUCKET} \
+	|| aws s3 mb s3://$${INFRASTRUCTURE_BUCKET} \
+		&&  aws s3api put-bucket-versioning \
+	--bucket $${INFRASTRUCTURE_BUCKET} \
+	--versioning-configuration  \
+	Status=Enabled
+
+{%- elif cloud | lower == 'gcp' %}
+	gsutil ls s3://$${INFRASTRUCTURE_BUCKET} \
+	|| gsutil mb -c regional -l $${CLOUDSDK_COMPUTE_REGION} gs://$${INFRASTRUCTURE_BUCKET}; \
+	gsutil versioning set on gs://$${INFRASTRUCTURE_BUCKET}
+
+{%- endif %}
+
+plan:
+	terraform init -backend=true
+	terraform plan
+
+apply:
+	terraform apply --auto-approve
+
+destroy:
+	terraform plan -destroy -out terraform.tfplan
+	terraform apply terraform.tfplan
+
+clean:
+	rm -f terraform.tfplan
+	rm -f terraform.tfstate
+	rm -fR .terraform/

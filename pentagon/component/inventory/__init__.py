@@ -5,7 +5,7 @@ import logging
 import traceback
 
 from pentagon.component import ComponentBase
-from pentagon.component.vpc import Vpc
+from pentagon.component.aws_vpc import AWSVpc as Vpc
 from pentagon.component.vpn import Vpn
 from pentagon.helpers import create_rsa_key
 from pentagon.defaults import AWSPentagonDefaults as PentagonDefaults
@@ -46,7 +46,7 @@ class Inventory(ComponentBase):
                 self._data['aws_region'] = self._data.get('aws_default_region')
                 self._merge_data(self._ssh_keys)
                 self.__create_keys()
-                Aws(self._data).add(self._destination)
+                Aws(self._data).add("{}/terraform".format(self._destination))
                 Vpn(self._data).add("{}/resources".format(self._destination), overwrite=True)
 
             if self._data['cloud'].lower() == 'gcp':
@@ -75,7 +75,7 @@ class Inventory(ComponentBase):
 class Aws(ComponentBase):
 
     def add(self, destination):
-        Vpc(self._data).add("{}/vpc".format(destination), overwrite=True)
+        Vpc(self._data).add("./{}".format(destination), overwrite=True)
 
 
 class Gcp(ComponentBase):
