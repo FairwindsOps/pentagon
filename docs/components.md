@@ -27,7 +27,7 @@ Options:
     - If a `-f` file is passed in, data are merged with `-D` values ovveriding the file values.
     - Example: 
         ```
-        pentagon add gcp.cluster -D name="pentagon-1" -D project="pentagon" -D zone="us-central1-a" -D additional_zones="us-central1-b,us-central1-b" -D network="pentagon" -o ./pentagon
+        pentagon --log-level=DEBUG add  gcp.cluster -D cluster_name="reactiveopsio-cluster" -D project="reactiveopsio" -D network="temp-network" -o ./demo -D node_locations="us-central1-a,us-central1-b" -D zone=us-central1-a
         ```
 
 - get: 
@@ -147,14 +147,12 @@ Options:
       - nat-0c6ef9261d8ebd788
       - nat-0de4ec4c946e3b7ce
       - nat-08806276217bae9b5
-
     ```
     - If a `-f` file is passed in, data are merged with `-D` values overiding the file values.
     - Example: 
         ```
         pentagon add kops.cluster -f `pwd`/vars.yml --log-level=DEBUG
         ```
-
 - get: 
     - Creates yml files in `./<cluster_name>/create_cluster.sh` by querying the state of an existing cluster and parsing values. For when you have an existing cluster that you want to capture its configuration.
     - Creates `./<cluster_name>/cluster.yml`, `./<cluster_name>/nodes.yml`, `./<cluster_name>/master.yml`, `./<cluster_name>/secret.sh`
@@ -170,13 +168,10 @@ Options:
 ### inventory
 - add:
     - Creates account configuration directory. Creates all necessary files in `config`, `clusters` and `resources`. Depending on `type` it may also add a `vpc` component and `vpn` component under `resources`. Creates `clusters` directory but does not create cluster configuration. Use the cluster component for that.
-    - `bash ./<nodepool_name>/create_nodepool.sh` will create the nodepool as configured
     - Arguments:
       - `name`: name of account to add to inventory (required)
       - `type`: type of account to add to inventory aws or gcp (required). 
     - If a `-f` file is passed in, data are merged with `-D` values ovveriding the file values
-    
-
 
 ## Writing your own components
 

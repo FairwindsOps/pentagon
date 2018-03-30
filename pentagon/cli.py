@@ -115,6 +115,7 @@ def cli(ctx, log_level, *args, **kwargs):
 # GCP Cloud options
 @click.option('--gcp-project', prompt=True, help="Google Cloud Project to create clusters in", cls=RequiredIf, required_if='cloud=gcp')
 @click.option('--gcp-zones', prompt=True, help="Google Cloud Project zones to create clusters in. Comma separated list.", cls=RequiredIf, required_if='cloud=gcp')
+@click.option('--gcp-region', prompt=True, help="Google Cloud Region to create regional resources in")
 def start_project(ctx, name, **kwargs):
     """ Create an infrastructure project from scratch with the configured options """
     try:

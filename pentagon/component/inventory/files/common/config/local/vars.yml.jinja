@@ -25,4 +25,11 @@ org: "{{ org_name }}"
 canonical_zone: "{{ dns_zone }}"
 vpn_bucket: "{{org_name}}-vpn"
 secrets_bucket: "{{org_name}}-secrets"
+
+{%- elif cloud == 'gcp' %}
+
+CLOUDSDK_CORE_PROJECT: "{{ gcp_project }}"
+CLOUDSDK_COMPUTE_ZONE: "{{ gcp_zone }}"
+CLOUDSDK_COMPUTE_REGION: "{{ gcp_region }}"
+
 {%- endif %}

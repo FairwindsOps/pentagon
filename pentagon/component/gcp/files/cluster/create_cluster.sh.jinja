@@ -1,6 +1,6 @@
 gcloud beta container \
 --project {{ project }} \
-clusters create {{ name }} \
+clusters create {{ cluster_name }} \
 {%- if cluster_ipv4_cidr %}
 --cluster-ipv4-cidr={{ cluster_ipv4_cidr }} \
 {%- endif %}
@@ -8,7 +8,7 @@ clusters create {{ name }} \
 --cluster-version={{ cluster_version }} \
 {%- endif %}
 --zone={{ zone }} \
---node-locations={{ node_locations|join(',') }} \
+--node-locations={{ node_locations }} \
 {%- if disk_size %}
 --disk-size={{ disk_size }} \
 {%- endif %}

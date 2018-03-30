@@ -27,20 +27,17 @@ local_config_init:
 	source yaml_source inventory/default/config/local/vars.yml; \
 	source yaml_source inventory/default/config/private/secrets.yml; \
 	inventory/default/config/local/local-config-init
-{%- if cloud | lower == 'aws' %}
-vpc:
+
+infrastructure:
 	source yaml_source inventory/default/config/local/vars.yml; \
 	source yaml_source inventory/default/config/private/secrets.yml; \
-	cd inventory/default/vpc ; \
+	cd inventory/default/terraform ; \
 	make all
 
-destroy_vpc:
-	source yaml_source inventory/default/config/local/vars.yml; \
-	source yaml_source inventory/default/config/private/secrets.yml; \
-	cd inventory/default/vpc ; \
-	make destroy
 
-destroy_vpc_bucket:
+{%- if cloud | lower == 'aws' %}
+
+destroy_infrastructure_bucket:
 	source yaml_source inventory/default/config/local/vars.yml; \
 	source yaml_source inventory/default/config/private/secrets.yml; \
 	aws s3 ls s3://${INFRASTRUCTURE_BUCKET} || exit 0 && \
