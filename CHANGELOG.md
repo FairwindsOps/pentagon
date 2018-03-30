@@ -6,6 +6,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [2.2.0] - 2018-3-30
+
+## Added
+- colorful logging
+- bug fixes and better support for GCP infrastructure
+- `--gcp-revion` as part of the above change
+
+## Updated
+- `yaml_source` no longer throws errors when file is empty, just logs a message
+- made the component class location method more flexible
+- reorganized terraform files and made terraform a first class citizen and part of the `inventory.Inventory` component
+- renamed vpc.VPC component to aws_vpc.AWSVpc as part of above change
+- reorganize the defaul `secrets.yml` and removed unnecessary lines
+
+
 ## [2.1.0] - 2018-2-27
 
 ## Added
