@@ -11,6 +11,13 @@ class Migration(migration.Migration):
 
     def run(self):
 
+        # Add new versions of files
+        c = core.Core({'cloud': 'aws'})
+        c._overwrite = True
+        c._destination = "./Makefile"
+        c._add_files('Makefile.jinja')
+        c._render_directory_templates()
+
         for item in self.inventory:
 
             inventory_path = "inventory/{}".format(item)
@@ -41,7 +48,7 @@ class Migration(migration.Migration):
                 new_aws_vpc_file_content = ('\n').join(new_aws_vpc_file_content[6:-1])
                 self.overwrite_file("{}/terraform/aws_vpc.tf".format(inventory_path), new_aws_vpc_file_content)
 
-                # Add new versions of files
+                #
                 i = inventory.Inventory(merge_dict(template_context, {'cloud': 'aws', 'name': 'default'}))
                 i._overwrite = True
                 i._destination = "{}/terraform/".format(inventory_path)
