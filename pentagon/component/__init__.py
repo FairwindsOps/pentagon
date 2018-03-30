@@ -130,5 +130,8 @@ class ComponentBase(object):
         else:
             source = self._files_directory
 
-        logging.debug("Destination: {}".format(self._destination_directory_name))
-        shutil.copy(source, self._destination_directory_name)
+        logging.debug("Adding file: {} -> {}".format(source, self._destination_directory_name))
+        if os.path.isfile(source):
+            shutil.copy(source, self._destination_directory_name)
+        elif os.path.isdir(source):
+            copy_tree(source, self._destination_directory_name)
