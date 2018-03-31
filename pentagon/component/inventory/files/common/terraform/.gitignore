@@ -3,4 +3,3 @@
 *.tfstate.backup
 .terraform/
 .DS_Store
-set_env.sh

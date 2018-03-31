@@ -33,11 +33,12 @@ class Migration(migration.Migration):
 
             if os.path.exists("{}/vpc".format(inventory_path)):
                 # Move files around
-                self.create_dir('{}/terraform/'.format(inventory_path))
-                self.move("{}/vpc/terraform.tfvars".format(inventory_path), "{}/terraform/aws_vpc.auto.tfvars".format(inventory_path))
-                self.move("{}/vpc/variables.tf".format(inventory_path), "{}/terraform/aws_vpc_variables.tf".format(inventory_path))
-                self.move("{}/vpc/main.tf".format(inventory_path), "{}/terraform/aws_vpc.tf".format(inventory_path))
-                self.delete("{}/vpc/main.tf".format(inventory_path))
+                #self.create_dir('{}/terraform/'.format(inventory_path))
+                self.move("{}/vpc/".format(inventory_path), "{}/terraform/".format(inventory_path))
+                self.move("{}/terraform/terraform.tfvars".format(inventory_path), "{}/terraform/aws_vpc.auto.tfvars".format(inventory_path))
+                self.move("{}/terraform/variables.tf".format(inventory_path), "{}/terraform/aws_vpc_variables.tf".format(inventory_path))
+                self.move("{}/terraform/main.tf".format(inventory_path), "{}/terraform/aws_vpc.tf".format(inventory_path))
+                
 
                 # Mutate files
                 aws_vpc_file_content = self.get_file_content("{}/terraform/aws_vpc.tf".format(inventory_path)).split('\n')
