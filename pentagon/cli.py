@@ -229,7 +229,9 @@ def get_component_class(component_path):
     possible_component_paths.append('{}.{}'.format(component_name, component_class_name))
     possible_component_paths.append('{}.{}'.format(component_name, component_class_name.title()))
     possible_component_paths.append('pentagon.component.{}.{}'.format(component_name, component_class_name))
+    possible_component_paths.append('pentagon.component.{}.{}'.format(component_name, component_class_name.title()))
     possible_component_paths.append('pentagon_{}.{}'.format(component_name, component_class_name))
+    possible_component_paths.append('pentagon_{}.{}'.format(component_name, component_class_name.title()))
 
     # Find Class if it exists
     for class_path in possible_component_paths:

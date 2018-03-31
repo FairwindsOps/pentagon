@@ -177,7 +177,12 @@ class Migration(object):
 
     def create_dir(self, path):
         """ Recursively create a directory """
-        os.createdirs("{}/{}".format(self._infrastructure_repository, path))
+        path = "{}/{}".format(self._infrastructure_repository, path)
+        try:
+            os.makedirs(path)
+        except OSError:
+            if not os.path.isdir(path):
+                raise
 
     def get_file_content(self, path):
         """ Retreive file contents in a string """

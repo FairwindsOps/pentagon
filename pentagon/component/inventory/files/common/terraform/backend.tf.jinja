@@ -4,7 +4,7 @@ terraform {
 {%- if cloud | lower == 'aws' %}
   backend "s3" {
     bucket = "{{ infrastructure_bucket }}"
-    key    = "{{ vpc_name }}/terraform/tf.state"
+    key    = "{{ name }}/terraform/tf.state"
     region = "{{ aws_region }}"
   }
 {%- elif cloud == 'gcp' %}
