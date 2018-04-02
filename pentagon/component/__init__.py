@@ -80,8 +80,12 @@ class ComponentBase(object):
 
     def _render_directory_templates(self):
         """ Loop and use render_template helper method on all templates in destination directory  """
-        logging.debug("Rendering Templates: ")
-        for folder, dirnames, files in os.walk(self._destination_directory_name):
+        template_location = self._destination_directory_name
+        if os.path.isfile(self._destination_directory_name):
+            template_location = os.path.dirname(self._destination_directory_name)
+            logging.debug("{} is a file. Using the directory {} instead.".format(self._destination_directory_name, template_location))
+        logging.debug("Rendering Templates in {}".format(template_location))
+        for folder, dirnames, files in os.walk(template_location):
             for template in glob.glob(folder + "/*.jinja"):
                 logging.debug("Rendering {}".format(template))
                 template_file_name = template.split('/')[-1]

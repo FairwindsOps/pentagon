@@ -14,9 +14,10 @@ class Migration(migration.Migration):
         # Add new versions of files
         c = core.Core({'cloud': 'aws'})
         c._overwrite = True
-        c._destination = "./Makefile"
+        c._destination = "./Makefile.jinja"
         c._add_files('Makefile.jinja')
         c._render_directory_templates()
+
 
         for item in self.inventory:
 
@@ -33,19 +34,22 @@ class Migration(migration.Migration):
 
             if os.path.exists("{}/vpc".format(inventory_path)):
                 # Move files around
-                #self.create_dir('{}/terraform/'.format(inventory_path))
                 self.move("{}/vpc/".format(inventory_path), "{}/terraform/".format(inventory_path))
                 self.move("{}/terraform/terraform.tfvars".format(inventory_path), "{}/terraform/aws_vpc.auto.tfvars".format(inventory_path))
                 self.move("{}/terraform/variables.tf".format(inventory_path), "{}/terraform/aws_vpc_variables.tf".format(inventory_path))
                 self.move("{}/terraform/main.tf".format(inventory_path), "{}/terraform/aws_vpc.tf".format(inventory_path))
-                
 
                 # Mutate files
                 aws_vpc_file_content = self.get_file_content("{}/terraform/aws_vpc.tf".format(inventory_path)).split('\n')
-                i = aws_vpc_file_content.index("// terraform backend config")
-                new_aws_vpc_file_content = \
-                    aws_vpc_file_content[0:i-1] + \
-                    aws_vpc_file_content[i+9:]
+                new_aws_vpc_file_content = aws_vpc_file_content[:]
+                if '// terraform backend config' in aws_vpc_file_content:
+                    i = aws_vpc_file_content.index("// terraform backend config")
+                    # Should remove provider and backend config if present
+                    new_aws_vpc_file_content = \
+                        aws_vpc_file_content[0:i-1] + \
+                        aws_vpc_file_content[i+9:]
+
+                self.delete("{}/terraform/terraform-remote.sh".format(inventory_path))
 
                 new_aws_vpc_file_content = ('\n').join(new_aws_vpc_file_content[6:-1])
                 self.overwrite_file("{}/terraform/aws_vpc.tf".format(inventory_path), new_aws_vpc_file_content)
@@ -61,7 +65,7 @@ class Migration(migration.Migration):
 
                 logging.warn("####### IMPORTANT: Your s3 backend configuration as changed ######")
                 logging.warn("Move your state path in s3:")
-                logging.warn("Command example: ")
+                logging.warn("Command example: (only for example purposes) ")
                 logging.warn("aws s3 sync s3://{bucket}/{vpc_tag_name}/{old_path}/ s3://{bucket}/{item}/{new_path}/".format(
                     bucket=inventory_vars.get('INFRASTRUCTURE_BUCKET'),
                     vpc_tag_name=inventory_vars.get('vpc_tag_name'),
