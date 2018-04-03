@@ -19,7 +19,7 @@ import component.kops as kops
 import component.inventory as inventory
 import component.core as core
 import component.gcp as gcp
-from helpers import render_template, write_yaml_file, create_rsa_key
+from helpers import render_template, write_yaml_file, create_rsa_key, merge_dict
 from meta import __version__, __author__
 
 

@@ -7,12 +7,12 @@ BASENAME := $(notdir ${INFRASTRUCTURE_REPO})
 {%- if cloud | lower == 'aws' %}
 VPN_BUCKET := $(subst infrastructure,vpn,$(BASENAME))
 INFRASTRUCTURE_BUCKET := $(notdir ${INFRASTRUCTURE_REPO})
-all: local_config_init install_requirements vpc vpc_id nat_gateways configure_working_cluster configure_production_cluster vpn
+all: local_config_init install_requirements infrastructure vpc_id nat_gateways configure_working_cluster configure_production_cluster vpn
 
-destroy: destroy_vpn destroy_vpn_bucket destroy_working_cluster destroy_production_cluster destroy_vpc destroy_vpc_bucket
-{%- else %}	
+destroy: destroy_vpn destroy_vpn_bucket destroy_working_cluster destroy_production_cluster destroy_infrastructure destroy_infrastructure_bucket
+{%- else %}
 
-all: local_config_init install_requirements create_working_cluster create_production_cluster
+all: local_config_init install_requirements infrastructure create_working_cluster create_production_cluster
 
 {%- endif %}
 
@@ -54,7 +54,7 @@ destroy_infrastructure_bucket:
 	rm .tmp &&\
 	aws s3api delete-bucket --bucket $(INFRASTRUCTURE_BUCKET)
 
-VPC_ID = "$(shell  source yaml_source inventory/default/config/local/vars.yml; source yaml_source inventory/default/config/private/secrets.yml;  cd inventory/default/vpc ; terraform output aws_vpc_id)"
+VPC_ID = "$(shell  source yaml_source inventory/default/config/local/vars.yml; source yaml_source inventory/default/config/private/secrets.yml;  cd inventory/default/terraform ; terraform output aws_vpc_id)"
 vpc_id:
 	source yaml_source inventory/default/config/local/vars.yml; \
 	source yaml_source inventory/default/config/private/secrets.yml; \
@@ -69,7 +69,7 @@ nat_gateways:
 	source yaml_source inventory/default/config/local/vars.yml; \
 	source yaml_source inventory/default/config/private/secrets.yml; \
 	echo "nat_gateways:" > inventory/default/clusters/nat_gateways.yml; \
-	cd inventory/default/vpc; \
+	cd inventory/default/terraform; \
 	for ng in `terraform output -json aws_nat_gateway_ids |jq -r '.value[]' `; \
 	  do echo "  - $$ng" >> ../clusters/nat_gateways.yml; \
 	done; \
@@ -163,7 +163,16 @@ create_production_cluster:
 	cd inventory/default/clusters/production; \
 	source ./create_cluster.sh || true
 
+destroy_infrastructure_bucket:
+	gsutil rm -r gs://$${INFRASTRUCTURE_BUCKET}
+
 {%- endif %}
+
+destroy_infrastructure:
+	source yaml_source inventory/default/config/local/vars.yml; \
+	source yaml_source inventory/default/config/private/secrets.yml; \
+	cd inventory/default/terraform ; \
+	make destroy
 
 make_tunnel:
 	#Experimental

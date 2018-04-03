@@ -1,0 +1,16 @@
+// terraform backend config
+
+terraform {
+{%- if cloud | lower == 'aws' %}
+  backend "s3" {
+    bucket = "{{ infrastructure_bucket }}"
+    key    = "{{ name }}/terraform/tf.state"
+    region = "{{ aws_region }}"
+  }
+{%- elif cloud == 'gcp' %}
+    backend "gcs" {
+        bucket  = "{{ infrastructure_bucket }}"
+        prefix  = "{{ name }}/terraform/tf.state"
+    }
+{%- endif %}
+}

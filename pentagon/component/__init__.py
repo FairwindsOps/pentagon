@@ -80,8 +80,12 @@ class ComponentBase(object):
 
     def _render_directory_templates(self):
         """ Loop and use render_template helper method on all templates in destination directory  """
-        logging.debug("Rendering Templates: ")
-        for folder, dirnames, files in os.walk(self._destination_directory_name):
+        template_location = self._destination_directory_name
+        if os.path.isfile(self._destination_directory_name):
+            template_location = os.path.dirname(self._destination_directory_name)
+            logging.debug("{} is a file. Using the directory {} instead.".format(self._destination_directory_name, template_location))
+        logging.debug("Rendering Templates in {}".format(template_location))
+        for folder, dirnames, files in os.walk(template_location):
             for template in glob.glob(folder + "/*.jinja"):
                 logging.debug("Rendering {}".format(template))
                 template_file_name = template.split('/')[-1]
@@ -119,11 +123,19 @@ class ComponentBase(object):
             logging.debug(traceback.format_exc(e))
             sys.exit(1)
 
-    def _add_files(self):
+    def _add_files(self, sub_path=None):
         """ Copies files and templates from <component>/files """
         if self._overwrite:
             from distutils.dir_util import copy_tree
         else:
             from shutil import copytree as copy_tree
-        logging.debug("Destination: {}".format(self._destination_directory_name))
-        copy_tree(self._files_directory, self._destination_directory_name)
+        if sub_path is not None:
+            source = ('{}/{}').format(self._files_directory, sub_path)
+        else:
+            source = self._files_directory
+
+        logging.debug("Adding file: {} -> {}".format(source, self._destination_directory_name))
+        if os.path.isfile(source):
+            shutil.copy(source, self._destination_directory_name)
+        elif os.path.isdir(source):
+            copy_tree(source, self._destination_directory_name)

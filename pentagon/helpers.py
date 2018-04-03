@@ -73,3 +73,12 @@ def create_rsa_key(name, path, bits=2048):
     pubkey = key.publickey()
     with open(public_key, 'w') as content_file:
         content_file.write(pubkey.exportKey('OpenSSH'))
+
+
+def merge_dict(d, new_data, clobber=False):
+        """ accepts new_data (dict) and clobbber (boolean). Merges dictionary with dictionary 'd'. If clobber is True, overwrites value. Defaults to false """
+        for key, value in new_data.items():
+            if d.get(key) is None or clobber:
+                logging.debug("Setting component data {}: {}".format(key, value))
+                d[key] = value
+        return d

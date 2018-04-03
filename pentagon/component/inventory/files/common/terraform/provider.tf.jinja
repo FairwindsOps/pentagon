@@ -1,0 +1,10 @@
+
+{%- if cloud | lower == 'aws' %}
+provider "aws" {
+    # Configuration set in env vars $AWS_ACCESS_KEY_ID, $AWS_SECRET_ACCESS_KEY and, $AWS_DEFAULT_REGION
+}
+{%- elif cloud == 'gcp' %}
+provider "google" {
+    # Configuration set in env vars $GOOGLE_PROJECT, $GCLOUD_PROJECT
+}
+{%- endif %}

@@ -158,7 +158,16 @@ class Migration(object):
     def move(self, source, destination):
         """ move files and directories with extreme predjudice """
         logging.info("Moving {} -> {}".format(self.real_path(source), self.real_path(destination)))
-        return os.rename(self.real_path(source), self.real_path(destination))
+
+        if os.path.isfile(source):
+            _move = shutil.move
+        elif os.path.exists(destination):
+            from distutils.dir_util import copy_tree as _move
+        else:
+            from shutil import copytree as _move
+
+        _move(self.real_path(source), self.real_path(destination))
+        self.delete(source)
 
     def overwrite_file(self, path, content, executable=False):
         """ alias create_file """
@@ -177,7 +186,12 @@ class Migration(object):
 
     def create_dir(self, path):
         """ Recursively create a directory """
-        os.createdirs("{}/{}".format(self._infrastructure_repository, path))
+        path = "{}/{}".format(self._infrastructure_repository, path)
+        try:
+            os.makedirs(path)
+        except OSError:
+            if not os.path.isdir(path):
+                raise
 
     def get_file_content(self, path):
         """ Retreive file contents in a string """

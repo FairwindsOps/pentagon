@@ -1,28 +1,14 @@
-###
-# AWS account specific variables
-###
 
 variable "aws_access_key" {}
 variable "aws_secret_key" {}
-variable "aws_region" {
-  default = "us-east-1"
-}
-variable "aws_azs" {
-  default = "us-east-1a, us-east-1c, us-east-1d, us-east-1e"
-}
-
-###
-# Organization specific variables
-###
+variable "aws_region" {}
+variable "aws_azs" {}
 
 variable "vpc_cidr" {
   default = "172.20"
 }
 
 variable "aws_vpc_name" {}
-###
-# VPC module specific variables
-###
 
 variable "az_count" {
   default = 3
