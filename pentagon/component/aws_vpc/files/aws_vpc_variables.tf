@@ -4,15 +4,11 @@ variable "aws_secret_key" {}
 variable "aws_region" {}
 variable "aws_azs" {}
 
-variable "vpc_cidr" {
-  default = "172.20"
-}
+variable "vpc_cidr" {}
 
 variable "aws_vpc_name" {}
 
-variable "az_count" {
-  default = 3
-}
+variable "az_count" {}
 variable "vpc_cidr_base" {}
 
 variable "admin_subnet_parent_cidr" {}
