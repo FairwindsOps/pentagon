@@ -22,7 +22,7 @@ class Cluster(ComponentBase):
                 self._data[key] = PentagonDefaults.kubernetes[key]
 
         if not self._data.get('network_cidr_base'):
-            self._data['network_cidr_base'] = PentagonDefaults.vpc['cidr_base']
+            self._data['network_cidr_base'] = PentagonDefaults.vpc['vpc_cidr_base']
 
         for key in ['authorization', 'networking']:
             self._data[key] = yaml.dump(self._data[key])

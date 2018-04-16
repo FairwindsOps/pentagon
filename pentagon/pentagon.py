@@ -246,7 +246,7 @@ class AWSPentagonProject(PentagonProject):
             'availability_zones': re.sub(" ", "", self._aws_availability_zones).split(","),
             'vpc_id': self._vpc_id,
             'ssh_key_path': "${{INFRASTRUCTURE_REPO}}/{}/{}.pub".format(self._private_path, self._ssh_keys['working_kube_key']),
-            'kubernetes_version': self._kubernetes_version,
+            'version': self._kubernetes_version,
             'ig_max_size': self._working_kubernetes_node_count,
             'ig_min_size': self._working_kubernetes_node_count,
             'master_availability_zones': [zone.strip() for zone in self._working_kubernetes_master_aws_zones.split(',')],
