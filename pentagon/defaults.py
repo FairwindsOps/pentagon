@@ -22,8 +22,9 @@ class AWSPentagonDefaults(object):
         'third_octet': 16,
         'third_octet_increment': 1,
         'authorization': {'alwaysAllow': {}},
-        'networking': {'flannel': {}},
+        'networking': {'flannel': {'backend': 'vxlan'}},
         'node_additional_policies': '[{"Effect": "Allow","Action": ["autoscaling:DescribeAutoScalingGroups", "autoscaling:DescribeAutoScalingInstances", "autoscaling:DescribeTags", "autoscaling:SetDesiredCapacity", "autoscaling:TerminateInstanceInAutoScalingGroup"],"Resource": "*"}]',
+        'ssh_key_path': '~/.ssh/id_rsa.pub'
     }
 
     vpc = {
