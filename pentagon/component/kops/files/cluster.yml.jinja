@@ -31,10 +31,12 @@ spec:
     name: events
   kubernetesApiAccess:
   - 0.0.0.0/0
-  kubernetesVersion: {{ kubernetes_version }}
+  kubernetesVersion: {{ version }}
   masterPublicName: api.{{ cluster_name }}
   networkCIDR: {{ network_cidr }}
+  {%- if vpc_id %}
   networkID: {{ vpc_id }}
+  {%- endif %}
   networking:
     {{ networking|indent(2) }}
   nonMasqueradeCIDR: 100.64.0.0/10
@@ -46,7 +48,9 @@ spec:
     name: {{ az }}
     type: Private
     zone: {{ az }}
+    {%- if nat_gateways %}
     egress: {{ nat_gateways[loop.index-1] }}
+    {%- endif %}
   {%- endfor -%}
   {%- for az in availability_zones %}
   - cidr: {{ network_cidr_base|string + "." + ((third_octet|int + 4 * third_octet_increment) + (loop.index - 1) * third_octet_increment)|string + ".0/" + network_mask|string }}
