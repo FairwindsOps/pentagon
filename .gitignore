@@ -5,3 +5,4 @@ config/private
 *.pem
 *.pub
 pentagon.egg-info
+.vscode
