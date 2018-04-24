@@ -23,8 +23,7 @@ Pentagon is “batteries included”- not only does one get a network with a clu
 * jq [Install JQ](https://stedolan.github.io/jq/download/)
 
 ## Installation
-* `pip install -e git+https://github.com/reactiveops/pentagon.git#egg=pentagon`
-  * The `-e` is important to include. The next steps will fail without it.
+* `pip install git+https://github.com/reactiveops/pentagon.git`
   * May require the `python-dev` and `libffi-dev` packages on some Linux distributions
   * Not necessary, but we suggest installing Pentagon into a [VirtualEnv](https://virtualenv.pypa.io/en/stable/)
 
@@ -55,15 +54,15 @@ Pentagon is “batteries included”- not only does one get a network with a clu
 
 ### Create a VPC
 This creates the VPC and private, public, and admin subnets in that VPC for non Kubernetes resources. Read more about networking [here](network.md).
-* `cd inventory/default/vpc`
-* Edit `terraform.tfvars`and verify the generated `aws_azs` actually exist in `aws_region`
+* `cd inventory/default/terraform`
+* Edit `aws_vpc.auto.tfvars`and verify the generated `aws_azs` actually exist in `aws_region`
 * `make all`
 * In `inventory/default/clusters/*/vars.yml`, set `VPC_ID` using the newly created VPC ID. You can find that ID in Terraform output or using the AWS web console.
 
 ### Configure DNS and Route53
 If you don't already have a Route53 Hosted Zone configured, do that now.
 * Create a Route53 Hosted Zone (e.g. `pentagon.mycompany.com`)
-* In `inventory/default/account/vars.yml` set `canonical_zone` to match your Hosted Zone
+* In `inventory/default/count/vars.yml` set `canonical_zone` to match your Hosted Zone
 * In `inventory/default/clusters/*/vars.yml`
   * Set `CLUSTER_NAME` to a hostname that ends with your hosted zone (e.g. `working-1.pentagon.mycompany.com`)
   * Set `DNS_ZONE` to your Hosted Zone (e.g. `pentagon.mycompany.com`)
@@ -84,7 +83,7 @@ Pentagon used Kops to create clusters in AWS. The default layout creates configu
 
 * Make sure your KOPS variables are set correctly with `. yaml_source inventory/default/config/local/vars.yml && . yaml_source inventory/default/config/private/secrets.yml`
 * Move into to the path for the cluster you want to work on with `cd inventory/default/clusters/<production|working>`
-* Run `bash cluster-config/kops.sh` to create a cluster.spec file for this cluster. This does not create any resources in AWS.
+* If you are using the `aws_vpc` Terraform provided, ensure you have set `nat_gateways` in the `vars.yml` for each cluster and that they the order of the `nat_gateway` ids matches the order of the subnets listed. This will ensure that the Kops cluster will have a properly configured network with the private subnets associated to the existing NAT gateways.
 
 ### Create Kubernetes Cluster
 * Use the [Kops component](components.md#kopscluster) to create your cluster.
