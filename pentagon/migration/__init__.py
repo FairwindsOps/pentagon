@@ -8,12 +8,14 @@ import glob
 import git
 import inspect
 import yamlord
+import semver
 
 from collections import OrderedDict
 
 from pentagon.migration import migrations
 from pentagon.pentagon import PentagonException
 from pentagon.helpers import write_yaml_file
+from pentagon.meta import __version__ as pentagon_version
 
 from pydoc import locate
 from distutils.version import StrictVersion
@@ -22,20 +24,38 @@ default_version = "1.2.0"
 version_file = '.version'
 
 
-def migrate(branch='migration'):
+def migrate(branch='migration', yes=False):
     """ Find applicabale migrations and run them """
+    logging.info("Pentagon Version: {}".format(installed_version()))
+    logging.info("Starting Repository Version: {}".format(current_version()))
+
     migrations = migrations_to_run(current_version(), available_migrations())
     if migrations:
-        for migration in migrations:
-            logging.info('Starting migration: {}'.format(migration))
-            migration_name = "migration_{}".format(migration.replace('.', '_'))
-
-            migration_class = locate("pentagon.migration.migrations.{}".format(migration_name))
-            migration_class.Migration(branch)
-        logging.info("Migrations complete. Use git to merge the migration branch.")
-
+        logging.info("There are Migrations to run: ")
+        logging.info(migrations)
+        if yes:
+            for migration in migrations:
+                logging.info('Starting migration: {}'.format(migration))
+                migration_name = "migration_{}".format(migration.replace('.', '_'))
+                migration_class = locate("pentagon.migration.migrations.{}".format(migration_name))
+                migration_class.Migration(branch).start()
+            logging.info("Migrations complete. Use git to merge the migration branch.")
+            logging.info("Current Repository Version: {}".format(current_version()))
+        else:
+            logging.info("Use: `pentagon migrate --yes` to run migrations")
     else:
-        logging.info("No Migrations to run. You are at the latest version!")
+        logging.info("No Migrations to run.")
+        compare_value = semver.compare(installed_version(), current_version())
+        if compare_value == -1:
+            logging.error("Repository Version > Installed Version. Upgrade Pentagon")
+            sys.exit(1)
+        elif compare_value == 1:
+            logging.info("Installed Version > Repository Version.")
+            logging.info(" Use `pentagon migrate --yes` to update Repository Version")
+            if yes:
+                Migration(None).version_only()
+        elif compare_value == 0:
+            logging.info(" You are at the latest version!")
 
 
 def migrations_to_run(current_version, available_migrations):
@@ -57,11 +77,7 @@ def available_migrations():
 
 def installed_version():
     """ get installed version of pentagon """
-    import pip
-    installed_packages = pip.get_installed_distributions()
-    for package in installed_packages:
-        if package.key == 'pentagon':
-            return package.version
+    return pentagon_version
 
 
 def infrastructure_repository():
@@ -133,9 +149,17 @@ class Migration(object):
             pass
 
     def __init__(self, branch_name):
+        logging.debug("This got run")
         self._infrastructure_repository = infrastructure_repository()
         self.branch = branch_name
+
+    def start(self):
+        """ run migration """
         self._run()
+
+    def version_only(self):
+        """ Only increase version in .version_file """
+        self.overwrite_file(version_file, installed_version())
 
     def real_path(self, path):
         return os.path.normpath("{}/{}".format(self._infrastructure_repository, path))
@@ -149,7 +173,7 @@ class Migration(object):
         os.chdir(self._infrastructure_repository)
         self._branch()
         self.run()
-        self._write_new_version(self._ending_version)
+        self._write_new_version(installed_version())
 
     def _write_new_version(self, version):
         """ write new file with new version following the migration """
