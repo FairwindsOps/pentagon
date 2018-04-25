@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+### Updated
+- Allowed more value to be optional in the kops templates
+- Updated docs
+
 ## [2.2.1] - 2018-4-9
 
 ## Removed `auto-approve` from terraform Makefile
