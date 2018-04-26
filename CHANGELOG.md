@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Updated
 - Allowed more value to be optional in the kops templates
 - Updated docs
+- Bumped terraform-vpc module source version
 
 ## [2.2.1] - 2018-4-9
 
