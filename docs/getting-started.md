@@ -32,7 +32,7 @@ Pentagon is “batteries included”- not only does one get a network with a clu
 * `pentagon start-project <project-name> --aws-access-key <aws-access-key> --aws-secret-key <aws-secret-key> --aws-default-region <aws-default-region>`
 ### Create a GCP/GKE Pentagon Project
 * `pentagon --log-level=DEBUG start-project --cloud=gcp  <project-name> --gcp-zones=<zone_1>,<zone_2>,..,<zone_n> --gcp-project <gcp_project_name> --gcp-region <gcp_region>`
-### 
+###
 * With the above basic options set, defaults will be set for you. See [Advanced Project Initialization](#advanced-project-initialization) for more options.
   * Arguments may also be set using environment variable in the format `PENTAGON_<argument_name_with_underscores>`.
 * `cd <project-name>-infrastructure`
@@ -45,10 +45,10 @@ Pentagon is “batteries included”- not only does one get a network with a clu
 
 #### Manual steps
 * `pip install -r requirements.txt`
-* `. yaml_source config/local/vars.yml`
-* `. yaml_source config/private/secrets.yml`
+* `. yaml_source inventory/default/config/local/vars.yml`
+* `. yaml_source inventory/default/config/private/secrets.yml`
   * Sources environment variables required for the following steps. This will be required each time you work with the infrastructure repository or if you move the repository to another location.
-* `bash config/local/local-config-init`
+* `bash inventory/default/config/local/local-config-init`
 
 ## AWS
 
@@ -275,8 +275,8 @@ If you wish to utilize the templating ability of the `pentagon start-project` co
     * Google Cloud Project to create clusters in
     * This argument required when --cloud=gcp
   * **--gcp-zones**
-    * Google Cloud Project zones to create clusters in. Comma separated list. 
+    * Google Cloud Project zones to create clusters in. Comma separated list.
     * This argument required when --cloud=gcp
   * **--gcp-region**
-    * Google Cloud region to create resoures in. 
+    * Google Cloud region to create resoures in.
     * This argument required when --cloud=gcp
