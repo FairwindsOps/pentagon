@@ -151,7 +151,7 @@ Options:
     - If a `-f` file is passed in, data are merged with `-D` values overiding the file values.
     - Example: 
         ```
-        pentagon add kops.cluster -f `pwd`/vars.yml --log-level=DEBUG
+        pentagon --log-level=DEBUG add kops.cluster -f `pwd`/vars.yml
         ```
 - get: 
     - Creates yml files in `./<cluster_name>/create_cluster.sh` by querying the state of an existing cluster and parsing values. For when you have an existing cluster that you want to capture its configuration.
