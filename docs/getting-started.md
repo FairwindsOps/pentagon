@@ -78,16 +78,19 @@ This creates a AWS instance running [OpenVPN](https://openvpn.net/). Read more a
   * Edit `inventory/config/private/ssh_config` and add the IP address from the SSH key prompt to the `#VPN instance` section.
 
 ### Configure a Kubernetes Cluster
-Pentagon used Kops to create clusters in AWS. The default layout creates configurations for two Kubernetes clusters: `working` and `production`. See [Overview](overview.md) for a more comprehensive description of the directory layout.
+Pentagon uses Kops to create clusters in AWS. The default layout creates configurations for two Kubernetes clusters: `working` and `production`. See [Overview](overview.md) for a more comprehensive description of the directory layout.
 
 * Make sure your KOPS variables are set correctly with `. yaml_source inventory/default/config/local/vars.yml && . yaml_source inventory/default/config/private/secrets.yml`
 * Move into to the path for the cluster you want to work on with `cd inventory/default/clusters/<production|working>`
-* If you are using the `aws_vpc` Terraform provided, ensure you have set `nat_gateways` in the `vars.yml` for each cluster and that they the order of the `nat_gateway` ids matches the order of the subnets listed. This will ensure that the Kops cluster will have a properly configured network with the private subnets associated to the existing NAT gateways.
+* If you are using the `aws_vpc` Terraform provided, ensure you have set `nat_gateways` in the `vars.yml` for each cluster and that they the order of the `nat_gateway` ids matches the order of the subnets listed. This will ensure that the Kops cluster will have a properly configured network with the private subnets associated to the existing NAT gateways.  
+* You can do this using the Makefile `make vpc_id` and `make nat_gateways`.
 
 ### Create Kubernetes Cluster
 * Use the [Kops component](components.md#kopscluster) to create your cluster.
 * By default a `vars.yml` will be created at `inventory/default/clusters/working` and `inventory/default/clusters/production`. Those files are sufficient to create a cluster using the kops.cluster though, if you are not using `make all` from above you will need to enter `nat_gateways` and `vpc-id` as described in [kops component documentation](components.md#kopscluster)
 
+* To create the cluster configs run `pentagon --log-level=DEBUG add kops.cluster -f vars.yml` in the directory of the cluster you wish to create.
+* To actually create the cluster: `cd clusters` then `kops.sh`
 * Use [kops](https://github.com/kubernetes/kops/blob/master/docs/cli/kops.md) to manage the cluster if necessary.
   * Run `kops edit cluster <clustername>` to view or edit the `cluster.spec`
   * You may also wish to edit the instance groups prior to cluster creation:
