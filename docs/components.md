@@ -20,24 +20,24 @@ Options:
 
 ### gcp.cluster
 
-- add: 
+- add:
     - Creates `./<cluster_name>/create_cluster.sh` compiled from the data passed in.
     - `bash ./<cluster_name>/create_cluster.sh` will create the cluster as configured.
     - Argument keys are lower case, underscore separated version of the [gcloud container cluster create](https://cloud.google.com/sdk/gcloud/reference/beta/container/clusters/create) command.
     - If a `-f` file is passed in, data are merged with `-D` values ovveriding the file values.
-    - Example: 
+    - Example:
         ```
         pentagon --log-level=DEBUG add  gcp.cluster -D cluster_name="reactiveopsio-cluster" -D project="reactiveopsio" -D network="temp-network" -o ./demo -D node_locations="us-central1-a,us-central1-b" -D zone=us-central1-a
         ```
 
-- get: 
+- get:
     - Creates `./<cluster_name>/create_cluster.sh` by querying the state of an existing cluster and parsing values. For when you have an existing cluster that you want to capture its configuration.
     - Creates `./<cluster_name>/node_pools/<node_pool_name>/create_nodepool.sh` for any nodepools that are not named `default-pool`. Set `-D get_default_nodepools=true` to capture configuration of `default-pool`. This is typically unecessary as the `create_cluster.sh` will already contain the configuration of the `default-pool`
     - `bash ./<cluster_name>/create_cluster.sh` will result in an error indicating the cluster is already present.
     - Argument keys are lower case, underscore separated version of the [gcloud container cluster describe](https://cloud.google.com/sdk/gcloud/reference/beta/container/node-pools/describe) command.
     - If `-f` file is passed in, data are merged with `-D` values ovveriding the file values
     - If `cluster` is omitted it will act on all clusters in the project
-    - Example: 
+    - Example:
       ```
       pentagon get gcp.cluster -D project="pentagon" -D zone="us-central1-a -D cluster="pentagon-1" -D get_default_nodepool="true"
       ```
@@ -49,14 +49,14 @@ Options:
     - `bash ./<nodepool_name>/create_nodepool.sh` will create the nodepool as configured
     - Argument keys are lower case, underscore separated version of the [gcloud container node-pools create](https://cloud.google.com/sdk/gcloud/reference/beta/container/node-pools/create) command
     - If a `-f` file is passed in, data are merged with `-D` values ovveriding the file values
-    - Example: 
+    - Example:
       ```
       pentagon add gcp.nodepool -D name="pentagon-1-nodepool" -D project="pentagon" -D zone="us-central1-a" -D additional_zones="us-central1-b,us-central1-b" -D machine_type="n1-standard-64" --enable-autoscaling
       ```
 
-- get: 
+- get:
     - Creates `./<nodepool_name>/create_nodepool.sh` by querying the state of an existing cluster nodepool and parsing values. For when you have an existing cluster that you want to capture its configuration.
-    - Creates `./<nodepool_name>/create_nodepool.sh` 
+    - Creates `./<nodepool_name>/create_nodepool.sh`
     - `bash ./<nodepool_name>/create_nodepool.sh` will result in an error indicating the cluster is already present.
     - Argument keys are lower case, underscore separated version of the [gcloud container node-pools describe](https://cloud.google.com/sdk/gcloud/reference/beta/container/node-pools/describe) command
     - If a `-f` file is passed in, data are merged with `-D` values ovveriding the file values
@@ -69,7 +69,7 @@ Options:
 
 ### vpc
 
-- add: 
+- add:
     - Creates `./vpc/` directory with Terraform code for the Pentagon default AWS VPC described [here](#network).
     - `cd ./vpc; make all` will create the vpc as describe by the arguments passed in
     - In the normal course of using Pentagon and the infrastructure repository, it is unlikely you'll use this component as it is automatically installed by default.
@@ -85,10 +85,10 @@ Options:
         ```
         pentagon add vpc -D vpc_name="pentagon-vpc" -D vpc_cidr_base="172.20" -D aws_availability_zones="ap-northeast-1a, ap-northeast-1c" -D aws_availability_zone_count = "2" -D aws_region = "ap-northeast-1"
         ```
-        
+
 ### kops.cluster
 
-- add: 
+- add:
     - Creates yml files in  `./<cluster_name>/` compiled from the data passed in.
     - `bash ./<cluster_name>/kops.sh` will create the cluster as configured.
     - Argument/ ConfigFile keys:
@@ -108,7 +108,7 @@ Options:
       - `ssh_key_path`: Path of public key for ssh access to nodes. (required)
       - `network_cidr`: VPC cidr for Kops created Kubernetes subnetes (default: 172.0.0.0/16)
       - `network_cidr_base`: First two octects of the network to template subnet cidrs from  (default: 172.0)
-      - `third_octet`: Starting value for the third octet of the subnet cidrs (default: 16) 
+      - `third_octet`: Starting value for the third octet of the subnet cidrs (default: 16)
       - `network_mask`: Value for network mask in subnet cidrs (defalt: 24)
       - `third_octet_increment`: Increment to increase third octet by for each of the Kubernetes subnets (default: 1) By default, the cidr of the first three private subnets will be 172.20.16.0/24, 172.20.17.0/24, 172.20.18.0/24
       - `authorization`: Authorization type for cluster. Allowed values are `alwaysAllow` and `rbac` (default: alwaysAllow)
@@ -149,18 +149,18 @@ Options:
       - nat-08806276217bae9b5
     ```
     - If a `-f` file is passed in, data are merged with `-D` values overiding the file values.
-    - Example: 
+    - Example:
         ```
         pentagon --log-level=DEBUG add kops.cluster -f `pwd`/vars.yml
         ```
-- get: 
+- get:
     - Creates yml files in `./<cluster_name>/create_cluster.sh` by querying the state of an existing cluster and parsing values. For when you have an existing cluster that you want to capture its configuration.
     - Creates `./<cluster_name>/cluster.yml`, `./<cluster_name>/nodes.yml`, `./<cluster_name>/master.yml`, `./<cluster_name>/secret.sh`
     - `secret.sh` does not have the content of the secret and will be able re-create the cluster secret if needed. You will have to transform the key id into a saved public key.
     - Arguments:
       - `name`: Kops cluster name you are getting (required). Argument can also be set through and environment variable called "CLUSTER_NAME".
       - `kops_state_store_bucket`: s3 bucket name where cluster state is stored (required). Argument can also be set through and environment variable called "KOPS_STATE_STORE_BUCKET"
-    - Example: 
+    - Example:
       ```
       pentagon get kops.cluster -Dname=working-1.cluster.reactiveops.io -Dkops_state_store=reactiveops.io-infrastructure
       ```
@@ -170,7 +170,7 @@ Options:
     - Creates account configuration directory. Creates all necessary files in `config`, `clusters` and `resources`. Depending on `type` it may also add a `vpc` component and `vpn` component under `resources`. Creates `clusters` directory but does not create cluster configuration. Use the cluster component for that.
     - Arguments:
       - `name`: name of account to add to inventory (required)
-      - `type`: type of account to add to inventory aws or gcp (required). 
+      - `type`: type of account to add to inventory aws or gcp (required).
     - If a `-f` file is passed in, data are merged with `-D` values ovveriding the file values
 
 ## Writing your own components
@@ -193,8 +193,8 @@ Examples of plugin component package module name and use:
     *  command: `pentagon add kops.cluster`
     *  module path:  `pentagon_kops.kops`
     *  class: `Cluster()`
-    
 
-See [example](/example-component) 
+
+See [example](/example-component)
 
 
