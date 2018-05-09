@@ -4,8 +4,6 @@ variable "aws_secret_key" {}
 variable "aws_region" {}
 variable "aws_azs" {}
 
-variable "vpc_cidr" {}
-
 variable "aws_vpc_name" {}
 
 variable "az_count" {}

@@ -29,10 +29,10 @@ Pentagon is “batteries included”- not only does one get a network with a clu
 
 ## Quick Start
 ### Create a AWS Pentagon Project
-* `pentagon start-project <project-name> --aws-access-key <aws-access-key> --aws-secret-key <aws-secret-key> --aws-default-region <aws-default-region>`
+* `pentagon start-project <project-name> --aws-access-key <aws-access-key> --aws-secret-key <aws-secret-key> --aws-default-region <aws-default-region>` --dns-zone <your-dns-zone>
 ### Create a GCP/GKE Pentagon Project
 * `pentagon --log-level=DEBUG start-project --cloud=gcp  <project-name> --gcp-zones=<zone_1>,<zone_2>,..,<zone_n> --gcp-project <gcp_project_name> --gcp-region <gcp_region>`
-### 
+###
 * With the above basic options set, defaults will be set for you. See [Advanced Project Initialization](#advanced-project-initialization) for more options.
   * Arguments may also be set using environment variable in the format `PENTAGON_<argument_name_with_underscores>`.
 * `cd <project-name>-infrastructure`
@@ -45,10 +45,10 @@ Pentagon is “batteries included”- not only does one get a network with a clu
 
 #### Manual steps
 * `pip install -r requirements.txt`
-* `. yaml_source config/local/vars.yml`
-* `. yaml_source config/private/secrets.yml`
+* `. yaml_source inventory/default/config/local/vars.yml`
+* `. yaml_source inventory/default/config/private/secrets.yml`
   * Sources environment variables required for the following steps. This will be required each time you work with the infrastructure repository or if you move the repository to another location.
-* `bash config/local/local-config-init`
+* `bash inventory/default/config/local/local-config-init`
 
 ## AWS
 
@@ -62,7 +62,6 @@ This creates the VPC and private, public, and admin subnets in that VPC for non 
 ### Configure DNS and Route53
 If you don't already have a Route53 Hosted Zone configured, do that now.
 * Create a Route53 Hosted Zone (e.g. `pentagon.mycompany.com`)
-* In `inventory/default/count/vars.yml` set `canonical_zone` to match your Hosted Zone
 * In `inventory/default/clusters/*/vars.yml`
   * Set `CLUSTER_NAME` to a hostname that ends with your hosted zone (e.g. `working-1.pentagon.mycompany.com`)
   * Set `DNS_ZONE` to your Hosted Zone (e.g. `pentagon.mycompany.com`)
@@ -79,16 +78,19 @@ This creates a AWS instance running [OpenVPN](https://openvpn.net/). Read more a
   * Edit `inventory/config/private/ssh_config` and add the IP address from the SSH key prompt to the `#VPN instance` section.
 
 ### Configure a Kubernetes Cluster
-Pentagon used Kops to create clusters in AWS. The default layout creates configurations for two Kubernetes clusters: `working` and `production`. See [Overview](overview.md) for a more comprehensive description of the directory layout.
+Pentagon uses Kops to create clusters in AWS. The default layout creates configurations for two Kubernetes clusters: `working` and `production`. See [Overview](overview.md) for a more comprehensive description of the directory layout.
 
 * Make sure your KOPS variables are set correctly with `. yaml_source inventory/default/config/local/vars.yml && . yaml_source inventory/default/config/private/secrets.yml`
 * Move into to the path for the cluster you want to work on with `cd inventory/default/clusters/<production|working>`
-* If you are using the `aws_vpc` Terraform provided, ensure you have set `nat_gateways` in the `vars.yml` for each cluster and that they the order of the `nat_gateway` ids matches the order of the subnets listed. This will ensure that the Kops cluster will have a properly configured network with the private subnets associated to the existing NAT gateways.
+* If you are using the `aws_vpc` Terraform provided, ensure you have set `nat_gateways` in the `vars.yml` for each cluster and that they the order of the `nat_gateway` ids matches the order of the subnets listed. This will ensure that the Kops cluster will have a properly configured network with the private subnets associated to the existing NAT gateways.  
+* You can do this using the Makefile `make vpc_id` and `make nat_gateways`.
 
 ### Create Kubernetes Cluster
 * Use the [Kops component](components.md#kopscluster) to create your cluster.
 * By default a `vars.yml` will be created at `inventory/default/clusters/working` and `inventory/default/clusters/production`. Those files are sufficient to create a cluster using the kops.cluster though, if you are not using `make all` from above you will need to enter `nat_gateways` and `vpc-id` as described in [kops component documentation](components.md#kopscluster)
 
+* To generate the cluster configs run `pentagon --log-level=DEBUG add kops.cluster -f vars.yml` in the directory of the cluster you wish to create.
+* To actually create the cluster: `cd clusters` then `kops.sh`
 * Use [kops](https://github.com/kubernetes/kops/blob/master/docs/cli/kops.md) to manage the cluster if necessary.
   * Run `kops edit cluster <clustername>` to view or edit the `cluster.spec`
   * You may also wish to edit the instance groups prior to cluster creation:
@@ -275,8 +277,8 @@ If you wish to utilize the templating ability of the `pentagon start-project` co
     * Google Cloud Project to create clusters in
     * This argument required when --cloud=gcp
   * **--gcp-zones**
-    * Google Cloud Project zones to create clusters in. Comma separated list. 
+    * Google Cloud Project zones to create clusters in. Comma separated list.
     * This argument required when --cloud=gcp
   * **--gcp-region**
-    * Google Cloud region to create resoures in. 
+    * Google Cloud region to create resoures in.
     * This argument required when --cloud=gcp
