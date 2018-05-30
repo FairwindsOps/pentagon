@@ -59,6 +59,7 @@ setup(name='pentagon',
         "coloredlogs==9.0",
         "awscli==1.15.17",
         "shyaml==0.5.0",
+        "semver==2.7.9",
       ],
       classifiers=[
           'Development Status :: 5 - Production/Stable',
