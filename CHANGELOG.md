@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [2.3.0] - 2018-5-30
+
+### Added
+- Some better behavior with migrations where a patch is made but not changes in structure was made
+
 ### Updated
 - Allowed more value to be optional in the kops templates
 - Updated docs
