@@ -188,6 +188,7 @@ class AWSPentagonProject(PentagonProject):
         self._working_kubernetes_worker_node_type = self.get_data('working_kubernetes_worker_node_type', self.PentagonDefaults.kubernetes['worker_node_type'])
         self._working_kubernetes_v_log_level = self.get_data('working_kubernetes_v_log_level', self.PentagonDefaults.kubernetes['v_log_level'])
         self._working_kubernetes_network_cidr = self.get_data('working_kubernetes_network_cidr', self.PentagonDefaults.kubernetes['network_cidr'])
+        self._working_third_octet = self.get_data('working_third_octet', self.PentagonDefaults.kubernetes['working_third_octet'])
 
         # Production Kubernetes
         self._production_kubernetes_cluster_name = self.get_data('production_kubernetes_cluster_name', 'production-1.{}'.format(self._dns_zone))
@@ -199,6 +200,7 @@ class AWSPentagonProject(PentagonProject):
         self._production_kubernetes_worker_node_type = self.get_data('production_kubernetes_worker_node_type', self.PentagonDefaults.kubernetes['worker_node_type'])
         self._production_kubernetes_v_log_level = self.get_data('production_kubernetes_v_log_level', self.PentagonDefaults.kubernetes['v_log_level'])
         self._production_kubernetes_network_cidr = self.get_data('production_kubernetes_network_cidr', self.PentagonDefaults.kubernetes['network_cidr'])
+        self._production_third_octet = self.get_data('production_third_octet', self.PentagonDefaults.kubernetes['production_third_octet'])
 
     def __default_aws_availability_zones(self):
         azs = []
@@ -256,7 +258,8 @@ class AWSPentagonProject(PentagonProject):
             'kubernetes_v_log_level': self._working_kubernetes_v_log_level,
             'network_cidr': self._working_kubernetes_network_cidr,
             'network_cidr_base': self._vpc_cidr_base,
-            'kops_state_store_bucket': self._infrastructure_bucket
+            'kops_state_store_bucket': self._infrastructure_bucket,
+            'third_octet': self._working_third_octet
         }
         write_yaml_file("{}/inventory/default/clusters/working/vars.yml".format(self._repository_directory), context)
 
@@ -277,6 +280,7 @@ class AWSPentagonProject(PentagonProject):
             'network_cidr': self._production_kubernetes_network_cidr,
             'network_cidr_base': self._vpc_cidr_base,
             'kops_state_store_bucket': self._infrastructure_bucket,
+            'third_octet': self._production_third_octet
         }
         write_yaml_file("{}/inventory/default/clusters/production/vars.yml".format(self._repository_directory), context)
 

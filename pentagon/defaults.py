@@ -20,6 +20,8 @@ class AWSPentagonDefaults(object):
         'version': '1.8.4',
         'network_mask': 24,
         'third_octet': 16,
+        'production_third_octet': 16,
+        'working_third_octet': 24,
         'third_octet_increment': 1,
         'authorization': {'alwaysAllow': {}},
         'networking': {'flannel': {'backend': 'vxlan'}},

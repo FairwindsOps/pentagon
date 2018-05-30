@@ -6,10 +6,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [2.3.0] - 2018-5-30
+
+### Added
+- Some better behavior with migrations where a patch is made but not changes in structure was made
+
 ### Updated
 - Allowed more value to be optional in the kops templates
 - Updated docs
 - Bumped terraform-vpc module source version
+
+### Fixed
+- Issue where kops clusters were created with the same network cidr
 
 ## [2.2.1] - 2018-4-9
 
@@ -17,12 +25,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [2.2.0] - 2018-3-30
 
-## Added
+### Added
 - colorful logging
 - bug fixes and better support for GCP infrastructure
 - `--gcp-revion` as part of the above change
 
-## Updated
+### Updated
 - `yaml_source` no longer throws errors when file is empty, just logs a message
 - made the component class location method more flexible
 - reorganized terraform files and made terraform a first class citizen and part of the `inventory.Inventory` component

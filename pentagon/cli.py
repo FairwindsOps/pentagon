@@ -169,10 +169,11 @@ def get(ctx, component_path, additional_args, **kwargs):
 @click.option("--dry-run/--no-dry-run", default=False, help="Test migration before applying")
 @click.option('--log-level', default="INFO", help="Log Level DEBUG,INFO,WARN,ERROR")
 @click.option('--branch', default="migration", help="Name of branch to create for migration. Default='migration'")
+@click.option('--yes/--no', default=False, help="Confirm to run migration")
 def migrate(ctx, **kwargs):
     """ Update Infrastructure Repository to the latest configuration """
     logging.basicConfig(level=kwargs.get('log_level'))
-    migration.migrate(kwargs['branch'])
+    migration.migrate(kwargs['branch'], kwargs['yes'])
 
 
 def _run(action, component_path, additional_args, options):
