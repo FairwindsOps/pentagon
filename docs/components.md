@@ -171,7 +171,14 @@ Options:
     - Arguments:
       - `name`: name of account to add to inventory (required)
       - `type`: type of account to add to inventory aws or gcp (required).
-    - If a `-f` file is passed in, data are merged with `-D` values ovveriding the file values
+    - If a `-f` file is passed in, data are merged with `-D` values overriding the file values
+
+    - Example:
+        ```
+        pentagon add inventory -Dtype=aws -Dname=prod -Daws_access_key=KEY -Daws_secret_key=SECRETKEY -D=aws_default_region=us-east-1
+        ```
+
+
 
 ## Writing your own components
 
