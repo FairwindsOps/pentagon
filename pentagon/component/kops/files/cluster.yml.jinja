@@ -31,7 +31,7 @@ spec:
     name: events
   kubernetesApiAccess:
   - 0.0.0.0/0
-  kubernetesVersion: {{ version }}
+  kubernetesVersion: {{ kubernetes_version }}
   masterPublicName: api.{{ cluster_name }}
   networkCIDR: {{ network_cidr }}
   {%- if vpc_id %}
@@ -57,7 +57,7 @@ spec:
     name: utility-{{ az }}
     type: Utility
     zone: {{ az }}
-  {%- endfor %}  
+  {%- endfor %}
   topology:
     dns:
       type: Public

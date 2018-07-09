@@ -173,10 +173,10 @@ class AWSPentagonProject(PentagonProject):
         self._vpc_id = self.get_data('vpc_id', self._vpc_id)
 
         # DNS
-        self._dns_zone = self.get_data('dns_zone', '{}.com'.format(self._name))      
+        self._dns_zone = self.get_data('dns_zone', '{}.com'.format(self._name))
 
         # Kubernetes version
-        self._kubernetes_version = self.get_data('kubernetes_version', self.PentagonDefaults.kubernetes['version'])
+        self._kubernetes_version = self.get_data('kubernetes_version', self.PentagonDefaults.kubernetes['kubernetes_version'])
 
         # Working Kubernetes
         self._working_kubernetes_cluster_name = self.get_data('working_kubernetes_cluster_name', 'working-1.{}'.format(self._dns_zone))
@@ -248,7 +248,7 @@ class AWSPentagonProject(PentagonProject):
             'availability_zones': re.sub(" ", "", self._aws_availability_zones).split(","),
             'vpc_id': self._vpc_id,
             'ssh_key_path': "${{INFRASTRUCTURE_REPO}}/{}/{}.pub".format(self._private_path, self._ssh_keys['working_kube_key']),
-            'version': self._kubernetes_version,
+            'kubernetes_version': self._kubernetes_version,
             'ig_max_size': self._working_kubernetes_node_count,
             'ig_min_size': self._working_kubernetes_node_count,
             'master_availability_zones': [zone.strip() for zone in self._working_kubernetes_master_aws_zones.split(',')],

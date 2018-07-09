@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+### Fixed
+- `kubernetes_version` parameter value wasn't applying to the kops cluster config from `values.yml` file
+
 ## [2.3.1] - 2018-5-30
 
 ### Fixed
