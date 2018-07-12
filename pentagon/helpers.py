@@ -2,7 +2,7 @@ import logging
 import os
 import traceback
 import jinja2
-import yamlord
+import oyaml as yaml
 from Crypto.PublicKey import RSA
 from stat import *
 from collections import OrderedDict
@@ -55,7 +55,8 @@ def write_yaml_file(filename, d, overwrite=False):
                 raise
     logging.debug("Writing yaml file {}".format(filename))
     logging.debug(d)
-    yamlord.write_yaml(d, filename)
+    with open(filename,'w+') as f:
+        yaml.dump(d, f, default_flow_style=False)
 
 
 def create_rsa_key(name, path, bits=2048):

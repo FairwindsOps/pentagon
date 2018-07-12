@@ -6,3 +6,4 @@ config/private
 *.pub
 pentagon.egg-info
 .vscode
+venv
