@@ -5,7 +5,7 @@ import click
 import logging
 import coloredlogs
 import traceback
-import yaml
+import oyaml as yaml
 import json
 import pentagon
 
@@ -186,24 +186,20 @@ def _run(action, component_path, additional_args, options):
     try:
         file = options.get('file', None)
         if file is not None:
-            file_data = parse_infile(file)
-
-            for key in data:
-                file_data[key] = data[key]
-
-            data = file_data
-
+            documents = parse_infile(file)
     except Exception as e:
         logging.error("Error parsing data from file or -D arguments")
         logging.error(e)
 
     component_class = get_component_class(component_path)
 
+
     try:
-        if callable(component_class):
-            getattr(component_class(data, additional_args), action)(options.get('out'))
-        else:
-            logging.error("Error locating module or class: {}".format(component_path))
+        for data in documents:          
+            if callable(component_class):
+                getattr(component_class(data, additional_args), action)(options.get('out'))
+            else:
+                logging.error("Error locating module or class: {}".format(component_path))
     except Exception, e:
         logging.error(e)
         logging.debug(traceback.format_exc(e))
@@ -259,7 +255,7 @@ def parse_infile(file):
         data_file.seek(0)
 
         try:
-            data = yaml.load(data_file, Loader=yaml.loader.BaseLoader)
+            data = list(yaml.load_all(data_file, Loader=yaml.loader.BaseLoader))
             logging.debug("Data parsed from file {}: {}".format(file, data))
             return data
         except yaml.YAMLError as yaml_error:
