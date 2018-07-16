@@ -182,6 +182,7 @@ def _run(action, component_path, additional_args, options):
     logging.debug("with options: {}".format(options))
     logging.debug("and additional arguments: {}".format(additional_args))
 
+    documents = [{}]
     data = parse_data(options.get('data', {}))
     try:
         file = options.get('file', None)
@@ -192,10 +193,8 @@ def _run(action, component_path, additional_args, options):
         logging.error(e)
 
     component_class = get_component_class(component_path)
-
-
     try:
-        for data in documents:          
+        for data in documents:
             if callable(component_class):
                 getattr(component_class(data, additional_args), action)(options.get('out'))
             else:
