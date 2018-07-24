@@ -111,7 +111,7 @@ Options:
       - `third_octet`: Starting value for the third octet of the subnet cidrs (default: 16)
       - `network_mask`: Value for network mask in subnet cidrs (defalt: 24)
       - `third_octet_increment`: Increment to increase third octet by for each of the Kubernetes subnets (default: 1) By default, the cidr of the first three private subnets will be 172.20.16.0/24, 172.20.17.0/24, 172.20.18.0/24
-      - `authorization`: Authorization type for cluster. Allowed values are `alwaysAllow` and `rbac` (default: alwaysAllow)
+      - `authorization`: Authorization type for cluster. Allowed values are `alwaysAllow` and `rbac` (default: rbac)
     - Example Config File
     ```
     availability_zones: [eu-west-1a, eu-west-1b, eu-west-1c]
@@ -203,5 +203,3 @@ Examples of plugin component package module name and use:
 
 
 See [example](/example-component)
-
-

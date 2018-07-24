@@ -23,7 +23,7 @@ class AWSPentagonDefaults(object):
         'production_third_octet': 16,
         'working_third_octet': 24,
         'third_octet_increment': 1,
-        'authorization': {'alwaysAllow': {}},
+        'authorization': {'rbac': {}},
         'networking': {'flannel': {'backend': 'vxlan'}},
         'node_additional_policies': '[{"Effect": "Allow","Action": ["autoscaling:DescribeAutoScalingGroups", "autoscaling:DescribeAutoScalingInstances", "autoscaling:DescribeTags", "autoscaling:SetDesiredCapacity", "autoscaling:TerminateInstanceInAutoScalingGroup"],"Resource": "*"}]',
         'ssh_key_path': '~/.ssh/id_rsa.pub'
