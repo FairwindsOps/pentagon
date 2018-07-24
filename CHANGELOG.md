@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 - `kubernetes_version` parameter value wasn't applying to the kops cluster config from `values.yml` file
 
+### Updated
+- Kops cluster `authorization` default changed to rbac
+
 ## [2.3.1] - 2018-5-30
 
 ### Fixed
