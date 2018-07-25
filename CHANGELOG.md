@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+### Updated
+- replaced PyYaml with oyaml and added capability to have multidocument yaml files for component declarations
+
 ### Fixed
 - `kubernetes_version` parameter value wasn't applying to the kops cluster config from `values.yml` file
 

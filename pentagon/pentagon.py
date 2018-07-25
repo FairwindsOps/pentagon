@@ -9,7 +9,7 @@ import os
 import re
 import sys
 import traceback
-import yaml
+import oyaml as yaml
 import boto3
 
 from git import Repo, Git
