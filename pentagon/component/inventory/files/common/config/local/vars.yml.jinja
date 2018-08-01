@@ -1,6 +1,5 @@
-
-ANSIBLE_CONFIG: '${INFRASTRUCTURE_REPO}/inventory/{{ name }}/config/private/ansible.cfg'
-KUBECONFIG: '${INFRASTRUCTURE_REPO}/inventory/{{ name }}/config/private/kube_config'
+ANSIBLE_CONFIG: '${INFRASTRUCTURE_REPO}/inventory/${INVENTORY}/config/private/ansible.cfg'
+KUBECONFIG: '${INFRASTRUCTURE_REPO}/inventory/${INVENTORY}/config/private/kube_config'
 HELM_HOME: "${INFRASTRUCTURE_REPO}/helm"
 
 {%- if cloud | lower == 'aws' %}
