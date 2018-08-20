@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [2.4.0] - 2018-8-21
 
 ### Updated
 - replaced PyYaml with oyaml and added capability to have multidocument yaml files for component declarations
