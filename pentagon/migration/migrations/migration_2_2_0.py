@@ -11,8 +11,6 @@ class Migration(migration.Migration):
 
     def run(self):
 
-        self.delete('{}/Makefile'.format(infrastructure_repo))
-
         for item in self.inventory:
             inventory_path = "inventory/{}".format(item)
             logging.debug('Inventory Path: {}'.format(inventory_path))
