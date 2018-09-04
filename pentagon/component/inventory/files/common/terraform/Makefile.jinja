@@ -24,10 +24,10 @@ bucket:
 
 plan:
 	terraform init -backend=true
-	terraform plan
+	terraform plan -out=terraform.tfplan
 
 apply:
-	terraform apply
+	terraform apply terraform.tfplan
 
 destroy:
 	terraform plan -destroy -out terraform.tfplan
