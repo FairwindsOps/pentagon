@@ -55,7 +55,7 @@ def migrate(branch='migration', yes=False):
             if yes:
                 Migration(None).version_only()
         elif compare_value == 0:
-            logging.info(" You are at the latest version!")
+            logging.info("You are at the latest version!")
 
 
 def migrations_to_run(current_version, available_migrations):
