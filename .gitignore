@@ -7,3 +7,5 @@ config/private
 pentagon.egg-info
 .vscode
 venv
+dist
+build

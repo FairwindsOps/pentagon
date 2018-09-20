@@ -42,3 +42,36 @@ jobs:
           name: Test Start Project
           command: |
             docker run --rm pentagon pentagon start-project circleci-test
+
+  upload:
+    docker:
+      - image: circleci/python:2
+    environment:
+      PYPI_USERNAME: ReactiveOps
+    working_directory: ~/pentagon
+    steps:
+      - checkout
+      - run:
+        name: init .pypirc
+        command: |
+          echo -e "[pypi]" >> ~/.pypirc
+          echo -e "username = $PYPI_USERNAME" >> ~/.pypirc
+          echo -e "password = $PYPI_PASSWORD" >> ~/.pypirc
+      - run:
+        name: package and upload
+        command: |
+          python setup sdist bdist_wheel upload
+
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - build:
+      - upload:
+          requires:
+            - build
+          filters:
+            tags:
+              only: /[0-9]+(\.[0-9]+)*/
+            branches:
+              ignore: /.*/

@@ -6,10 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unrelesaed - 2018-x-xx
 ### Updated
-* ...
 
 ### Fixed
-* ...
+
+###
+- added PyPi upload to circleci config
 
 ## [2.4.0] - 2018-8-21
 
