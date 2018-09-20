@@ -12,7 +12,6 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 
-
 version: 2
 
 jobs:
@@ -43,7 +42,7 @@ jobs:
           command: |
             docker run --rm pentagon pentagon start-project circleci-test
 
-  upload:
+  release:
     docker:
       - image: circleci/python:2
     environment:
@@ -60,28 +59,35 @@ jobs:
             echo -e "username = $PYPI_USERNAME" >> ~/.pypirc
             echo -e "password = $PYPI_PASSWORD" >> ~/.pypirc
       - run:
-          name: create
-          commands:
-            - git fetch --tags
-            - curl -O https://raw.githubusercontent.com/reactiveops/release.sh/v0.0.2/release.sh
-            - /bin/bash release.sh
+          name: create release
+          command: |
+            git fetch --tags
+            curl -O https://raw.githubusercontent.com/reactiveops/release.sh/v0.0.2/release
+            /bin/bash release
       - run:
-        name: package and upload
-        command: |
-          python setup sdist bdist_wheel upload
-
-
+          name: package and upload
+          command: |
+            sudo pip install twine
+            python setup.py sdist bdist_wheel
+            twine upload dist/*
 
 workflows:
   version: 2
-  build_and_deploy:
+  build:
     jobs:
       - build:
-      - upload:
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              only: /.*/
+      - release:
           requires:
             - build
           filters:
             tags:
-              only: /[0-9]+(\.[0-9]+)*/
+              only: /.*/
             branches:
               ignore: /.*/
+
+
