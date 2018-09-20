@@ -48,19 +48,29 @@ jobs:
       - image: circleci/python:2
     environment:
       PYPI_USERNAME: ReactiveOps
+      GITHUB_ORGANIZATION: $CIRCLE_PROJECT_USERNAME
+      GITHUB_REPOSITORY: $CIRCLE_PROJECT_REPONAME
     working_directory: ~/pentagon
     steps:
       - checkout
       - run:
-        name: init .pypirc
-        command: |
-          echo -e "[pypi]" >> ~/.pypirc
-          echo -e "username = $PYPI_USERNAME" >> ~/.pypirc
-          echo -e "password = $PYPI_PASSWORD" >> ~/.pypirc
+          name: init .pypirc
+          command: |
+            echo -e "[pypi]" >> ~/.pypirc
+            echo -e "username = $PYPI_USERNAME" >> ~/.pypirc
+            echo -e "password = $PYPI_PASSWORD" >> ~/.pypirc
+      - run:
+          name: create
+          commands:
+            - git fetch --tags
+            - curl -O https://raw.githubusercontent.com/reactiveops/release.sh/v0.0.2/release.sh
+            - /bin/bash release.sh
       - run:
         name: package and upload
         command: |
           python setup sdist bdist_wheel upload
+
+
 
 workflows:
   version: 2
