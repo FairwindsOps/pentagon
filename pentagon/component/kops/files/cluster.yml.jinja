@@ -18,8 +18,8 @@ spec:
   dnsZone: {{ cluster_dns }}
   etcdClusters:
   - name: main
-​​    enableEtcdTLS: true
-​​    version: 3.2.24
+    enableEtcdTLS: true
+    version: 3.2.24
     etcdMembers:
     {%- for az in master_availability_zones %}
     - instanceGroup: master-{{ az }}
@@ -27,8 +27,8 @@ spec:
       encryptedVolume: true
     {%- endfor %}
   - name: events
-​​    enableEtcdTLS: true
-​​    version: 3.2.24
+    enableEtcdTLS: true
+    version: 3.2.24
     etcdMembers:
     {%- for az in master_availability_zones %}
     - instanceGroup: master-{{ az }}
