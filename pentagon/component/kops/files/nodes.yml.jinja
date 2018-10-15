@@ -6,6 +6,7 @@ metadata:
   name: nodes
 spec:
   machineType: {{ worker_node_type }}
+  image: {{ worker_node_image }}
   maxSize: {{ ig_max_size if ig_max_size else node_count }}
   minSize: {{ ig_min_size if ig_min_size else node_count }}
   role: Node

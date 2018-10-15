@@ -8,6 +8,7 @@ metadata:
   name: master-{{ az }}
 spec:
   machineType: {{ master_node_type }}
+  image: {{ master_node_image }}
   maxSize: 1
   minSize: 1
   role: Master
