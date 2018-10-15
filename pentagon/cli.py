@@ -118,12 +118,13 @@ def cli(ctx, log_level, *args, **kwargs):
 @click.option('--gcp-region', prompt=True, help="Google Cloud Region to create regional resources in", cls=RequiredIf, required_if='cloud=gcp')
 def start_project(ctx, name, **kwargs):
     """ Create an infrastructure project from scratch with the configured options """
+
     try:
 
         logging.basicConfig(level=kwargs.get('log_level'))
         file_data = {}
-        if kwargs.get('config-file'):
-            file_data = parse_infile(kwargs.get('config_file'))
+        if kwargs.get('config_file'):
+            file_data = parse_infile(kwargs.get('config_file'))[0]
         kwargs.update(file_data)
         logging.debug(kwargs)
         cloud = kwargs.get('cloud')
