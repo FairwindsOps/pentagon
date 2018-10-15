@@ -8,8 +8,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Updated
 
 ### Fixed
+- Reading from config fil
+- Templating local path for ssh_config
+- Installation requirements
+- Worker and Master variable name for kubernetes arguements
 
 ### Added
+
+### Removed
+- Makefiles
 
 ## [2.4.1] - 2018-09-21
 ### Updated
