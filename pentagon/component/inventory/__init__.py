@@ -44,6 +44,7 @@ class Inventory(ComponentBase):
 
             if self._data['cloud'].lower() == 'aws':
                 self._data['aws_region'] = self._data.get('aws_default_region')
+                self._data['account'] = os.path.basename(self._destination)
                 self._merge_data(self._ssh_keys)
                 self.__create_keys()
                 Aws(self._data).add("{}/terraform".format(self._destination))

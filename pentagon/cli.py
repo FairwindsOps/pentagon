@@ -76,13 +76,13 @@ def cli(ctx, log_level, *args, **kwargs):
 # Working
 @click.option('--working-kubernetes-cluster-name', help="Name of the working kubernetes cluster nodes")
 @click.option('--working-kubernetes-node-count', help="Name of the working kubernetes cluster nodes")
-@click.option('--working-kubernetes-node-type', help="Node type of the kube workers")
+@click.option('--working-kubernetes-worker-node-type', help="Node type of the kube workers")
 @click.option('--working-kubernetes-network-cidr', help="Network cidr of the kubernetes working cluster")
 
 # Production
 @click.option('--production-kubernetes-cluster-name', help="Name of the production kubernetes cluster nodes")
 @click.option('--production-kubernetes-node-count', help="Name of the production kubernetes cluster nodes")
-@click.option('--production-kubernetes-node-type', help="Node type of the kube workers")
+@click.option('--production-kubernetes-worker-node-type', help="Node type of the kube workers")
 @click.option('--production-kubernetes-network-cidr', help="Network cidr of the kubernetes working cluster")
 
 # AWS Cloud options
@@ -98,7 +98,7 @@ def cli(ctx, log_level, *args, **kwargs):
 # AWS only Kubernetes options
 # Working
 @click.option('--working-kubernetes-master-aws-zone', help="Availability zone to place the kube master in")
-@click.option('--working-kubernetes-master-type', help="AWS only. Node type of the kube master")
+@click.option('--working-kubernetes-master-node-type', help="AWS only. Node type of the kube master")
 @click.option('--working-kube-key', help="Name of the ssh key for the working kubernetes cluster")
 @click.option('--working-private-key', help="Name of the ssh key for the working non kubernetes instances")
 @click.option('--working-kubernetes-dns-zone', help="DNS Zone of the kubernetes working cluster")
@@ -106,7 +106,7 @@ def cli(ctx, log_level, *args, **kwargs):
 
 # Poduction
 @click.option('--production-kubernetes-master-aws-zone', help="Availability zone to place the kube master in")
-@click.option('--production-kubernetes-master-type', help=" AWS only. Node type of the kube master")
+@click.option('--production-kubernetes-master-node-type', help=" AWS only. Node type of the kube master")
 @click.option('--production-kube-key', help="Name of the ssh key for the production kubernetes cluster")
 @click.option('--production-private-key', help="Name of the ssh key for the production non kubernetes instances")
 @click.option('--production-kubernetes-dns-zone', help="DNS Zone of the kubernetes production cluster")
@@ -118,12 +118,13 @@ def cli(ctx, log_level, *args, **kwargs):
 @click.option('--gcp-region', prompt=True, help="Google Cloud Region to create regional resources in", cls=RequiredIf, required_if='cloud=gcp')
 def start_project(ctx, name, **kwargs):
     """ Create an infrastructure project from scratch with the configured options """
+
     try:
 
         logging.basicConfig(level=kwargs.get('log_level'))
         file_data = {}
-        if kwargs.get('config-file'):
-            file_data = parse_infile(kwargs.get('config_file'))
+        if kwargs.get('config_file'):
+            file_data = parse_infile(kwargs.get('config_file'))[0]
         kwargs.update(file_data)
         logging.debug(kwargs)
         cloud = kwargs.get('cloud')
