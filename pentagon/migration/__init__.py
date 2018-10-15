@@ -9,6 +9,7 @@ import git
 import inspect
 import yamlord
 import semver
+import fnmatch
 
 from collections import OrderedDict
 
@@ -237,3 +238,13 @@ class Migration(object):
             return shutil.rmtree(self.real_path(path))
 
         return False
+
+    def find_files(self, path='./', file_pattern=None):
+        matches = []
+        for root, dirnames, filenames in os.walk(path):
+            for filename in fnmatch.filter(filenames, file_pattern):
+                matches.append(os.path.join(root, filename))
+
+        if len(matches) == 0:
+            logging.warn("No {} files found!".format(file_pattern))
+        return matches
