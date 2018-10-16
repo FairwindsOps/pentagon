@@ -2,6 +2,8 @@ import logging
 import os
 import traceback
 import jinja2
+import string
+
 import oyaml as yaml
 from Crypto.PublicKey import RSA
 from stat import *
@@ -83,3 +85,17 @@ def merge_dict(d, new_data, clobber=False):
                 logging.debug("Setting component data {}: {}".format(key, value))
                 d[key] = value
         return d
+
+
+def allege_aws_availability_zones(region, count):
+    """
+    Accepts a region (string) and count (int) and returns a list of potential aws availability zones
+    It does no verification that the region is correct or that the az actually exists
+    Ex: for region 'us-west-1' and count '3' it will return ['us-west-1a', 'us-west-1b', 'us-west-1c']
+    """
+    azs = []
+    logging.info("Guessing at default AWS AZs")
+    for i in range(0, count):
+        azs += ["{}{}".format(region, list(string.ascii_lowercase)[i])]
+
+    return (", ").join(azs)

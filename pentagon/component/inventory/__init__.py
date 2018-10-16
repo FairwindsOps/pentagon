@@ -47,6 +47,7 @@ class Inventory(ComponentBase):
                 self._data['account'] = os.path.basename(self._destination)
                 self._merge_data(self._ssh_keys)
                 self.__create_keys()
+
                 Aws(self._data).add("{}/terraform".format(self._destination))
                 Vpn(self._data).add("{}/resources".format(self._destination), overwrite=True)
 
@@ -76,6 +77,9 @@ class Inventory(ComponentBase):
 class Aws(ComponentBase):
 
     def add(self, destination):
+        for key, value in PentagonDefaults.vpc.iteritems():
+            if not self._data.get(key):
+                self._data[key] = value
         Vpc(self._data).add("./{}".format(destination), overwrite=True)
 
 

@@ -3,7 +3,6 @@
 
 import datetime
 import shutil
-import string
 import logging
 import os
 import re
@@ -19,7 +18,7 @@ import component.kops as kops
 import component.inventory as inventory
 import component.core as core
 import component.gcp as gcp
-from helpers import render_template, write_yaml_file, create_rsa_key, merge_dict
+from helpers import render_template, write_yaml_file, create_rsa_key, merge_dict, allege_aws_availability_zones
 from meta import __version__, __author__
 
 
@@ -141,8 +140,6 @@ class AWSPentagonProject(PentagonProject):
                         {'Name': 'architecture', 'Values': ['x86_64']},
                         {'Name': 'name', 'Values': ['ubuntu/images/hvm-ssd/ubuntu-trusty*']}]
 
-    availability_zone_designations = list(string.ascii_lowercase)
-
     def __init__(self, name, data={}):
         super(AWSPentagonProject, self).__init__(name, data)
         self._create_keys = self.get_data('create_keys')
@@ -161,7 +158,7 @@ class AWSPentagonProject(PentagonProject):
         if self.get_data('aws_default_region'):
             self._aws_default_region = self.get_data('aws_default_region')
             self._aws_availability_zone_count = int(self.get_data('aws_availability_zone_count', self.PentagonDefaults.vpc['aws_availability_zone_count']))
-            self._aws_availability_zones = self.get_data('aws_availability_zones', self.__default_aws_availability_zones())
+            self._aws_availability_zones = self.get_data('aws_availability_zones')
         else:
             self._aws_default_region = self._aws_default_region_placeholder
             self._aws_availability_zone_count = self._aws_availability_zone_count_placeholder
@@ -201,14 +198,6 @@ class AWSPentagonProject(PentagonProject):
         self._production_kubernetes_v_log_level = self.get_data('production_kubernetes_v_log_level', self.PentagonDefaults.kubernetes['v_log_level'])
         self._production_kubernetes_network_cidr = self.get_data('production_kubernetes_network_cidr', self.PentagonDefaults.kubernetes['network_cidr'])
         self._production_third_octet = self.get_data('production_third_octet', self.PentagonDefaults.kubernetes['production_third_octet'])
-
-    def __default_aws_availability_zones(self):
-        azs = []
-        logging.info("Creating default AWS AZs")
-        for i in range(0, self._aws_availability_zone_count):
-            azs += ["{}{}".format(self._aws_default_region, self.availability_zone_designations[i])]
-
-        return (", ").join(azs)
 
     @property
     def context(self):
