@@ -7,11 +7,13 @@ import coloredlogs
 import traceback
 import oyaml as yaml
 import json
+
 import pentagon
+import migration
 
 from pydoc import locate
 from pentagon import PentagonException
-import migration
+from helpers import merge_dict
 
 from meta import __version__, __author__
 
@@ -195,8 +197,9 @@ def _run(action, component_path, additional_args, options):
 
     component_class = get_component_class(component_path)
     try:
-        for data in documents:
+        for doc in documents:
             if callable(component_class):
+                data = merge_dict(doc, data, clobber=True)
                 getattr(component_class(data, additional_args), action)(options.get('out'))
             else:
                 logging.error("Error locating module or class: {}".format(component_path))
