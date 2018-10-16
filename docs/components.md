@@ -175,7 +175,7 @@ Options:
 
     - Example:
         ```
-        pentagon add inventory -Dtype=aws -Dname=prod -Daws_access_key=KEY -Daws_secret_key=SECRETKEY -D=aws_default_region=us-east-1
+        pentagon add inventory -Dtype=aws -Dname=prod -Daws_access_key=KEY -Daws_secret_key=SECRETKEY -Daws_default_region=us-east-1
         ```
 
 
