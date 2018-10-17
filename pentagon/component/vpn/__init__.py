@@ -10,7 +10,8 @@ class Vpn(ComponentBase):
 
     _required_parameters = [
         'aws_access_key',
-        'aws_secret_key'
+        'aws_secret_key',
+        'project_name'
     ]
 
     _ami_owners = ['099720109477']  # Amazon AMI owner
