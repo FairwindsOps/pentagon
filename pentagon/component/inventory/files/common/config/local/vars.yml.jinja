@@ -13,7 +13,7 @@ AWS_AVAILABILITY_ZONE_COUNT: "{{ aws_availability_zone_count }}"
 
 AWS_INVENTORY_PATH: '${INFRASTRUCTURE_REPO}/plugins/'
 
-KOPS_STATE_STORE_BUCKET: "{{ KOPS_STATE_STORE_BUCKET }}"
+KOPS_STATE_STORE_BUCKET: "{{ infrastructure_bucket }}"
 KOPS_STATE_STORE: "s3://${KOPS_STATE_STORE_BUCKET}"
 
 vpc_tag_name: "{{ vpc_name }}"
