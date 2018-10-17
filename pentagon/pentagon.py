@@ -70,6 +70,7 @@ class PentagonProject(object):
         for key, value in self._data.items():
             if value and key not in self.keys_to_sanitize:
                 config[key] = value
+        config['project_name'] = self._name
 
         logging.debug(config)
         try:

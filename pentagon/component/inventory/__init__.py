@@ -18,7 +18,8 @@ class Inventory(ComponentBase):
         'name',
         'infrastructure_bucket',
         'aws_access_key',
-        'aws_secret_key'
+        'aws_secret_key',
+        'project_name'
     ]
 
     def __init__(self, data, additional_args=None, **kwargs):
