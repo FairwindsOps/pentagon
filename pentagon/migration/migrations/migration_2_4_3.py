@@ -19,6 +19,7 @@ class Migration(migration.Migration):
             inventory_path = "inventory/{}".format(item)
             with self.YamlEditor('{}/config/local/vars.yml'.format(inventory_path)) as vars_yml:
                 vars_yml.remove('org-name')
+                vars_yml.remove('secrets_bucket')
                 vars_yml.write()
 
             if os.path.exists("{}/resources/admin-environment/".format(inventory_path)):
