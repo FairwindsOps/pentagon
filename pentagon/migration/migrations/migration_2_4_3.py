@@ -31,4 +31,9 @@ class Migration(migration.Migration):
                 with self.YamlEditor("{}/resources/admin-environment/env.yml".format(inventory_path)) as env_yml:
                     env_yml['env'] = "{{ org }}"
                     env_yml['open_vpn_host'] = "vpn-{{ org }}.{{ canonical_zone }}"
-                    env_yml['vpn_bucket'] = "{{ org }}-vpn"
+                    env_yml.write()
+
+                with self.YamlEditor("{}/resources/admin-environment/env.yml".format(inventory_path)) as env_yml:
+                    data = env_yml.get_data()
+                    del data['vpn_bucket']
+                    self.overwrite_file("{}/resources/admin-environment/env.yml".format(inventory_path), yaml.safe_dump(data, default_flow_style=False))

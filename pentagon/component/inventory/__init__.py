@@ -55,7 +55,7 @@ class Inventory(ComponentBase):
                 self.__create_keys()
 
                 Aws(self._data).add("{}/terraform".format(self._destination))
-                if self._data.get('configure_vpn'):
+                if self._data.get('configure_vpn', True):
                     Vpn(self._data).add("{}/resources".format(self._destination), overwrite=True)
 
             if self._data['cloud'].lower() == 'gcp':
