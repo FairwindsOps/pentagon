@@ -223,6 +223,8 @@ class AWSPentagonProject(PentagonProject):
             'working_private_key': self._ssh_keys['working_private_key'],
             'admin_vpn_key': self._ssh_keys['admin_vpn_key'],
             'name': 'default',
+            'project_name': self._name,
+            'configure_vpn': self.get_data('configure_vpn')
         }
         logging.debug(self._context)
         return self._context
