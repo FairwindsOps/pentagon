@@ -26,9 +26,9 @@ class RequiredIf(click.Option):
         self.required_value = self.required_if[1]
         assert self.required_if, "'required_if' parameter required"
         kwargs['help'] = (kwargs.get('help', '') +
-            ' NOTE: This argument required when --%s=%s' %
-            (self.required_option, self.required_value)
-        ).strip()
+                          ' NOTE: This argument required when --%s=%s' %
+                          (self.required_option, self.required_value)
+                          ).strip()
         super(RequiredIf, self).__init__(*args, **kwargs)
 
     def handle_parse_result(self, ctx, opts, args):
@@ -59,10 +59,8 @@ def cli(ctx, log_level, *args, **kwargs):
 @click.option('--force/--no-force', help="Ignore existing directories and copy project")
 @click.option('--cloud', default="aws", help="Cloud providor to create default inventory. Defaults to 'aws'. [aws,gcp,none]")
 @click.option('--hash-type', default="aws", type=click.Choice(['aws', 'gcp']), help="Type cloud project to create. Defaults to 'aws'")
-
 # General Cloud Options
 @click.option('--zones', help="Availability zones as a comma delimited list", cls=RequiredIf, required_if='cloud=gcp')
-
 # Currently only AWS but maybe we can/should add GCP later
 @click.option('--configure-vpn/--no-configure-vpn', default=True, help="Whether or not to configure the vpn.")
 @click.option('--vpc-name', help="Name of VPC to create")
@@ -70,23 +68,19 @@ def cli(ctx, log_level, *args, **kwargs):
 @click.option('--vpc-id', help="AWS VPC id to create the kubernetes clusters in")
 @click.option('--admin-vpn-key', help="Name of the ssh key for the admin user of the VPN instance")
 @click.option('--vpn-ami-id', help="ami-id to use for the VPN instance")
-
 # General Kubernetes options
 @click.option('--kubernetes-version', help="Version of kubernetes to use for cluster nodes")
 @click.option('--disk-size', help="Size disk to provision on the kubernetes vms")
-
 # Working
 @click.option('--working-kubernetes-cluster-name', help="Name of the working kubernetes cluster nodes")
 @click.option('--working-kubernetes-node-count', help="Name of the working kubernetes cluster nodes")
 @click.option('--working-kubernetes-worker-node-type', help="Node type of the kube workers")
 @click.option('--working-kubernetes-network-cidr', help="Network cidr of the kubernetes working cluster")
-
 # Production
 @click.option('--production-kubernetes-cluster-name', help="Name of the production kubernetes cluster nodes")
 @click.option('--production-kubernetes-node-count', help="Name of the production kubernetes cluster nodes")
 @click.option('--production-kubernetes-worker-node-type', help="Node type of the kube workers")
 @click.option('--production-kubernetes-network-cidr', help="Network cidr of the kubernetes working cluster")
-
 # AWS Cloud options
 @click.option('--aws-access-key', prompt=True, default=lambda: os.environ.get('PENTAGON_aws_access_key'), help="AWS access key", cls=RequiredIf, required_if='cloud=aws')
 @click.option('--aws-secret-key', prompt=True, default=lambda: os.environ.get('PENTAGON_aws_secret_key'), help="AWS secret key", cls=RequiredIf, required_if='cloud=aws')
@@ -96,7 +90,6 @@ def cli(ctx, log_level, *args, **kwargs):
 @click.option('--infrastructure-bucket', help="Name of S3 Bucket to store state")
 @click.option('--dns-zone', help="DNS zone to configure DNS records in")
 @click.option('--create-keys/--no-create-keys', default=True, help="Create ssh keys or not")
-
 # AWS only Kubernetes options
 # Working
 @click.option('--working-kubernetes-master-aws-zone', help="Availability zone to place the kube master in")
@@ -105,7 +98,6 @@ def cli(ctx, log_level, *args, **kwargs):
 @click.option('--working-private-key', help="Name of the ssh key for the working non kubernetes instances")
 @click.option('--working-kubernetes-dns-zone', help="DNS Zone of the kubernetes working cluster")
 @click.option('--working-kubernetes-v-log-level', help="V Log Level kubernetes working cluster")
-
 # Poduction
 @click.option('--production-kubernetes-master-aws-zone', help="Availability zone to place the kube master in")
 @click.option('--production-kubernetes-master-node-type', help=" AWS only. Node type of the kube master")
@@ -113,7 +105,6 @@ def cli(ctx, log_level, *args, **kwargs):
 @click.option('--production-private-key', help="Name of the ssh key for the production non kubernetes instances")
 @click.option('--production-kubernetes-dns-zone', help="DNS Zone of the kubernetes production cluster")
 @click.option('--production-kubernetes-v-log-level', help="V Log Level kubernetes production cluster")
-
 # GCP Cloud options
 @click.option('--gcp-project', prompt=True, help="Google Cloud Project to create clusters in", cls=RequiredIf, required_if='cloud=gcp')
 @click.option('--gcp-zones', prompt=True, help="Google Cloud Project zones to create clusters in. Comma separated list.", cls=RequiredIf, required_if='cloud=gcp')
@@ -187,6 +178,7 @@ def _run(action, component_path, additional_args, options):
 
     documents = [{}]
     data = parse_data(options.get('data', {}))
+
     try:
         file = options.get('file', None)
         if file is not None:
@@ -200,6 +192,15 @@ def _run(action, component_path, additional_args, options):
         for doc in documents:
             if callable(component_class):
                 data = merge_dict(doc, data, clobber=True)
+                # Making data keys more flexible and allowing keys with
+                # - to be be corrected in place
+                data_copy = data.copy()
+                for key, value in data.iteritems():
+                    flex_key = key.replace('-', '_')
+                    if flex_key != key:
+                        data_copy[flex_key] = value
+                data = data_copy
+
                 getattr(component_class(data, additional_args), action)(options.get('out'))
             else:
                 logging.error("Error locating module or class: {}".format(component_path))
