@@ -171,6 +171,7 @@ Options:
     - Arguments:
       - `name`: name of account to add to inventory (required)
       - `type`: type of account to add to inventory aws or gcp (required).
+      - `project_name`: name of the project the inventory is being added to. (required)
     - If a `-f` file is passed in, data are merged with `-D` values overriding the file values
 
     - Example:
