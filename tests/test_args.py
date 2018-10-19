@@ -127,9 +127,11 @@ class TestPentagonProjectWithMinimalArgs(TestPentagonProject):
 
     def test_aws_availability_zones(self):
         azs = "test-aws-regiona, test-aws-regionb, test-aws-regionc, test-aws-regiond, test-aws-regione"
+        from pentagon.helpers import allege_aws_availability_zones
         self.assertIsInstance(self.p._aws_availability_zone_count, int)
         self.assertEqual(self.p._aws_default_region, self.args['aws_default_region'])
-        self.assertEqual(self.p._aws_availability_zones, azs)
+        alleged_azs = allege_aws_availability_zones(self.p._aws_default_region, self.p._aws_availability_zone_count)
+        self.assertEqual(alleged_azs, azs)
 
 
 class TestPentagon(TestPentagonProject):

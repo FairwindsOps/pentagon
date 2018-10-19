@@ -3,7 +3,6 @@
 
 import datetime
 import shutil
-import string
 import logging
 import os
 import re
@@ -19,7 +18,7 @@ import component.kops as kops
 import component.inventory as inventory
 import component.core as core
 import component.gcp as gcp
-from helpers import render_template, write_yaml_file, create_rsa_key, merge_dict
+from helpers import render_template, write_yaml_file, create_rsa_key, merge_dict, allege_aws_availability_zones
 from meta import __version__, __author__
 
 
@@ -71,6 +70,7 @@ class PentagonProject(object):
         for key, value in self._data.items():
             if value and key not in self.keys_to_sanitize:
                 config[key] = value
+        config['project_name'] = self._name
 
         logging.debug(config)
         try:
@@ -134,14 +134,6 @@ class AWSPentagonProject(PentagonProject):
     _production_kubernetes_node_count = '<production_kubernetes_node_count>'
     _production_kubernetes_master_aws_zone = '<production_kubernetes_master_aws_zone>'
 
-    # VPN
-    _ami_owners = ['099720109477']  # Amazon AMI owner
-    _vpn_ami_id_placeholder = "<ami_id>"
-    _vpn_ami_filters = [{'Name': 'virtualization-type', 'Values': ['hvm']},
-                        {'Name': 'architecture', 'Values': ['x86_64']},
-                        {'Name': 'name', 'Values': ['ubuntu/images/hvm-ssd/ubuntu-trusty*']}]
-
-    availability_zone_designations = list(string.ascii_lowercase)
 
     def __init__(self, name, data={}):
         super(AWSPentagonProject, self).__init__(name, data)
@@ -161,7 +153,7 @@ class AWSPentagonProject(PentagonProject):
         if self.get_data('aws_default_region'):
             self._aws_default_region = self.get_data('aws_default_region')
             self._aws_availability_zone_count = int(self.get_data('aws_availability_zone_count', self.PentagonDefaults.vpc['aws_availability_zone_count']))
-            self._aws_availability_zones = self.get_data('aws_availability_zones', self.__default_aws_availability_zones())
+            self._aws_availability_zones = self.get_data('aws_availability_zones')
         else:
             self._aws_default_region = self._aws_default_region_placeholder
             self._aws_availability_zone_count = self._aws_availability_zone_count_placeholder
@@ -202,13 +194,7 @@ class AWSPentagonProject(PentagonProject):
         self._production_kubernetes_network_cidr = self.get_data('production_kubernetes_network_cidr', self.PentagonDefaults.kubernetes['network_cidr'])
         self._production_third_octet = self.get_data('production_third_octet', self.PentagonDefaults.kubernetes['production_third_octet'])
 
-    def __default_aws_availability_zones(self):
-        azs = []
-        logging.info("Creating default AWS AZs")
-        for i in range(0, self._aws_availability_zone_count):
-            azs += ["{}{}".format(self._aws_default_region, self.availability_zone_designations[i])]
-
-        return (", ").join(azs)
+        self._vpn_ami_id = self.get_data('vpn_ami_id')
 
     @property
     def context(self):
@@ -229,7 +215,6 @@ class AWSPentagonProject(PentagonProject):
             'vpc_name': self._vpc_name,
             'infrastructure_bucket': self._infrastructure_bucket,
             'aws_region': self._aws_default_region,
-            'KOPS_STATE_STORE_BUCKET': self._infrastructure_bucket,
             'dns_zone': self._dns_zone,
             'vpn_ami_id': self._vpn_ami_id,
             'production_kube_key': self._ssh_keys['production_kube_key'],
@@ -238,6 +223,8 @@ class AWSPentagonProject(PentagonProject):
             'working_private_key': self._ssh_keys['working_private_key'],
             'admin_vpn_key': self._ssh_keys['admin_vpn_key'],
             'name': 'default',
+            'project_name': self._name,
+            'configure_vpn': self.get_data('configure_vpn')
         }
         logging.debug(self._context)
         return self._context
@@ -284,35 +271,7 @@ class AWSPentagonProject(PentagonProject):
         }
         write_yaml_file("{}/inventory/default/clusters/production/vars.yml".format(self._repository_directory), context)
 
-    def __get_vpn_ami_id(self):
-
-        self._vpn_ami_id = self._vpn_ami_id_placeholder
-
-        if self.get_data('configure_vpn'):
-            if self.get_data('vpn_ami_id'):
-                self._vpn_ami_id = self.get_data('vpn_ami_id')
-            elif \
-                    self._aws_access_key != self._aws_access_key_placeholder and \
-                    self._aws_secret_key != self._aws_secret_key_placeholder and \
-                    self._aws_default_region != self._aws_default_region_placeholder:
-
-                logging.info("Getting VPN ami-id from AWS")
-
-                try:
-                    client = boto3.client('ec2',
-                                          aws_access_key_id=self._aws_access_key,
-                                          aws_secret_access_key=self._aws_secret_key,
-                                          region_name=self._aws_default_region
-                                          )
-                    images = client.describe_images(Owners=self._ami_owners, Filters=self._vpn_ami_filters)
-                    self._vpn_ami_id = images['Images'][-1]['ImageId']
-                except Exception, e:
-                    logging.error("Encountered \" {} \" getting ami-id. VPN not configured fully. See docs/vpn.md for more information".format(e))
-            else:
-                logging.warn("Cannot get ami-id without AWS Key, Secret and Default Region set")
-
     def configure_default_project(self):
-            self.__get_vpn_ami_id()
             inventory.Inventory(self.context).add('{}/inventory/default'.format(self._repository_directory))
             self.__add_kops_working_cluster()
             self.__add_kops_production_cluster()
