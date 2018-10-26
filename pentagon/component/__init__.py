@@ -117,6 +117,7 @@ class ComponentBase(object):
             self._add_files()
             self._remove_init_file()
             self._render_directory_templates()
+            logging.info("New component added. Source your environment before proceeding or unexpected behavior may result.")
         except Exception as e:
             logging.error("Error occured configuring component")
             logging.error(e)
