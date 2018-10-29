@@ -14,17 +14,23 @@ from pentagon.defaults import AWSPentagonDefaults as PentagonDefaults
 class Inventory(ComponentBase):
 
     _defaults = {'cloud': 'aws'}
-    _required_parameters = ['name']
+    _required_parameters = [
+        'name',
+        'infrastructure_bucket',
+        'aws_access_key',
+        'aws_secret_key',
+        'project_name'
+    ]
 
     def __init__(self, data, additional_args=None, **kwargs):
         super(Inventory, self).__init__(data, additional_args, **kwargs)
         self._ssh_keys = {
-                  'admin_vpn_key': self._data.get('admin_vpn_key', PentagonDefaults.ssh['admin_vpn_key']),
-                  'working_kube_key': self._data.get('working_kube_key', PentagonDefaults.ssh['working_kube_key']),
-                  'production_kube_key': self._data.get('production_kube_key', PentagonDefaults.ssh['production_kube_key']),
-                  'working_private_key': self._data.get('working_private_key', PentagonDefaults.ssh['working_private_key']),
-                  'production_private_key': self._data.get('production_private_key', PentagonDefaults.ssh['production_private_key']),
-                 }
+            'admin_vpn_key': self._data.get('admin_vpn_key', PentagonDefaults.ssh['admin_vpn_key']),
+            'working_kube_key': self._data.get('working_kube_key', PentagonDefaults.ssh['working_kube_key']),
+            'production_kube_key': self._data.get('production_kube_key', PentagonDefaults.ssh['production_kube_key']),
+            'working_private_key': self._data.get('working_private_key', PentagonDefaults.ssh['working_private_key']),
+            'production_private_key': self._data.get('production_private_key', PentagonDefaults.ssh['production_private_key']),
+        }
 
     @property
     def _files_directory(self):
@@ -47,8 +53,10 @@ class Inventory(ComponentBase):
                 self._data['account'] = os.path.basename(self._destination)
                 self._merge_data(self._ssh_keys)
                 self.__create_keys()
+
                 Aws(self._data).add("{}/terraform".format(self._destination))
-                Vpn(self._data).add("{}/resources".format(self._destination), overwrite=True)
+                if self._data.get('configure_vpn', True):
+                    Vpn(self._data).add("{}/resources".format(self._destination), overwrite=True)
 
             if self._data['cloud'].lower() == 'gcp':
                 Gcp(self._data).add(self._destination)

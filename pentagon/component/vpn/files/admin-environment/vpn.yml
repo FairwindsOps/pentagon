@@ -46,5 +46,4 @@
   roles:
     - role: Stouts.openvpn-master
       vpn_role: 'primary'
-      org: "{{ org_name }}"
       openvpn_first_run: "{{ hostvars['localhost']['openvpn_first_run'] }}"

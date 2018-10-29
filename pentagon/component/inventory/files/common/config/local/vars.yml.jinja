@@ -13,17 +13,14 @@ AWS_AVAILABILITY_ZONE_COUNT: "{{ aws_availability_zone_count }}"
 
 AWS_INVENTORY_PATH: '${INFRASTRUCTURE_REPO}/plugins/'
 
-KOPS_STATE_STORE_BUCKET: "{{ KOPS_STATE_STORE_BUCKET }}"
+KOPS_STATE_STORE_BUCKET: "{{ infrastructure_bucket }}"
 KOPS_STATE_STORE: "s3://${KOPS_STATE_STORE_BUCKET}"
 
 vpc_tag_name: "{{ vpc_name }}"
-org_name: "{{ org_name }}"
-{% raw -%}
-org: "{{ org_name }}" 
-{%- endraw %}
+org: "{{ project_name }}"
+
 canonical_zone: "{{ dns_zone }}"
-vpn_bucket: "{{org_name}}-vpn"
-secrets_bucket: "{{org_name}}-secrets"
+vpn_bucket: "{{project_name}}-vpn"
 
 {%- elif cloud == 'gcp' %}
 
