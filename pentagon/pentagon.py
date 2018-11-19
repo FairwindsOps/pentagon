@@ -134,7 +134,6 @@ class AWSPentagonProject(PentagonProject):
     _production_kubernetes_node_count = '<production_kubernetes_node_count>'
     _production_kubernetes_master_aws_zone = '<production_kubernetes_master_aws_zone>'
 
-
     def __init__(self, name, data={}):
         super(AWSPentagonProject, self).__init__(name, data)
         self._create_keys = self.get_data('create_keys')
@@ -153,7 +152,9 @@ class AWSPentagonProject(PentagonProject):
         if self.get_data('aws_default_region'):
             self._aws_default_region = self.get_data('aws_default_region')
             self._aws_availability_zone_count = int(self.get_data('aws_availability_zone_count', self.PentagonDefaults.vpc['aws_availability_zone_count']))
-            self._aws_availability_zones = self.get_data('aws_availability_zones')
+            self._aws_availability_zones = self.get_data('aws_availability_zones') or allege_aws_availability_zones(
+                self._aws_default_region, self._aws_availability_zone_count)
+
         else:
             self._aws_default_region = self._aws_default_region_placeholder
             self._aws_availability_zone_count = self._aws_availability_zone_count_placeholder
@@ -188,8 +189,10 @@ class AWSPentagonProject(PentagonProject):
 
         self._production_kubernetes_node_count = self.get_data('production_kubernetes_node_count', self.PentagonDefaults.kubernetes['node_count'])
         self._production_kubernetes_master_aws_zones = self.get_data('production_kubernetes_master_aws_zones', self._aws_availability_zones)
-        self._production_kubernetes_master_node_type = self.get_data('production_kubernetes_master_node_type', self.PentagonDefaults.kubernetes['master_node_type'])
-        self._production_kubernetes_worker_node_type = self.get_data('production_kubernetes_worker_node_type', self.PentagonDefaults.kubernetes['worker_node_type'])
+        self._production_kubernetes_master_node_type = self.get_data(
+            'production_kubernetes_master_node_type', self.PentagonDefaults.kubernetes['master_node_type'])
+        self._production_kubernetes_worker_node_type = self.get_data(
+            'production_kubernetes_worker_node_type', self.PentagonDefaults.kubernetes['worker_node_type'])
         self._production_kubernetes_v_log_level = self.get_data('production_kubernetes_v_log_level', self.PentagonDefaults.kubernetes['v_log_level'])
         self._production_kubernetes_network_cidr = self.get_data('production_kubernetes_network_cidr', self.PentagonDefaults.kubernetes['network_cidr'])
         self._production_third_octet = self.get_data('production_third_octet', self.PentagonDefaults.kubernetes['production_third_octet'])
@@ -272,9 +275,9 @@ class AWSPentagonProject(PentagonProject):
         write_yaml_file("{}/inventory/default/clusters/production/vars.yml".format(self._repository_directory), context)
 
     def configure_default_project(self):
-            inventory.Inventory(self.context).add('{}/inventory/default'.format(self._repository_directory))
-            self.__add_kops_working_cluster()
-            self.__add_kops_production_cluster()
+        inventory.Inventory(self.context).add('{}/inventory/default'.format(self._repository_directory))
+        self.__add_kops_working_cluster()
+        self.__add_kops_production_cluster()
 
 
 class GCPPentagonProject(PentagonProject):
@@ -311,7 +314,7 @@ class GCPPentagonProject(PentagonProject):
             'node_locations': self.get_data('zones'),
             'cluster_name': self.local_defaults.get('working_cluster_name'),
             'cluster_ipv4_cidr': self.PentagonDefaults.kubernetes['working_cluster_ipv4_cidr']
-            })
+        })
         gcp.Cluster(context).add('{}/inventory/default/clusters/working'.format(self._repository_directory))
 
     def add_production_cluster(self):
@@ -322,7 +325,7 @@ class GCPPentagonProject(PentagonProject):
             'locations': self.get_data('zones'),
             'cluster_name': self.local_defaults.get('production_cluster_name'),
             'cluster_ipv4_cidr': self.PentagonDefaults.kubernetes['production_cluster_ipv4_cidr']
-            })
+        })
         gcp.Cluster(context).add('{}/inventory/default/clusters/production'.format(self._repository_directory))
 
     def configure_default_project(self):
