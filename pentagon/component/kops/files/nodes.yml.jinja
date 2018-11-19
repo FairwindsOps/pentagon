@@ -1,9 +1,11 @@
+{% for az in availability_zones -%}
+---
 apiVersion: kops/v1alpha2
 kind: InstanceGroup
 metadata:
   labels:
     kops.k8s.io/cluster: {{ cluster_name }}
-  name: nodes
+  name: nodes-{{ az }}
 spec:
   machineType: {{ worker_node_type }}
   image: {{ worker_node_image }}
@@ -11,8 +13,7 @@ spec:
   minSize: {{ ig_min_size if ig_min_size else node_count }}
   role: Node
   subnets:
-  {% for az in availability_zones -%}
   - {{ az }}
-  {% endfor -%}
   rootVolumeSize: {{ node_root_volume_size }}
   rootVolumeType: gp2
+{% endfor -%}
