@@ -7,11 +7,11 @@
 This repository relies on system tools and Python libraries for your system.
 
 System Tools:
-* [Terraform](https://www.terraform.io) version >= 0.9
-* [kops](https://github.com/kubernetes/kops) version 1.5.3
-* [kubectl](https://kubernetes.io/docs/user-guide/kubectl-overview/) version 1.5.x
+* [Terraform](https://www.terraform.io)
+* [kops](https://github.com/kubernetes/kops)
+* [kubectl](https://kubernetes.io/docs/user-guide/kubectl-overview/)
 
-kubectl should try to match the cluster version, in this case the 1.5.x series for Kubernetes.
+Kubectl should try to match the cluster version.
 
 Python Libraries:
 
