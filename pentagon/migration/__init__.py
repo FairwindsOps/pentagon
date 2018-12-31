@@ -7,7 +7,7 @@ import sys
 import glob
 import git
 import inspect
-import yamlord
+import oyaml as yaml
 import semver
 import fnmatch
 
@@ -105,11 +105,16 @@ class Migration(object):
 
     class YamlEditor(object):
 
-        def __init__(self, file):
+        def __init__(self, file=None):
             # Fetch yaml file as ordered dict
-            self.file = file
-            self.data = yamlord.read_yaml(self.file)
-            logging.debug(self.data)
+            self.file = file 
+            self.data = {}
+            if self.file:
+                with open(self.file) as yf:
+                    self.data = yaml.load(yf.read())
+                logging.debug(self.data)
+            else:
+                logging.debug("YamlEditor initialized with no file")
 
         def update(self, new_data, clobber=False):
             """ accepts a dict and appends keys to ordered dict. Updates keys if clobber is True"""
@@ -129,7 +134,8 @@ class Migration(object):
         def write(self, file=None):
             if file is not None:
                 self.file = file
-            return yamlord.write_yaml(self.data, self.file)
+                with open(self.file, 'w') as yf:
+                    yf.write(yaml.dump(self.data))
 
         def get(self, key, default=None):
             return self.data.get(key, default)
