@@ -9,6 +9,21 @@ from pentagon.helpers import merge_dict
 import re
 import oyaml as yaml
 
+ig_message = """
+# This file has been updated to contain a new set of InstanceGroups with one per Subnet
+# The min/max size should be the original size divided by the number of subnets
+# In order to put the new InstanceGroups into service you will need to:
+# 1. `kops replace -f` this file
+# 2. `kops update --yes` this cluster
+# 3. ensure the InstanceGroups come up properly
+# 4. cordon and drain the old nodes
+# 5. Update the ClusterAutoScaler configuration. You should take this opportinity to
+#    make it auto disover if appropriate: https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/cloudprovider/aws/README.md#auto-discovery-setup
+# 6. `kops delete` the old, multi-subnet InstanceGroup and delete it from this file
+# 7. Delete this comment and check the whole shebang into Git
+# 8. Go get pie and ice-cream
+
+"""
 
 class Migration(migration.Migration):
     _starting_version = '2.6.2'
@@ -82,7 +97,9 @@ class Migration(migration.Migration):
                             else:
                                 node_group['spec']['cloudLabels'] = as_clabels
 
+                            write_message = False
                             if sn_count > 1:
+                                write_message = True
                                 max_size=node_group['spec']['maxSize'] / sn_count
                                 min_size=node_group['spec']['minSize'] / sn_count
                                 name=node_group['metadata']['name']
@@ -100,20 +117,7 @@ class Migration(migration.Migration):
                                     new_node_group['metadata']['name']="{}-{}".format(name, subnet)
                                     new_node_groups.append(new_node_group)
 
-                                with open("{}/cluster-config/{}".format(item_path, 'nodes.yml'), 'w') as nodes_file:
-                                    nodes_file.write("""
-# This file has been updated to contain a new set of InstanceGroups with one per Subnet
-# The min/max size should be the original size divided by the number of subnets
-# In order to put the new InstanceGroups into service you will need to:
-# 1. `kops replace -f` this file
-# 2. `kops update --yes` this cluster
-# 3. ensure the InstanceGroups come up properly
-# 4. cordon and drain the old nodes
-# 5. Update the ClusterAutoScaler configuration. You should take this opportinity to
-#    make it auto disover if appropriate: https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/cloudprovider/aws/README.md#auto-discovery-setup
-# 6. `kops delete` the old, multi-subnet InstanceGroup and delete it from this file
-# 7. Delete this comment and check the whole shebang into Git
-# 8. Go get pie and ice-cream
-
-""")
-                                    nodes_file.write(yaml.dump_all(new_node_groups, default_flow_style=False))
+                            with open("{}/cluster-config/{}".format(item_path, 'nodes.yml'), 'w') as nodes_file:
+                                if write_message:
+                                    nodes_file.write(ig_message)
+                                nodes_file.write(yaml.dump_all(new_node_groups, default_flow_style=False))
