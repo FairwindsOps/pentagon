@@ -203,6 +203,8 @@ class Migration(migration.Migration):
                                 for hook in hooks:
                                     if hook['name'] == 'kops-hook-authenticator-config.service':
                                         hooks.pop(hooks.index(hook))
+                            else:
+                                cluster_spec['hooks'] = []
 
                             ### Using the above magic to keep formatting on the literal strings in the yaml
 
@@ -212,6 +214,7 @@ class Migration(migration.Migration):
                             
                             hook = yaml.load(aws_iam_kops_hook)
                             hook['manifest'] = literal_unicode(hook['manifest'])
+                            
                             cluster_spec['hooks'].append(hook)
 
                             if not cluster_spec.get('kubeAPIServer'):

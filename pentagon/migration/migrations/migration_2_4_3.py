@@ -39,5 +39,9 @@ class Migration(migration.Migration):
 
                 with self.YamlEditor("{}/resources/admin-environment/env.yml".format(inventory_path)) as env_yml:
                     data = env_yml.get_data()
-                    del data['vpn_bucket']
+                    try:
+                        del data['vpn_bucket']
+                    except KeyError, e:
+                        pass
+
                     self.overwrite_file("{}/resources/admin-environment/env.yml".format(inventory_path), yaml.safe_dump(data, default_flow_style=False))
