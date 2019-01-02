@@ -29,11 +29,26 @@ ig_message = """
 
 # TODO: Write up a read me of the changes.
 readme = """
-cluster-config
-post-kops.sh
-Node IG update subnets
-aws-iam-auth update
-auditlogging update
+
+# Migration 2.6.2 -> 2.7.0
+
+## This migration:
+- removes older artifacts like the `post-kops.sh` if they exist
+- renames `inventory/<inventory>/clusters/<cluster>/cluster` -> `inventory/<inventory>/clusters/<cluster>/cluster-config` to match the current standard
+- splits any Kops instance group with more than on subnet into multiple instance groups with a single subnet. 
+  * it attempts to guess on the correct min/max size of the instance groups by `current min/max / number of subnets` as an integer. 
+  * it leaves the exisiting instance group in place to ease the migration
+  * there are instruction in each `inventory/<inventory>/clusters/<cluster>/cluster-config/nodes.yml`
+- adds audit logging to all kops clusters if not already there
+- adds cloud labels to allow cluster auto scaler to auto detect
+  * you may still need to add the iam policy to the nodes for it to function properly
+- updates the aws-iam-authenticator hook to note require any cloud storage
+
+## Risks:
+- the manifold update to the kops clusters will be a multi step process and may incur some risk.
+
+## Follow up tasks:
+- the update to the aws-iam-authenticator config no longer requires any cloud storage. Delete the bucket if it exists. 
 
 """
 
@@ -91,6 +106,8 @@ yaml.add_representer(literal_unicode, literal_unicode_representer)
 class Migration(migration.Migration):
     _starting_version = '2.6.2'
     _ending_version = '2.7.0'
+
+    _readme_string = readme
 
     def run(self):
 
@@ -223,10 +240,10 @@ class Migration(migration.Migration):
                             hook = yaml.load(aws_iam_kops_hook)
                             hook['manifest'] = literal_unicode(hook['manifest'])
 
-                            fileAssets = cluster_spec.get('fileAssets')
-                            if fileAssets:
-                                if fileAssets.get('content'):
-                                    cluster_spec['fileAssets']['content'] = literal_unicode(cluster_spec['fileAssets']['content'])
+                            fileAssets = cluster_spec.get('fileAssets',[])
+                            for fa in fileAssets:
+                                if fa.get('content'):
+                                    fa['content'] = literal_unicode(fa['content'])
 
                             cluster_spec['hooks'].append(hook)
 

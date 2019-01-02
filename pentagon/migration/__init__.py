@@ -23,7 +23,7 @@ from distutils.version import StrictVersion
 
 default_version = "1.2.0"
 version_file = '.version'
-
+migrationn_readme_file = 'migrations.md'
 
 def migrate(branch='migration', yes=False):
     """ Find applicabale migrations and run them """
@@ -181,10 +181,16 @@ class Migration(object):
         self._branch()
         self.run()
         self._write_new_version(installed_version())
+        self._append_migration_readme()
 
     def _write_new_version(self, version):
         """ write new file with new version following the migration """
         self.overwrite_file(version_file, version)
+
+    def _append_migration_readme(self):
+        if hasattr(self, "_readme_string"):
+            with open(migrationn_readme_file,'w+') as mrf:
+                mrf.write(self._readme_string)
 
     def move(self, source, destination):
         """ move files and directories with extreme predjudice """
