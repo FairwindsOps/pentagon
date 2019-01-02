@@ -2,11 +2,9 @@
 import logging
 import os
 import shutil
-import distutils.dir_util
 import sys
 import glob
 import git
-import inspect
 import oyaml as yaml
 import semver
 import fnmatch
@@ -15,7 +13,6 @@ from collections import OrderedDict
 
 from pentagon.migration import migrations
 from pentagon.pentagon import PentagonException
-from pentagon.helpers import write_yaml_file
 from pentagon.meta import __version__ as pentagon_version
 
 from pydoc import locate
@@ -23,10 +20,11 @@ from distutils.version import StrictVersion
 
 default_version = "1.2.0"
 version_file = '.version'
-migrationn_readme_file = 'migrations.md'
+migration_readme_file = 'migrations.md'
+
 
 def migrate(branch='migration', yes=False):
-    """ Find applicabale migrations and run them """
+    """ Find applicable migrations and run them """
     logging.info("Pentagon Version: {}".format(installed_version()))
     logging.info("Starting Repository Version: {}".format(current_version()))
 
@@ -84,12 +82,12 @@ def installed_version():
 def infrastructure_repository():
     infrastructure_repo = os.environ.get('INFRASTRUCTURE_REPO')
     if infrastructure_repo is None:
-        raise PentagonException('Required environnment variable INFRASTRUCTURE_REPO is not set.')
+        raise PentagonException('Required environment variable INFRASTRUCTURE_REPO is not set.')
     return infrastructure_repo
 
 
 def current_version(version_file=version_file):
-    """ get current version of the infrastucture_repo """
+    """ get current version of the infrastructure_repo """
     try:
         with open("{}/{}".format(infrastructure_repository(), version_file)) as vf:
             version = vf.readline()
@@ -128,7 +126,7 @@ class Migration(object):
                     del self.data[key]
 
         def get_data(self):
-            """ return orderd dict of yaml """
+            """ return ordered dict of yaml """
             return self.data
 
         def write(self, file=None):
@@ -173,7 +171,13 @@ class Migration(object):
 
     def _branch(self):
         repo = git.Repo(self._infrastructure_repository)
-        new_branch = repo.create_head(self.branch)
+        try:
+            repo.create_head(self.branch)
+        except OSError as e:
+            logging.error("OSError %s", e)
+            logging.error("Most likely the migration branch still exists.  Please delete it and try again.")
+            sys.exit(1)
+
         repo.git.checkout(self.branch)
 
     def _run(self):
@@ -189,11 +193,11 @@ class Migration(object):
 
     def _append_migration_readme(self):
         if hasattr(self, "_readme_string"):
-            with open(migrationn_readme_file,'w+') as mrf:
+            with open(migration_readme_file, 'w+') as mrf:
                 mrf.write(self._readme_string)
 
     def move(self, source, destination):
-        """ move files and directories with extreme predjudice """
+        """ move files and directories with extreme prejudice """
         logging.info("Moving {} -> {}".format(self.real_path(source), self.real_path(destination)))
 
         if os.path.isfile(source):
@@ -242,7 +246,7 @@ class Migration(object):
 
     def delete(self, path):
         """ deletes file or directory """
-        logging.info("Deleteing {}".format(path))
+        logging.info("Deleting {}".format(path))
         if os.path.isfile(self.real_path(path)):
             return os.remove(self.real_path(path))
 
