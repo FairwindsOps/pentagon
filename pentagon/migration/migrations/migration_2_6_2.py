@@ -3,11 +3,6 @@ from copy import deepcopy
 
 from pentagon import migration
 from pentagon.migration import *
-from pentagon.component import core, inventory
-from pentagon.helpers import merge_dict
-
-import re
-#import oyaml as yaml
 import yaml
 
 ig_message = """
@@ -19,15 +14,14 @@ ig_message = """
 # 3. `kops update --yes` this cluster
 # 4. ensure the InstanceGroups come up properly
 # 5. cordon and drain the old nodes
-# 6. Update the ClusterAutoScaler configuration. You should take this opportinity to
-#    make it auto disover if appropriate: https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/cloudprovider/aws/README.md#auto-discovery-setup
+# 6. Update the ClusterAutoScaler configuration. You should take this opportunity to
+#    make it auto discover if appropriate: https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/cloudprovider/aws/README.md#auto-discovery-setup
 # 7. `kops delete` the old, multi-subnet InstanceGroup and delete it from this file
 # 8. Delete this comment and check the whole shebang into Git
 # 9. Go engage in the relaxing activity of your choice
 
 """
 
-# TODO: Write up a read me of the changes.
 readme = """
 
 # Migration 2.6.2 -> 2.7.0
@@ -37,10 +31,10 @@ readme = """
 - renames `inventory/<inventory>/clusters/<cluster>/cluster` -> `inventory/<inventory>/clusters/<cluster>/cluster-config` to match the current standard
 - splits any Kops instance group with more than on subnet into multiple instance groups with a single subnet. 
   * it attempts to guess on the correct min/max size of the instance groups by `current min/max / number of subnets` as an integer. 
-  * it leaves the exisiting instance group in place to ease the migration
-  * there are instruction in each `inventory/<inventory>/clusters/<cluster>/cluster-config/nodes.yml`
+  * it leaves the existing instance group in place to ease the migration
+  * there are instructions in each `inventory/<inventory>/clusters/<cluster>/cluster-config/nodes.yml`
 - adds audit logging to all kops clusters if not already there
-- adds cloud labels to allow cluster auto scaler to auto detect
+- adds cloud labels to allow cluster-autoscaler auto detect
   * you may still need to add the iam policy to the nodes for it to function properly
 - updates the aws-iam-authenticator hook to note require any cloud storage
 
@@ -181,7 +175,7 @@ content: |
           resources: ["tokenreviews"]
       omitStages:
         - "RequestReceived"
-    # Get repsonses can be large; skip them.
+    # Get responses can be large; skip them.
     - level: Request
       verbs: ["get", "list", "watch"]
       resources:
@@ -234,8 +228,6 @@ content: |
         - "RequestReceived"
 """
 
-# https://reactiveops.slack.com/archives/C34KQUCDC/p1546024063081300
-
 # Magic to make block formatting in yaml.dump work as expected
 
 
@@ -254,10 +246,10 @@ def folded_unicode_representer(dumper, data):
 def literal_unicode_representer(dumper, data):
     return dumper.represent_scalar(u'tag:yaml.org,2002:str', data, style='|')
 
+
 yaml.add_representer(folded_unicode, folded_unicode_representer)
 yaml.add_representer(literal_unicode, literal_unicode_representer)
 # https://stackoverflow.com/questions/6432605/any-yaml-libraries-in-python-that-support-dumping-of-long-strings-as-block-liter
-####
 
 
 class Migration(migration.Migration):
@@ -333,7 +325,7 @@ class Migration(migration.Migration):
                                 cluster_name = node_group['metadata']['labels']['kops.k8s.io/cluster']
 
                                 # Add cloud labels to the existing Node Group
-                                # Don't clobber existin cloud labels
+                                # Don't clobber existing cloud labels
                                 clabels = node_group['spec'].get('cloudLabels')
 
                                 as_clabels = {
@@ -355,7 +347,8 @@ class Migration(migration.Migration):
                                     min_size = node_group['spec']['minSize'] / sn_count
                                     name = node_group['metadata']['name']
 
-                                    logging.info("Creating New Kops Instance Groups for {} group {}".format(cluster_item, node_group['metadata']['name']))
+                                    logging.warn("Creating New Kops Instance Groups for {} group {}. This will require manual intervention."
+                                                 .format(cluster_item, node_group['metadata']['name']))
                                     logging.warn("Best guess group sizing: MinSize = {} and MaxSize = {}".format(min_size, max_size))
 
                                     # Create new instance groups from existing instance group
@@ -403,7 +396,7 @@ class Migration(migration.Migration):
                                 file_assets = cluster_spec['fileAssets']
 
                             audit_policy_file_assets = yaml.load(audit_log_file_assets_string)
-                            
+
                             existing_audit_file_assets = [ fa for fa in file_assets if fa['name'] == audit_policy_file_assets['name'] ]
 
                             if len(existing_audit_file_assets) == 0:
