@@ -64,12 +64,21 @@ audit_log_api_server_settings = {
 
 # https://reactiveops.slack.com/archives/C34KQUCDC/p1546024063081300
 
-#### Magic to make block formatting in yaml.dump work as expected
-class folded_unicode(unicode): pass
-class literal_unicode(unicode): pass
+# Magic to make block formatting in yaml.dump work as expected
+
+
+class folded_unicode(unicode):
+    pass
+
+
+class literal_unicode(unicode):
+    pass
+
 
 def folded_unicode_representer(dumper, data):
     return dumper.represent_scalar(u'tag:yaml.org,2002:str', data, style='>')
+
+
 def literal_unicode_representer(dumper, data):
     return dumper.represent_scalar(u'tag:yaml.org,2002:str', data, style='|')
 
@@ -206,15 +215,19 @@ class Migration(migration.Migration):
                             else:
                                 cluster_spec['hooks'] = []
 
-                            ### Using the above magic to keep formatting on the literal strings in the yaml
+                            # Using the above magic to keep formatting on the literal strings in the yaml
 
-                            for policy_type in cluster_spec.get('additionalPolicies',{}):
+                            for policy_type in cluster_spec.get('additionalPolicies', {}):
                                 cluster_spec['additionalPolicies'][policy_type] = literal_unicode(cluster_spec['additionalPolicies'][policy_type])
 
-                            
                             hook = yaml.load(aws_iam_kops_hook)
                             hook['manifest'] = literal_unicode(hook['manifest'])
-                            
+
+                            fileAssets = cluster_spec.get('fileAssets')
+                            if fileAssets:
+                                if fileAssets.get('content'):
+                                    cluster_spec['fileAssets']['content'] = literal_unicode(cluster_spec['fileAssets']['content'])
+
                             cluster_spec['hooks'].append(hook)
 
                             if not cluster_spec.get('kubeAPIServer'):
