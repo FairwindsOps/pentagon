@@ -347,7 +347,8 @@ class Migration(migration.Migration):
                                     min_size = node_group['spec']['minSize'] / sn_count
                                     name = node_group['metadata']['name']
 
-                                    logging.info("Creating New Kops Instance Groups for {} group {}".format(cluster_item, node_group['metadata']['name']))
+                                    logging.warn("Creating New Kops Instance Groups for {} group {}. This will require manual intervention."
+                                                 .format(cluster_item, node_group['metadata']['name']))
                                     logging.warn("Best guess group sizing: MinSize = {} and MaxSize = {}".format(min_size, max_size))
 
                                     # Create new instance groups from existing instance group
