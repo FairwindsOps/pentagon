@@ -43,6 +43,7 @@ readme = """
 
 ## Follow up tasks:
 - the update to the aws-iam-authenticator config no longer requires any cloud storage. Delete the bucket if it exists. 
+- this version update changes the standards for the EtcD verion. This is a breaking change so it is not handled automatically in this migration.
 
 """
 
