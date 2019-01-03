@@ -25,7 +25,10 @@ class Migration(migration.Migration):
             if os.path.exists("{}/resources/admin-environment/".format(inventory_path)):
                 with self.YamlEditor("{}/resources/admin-environment/vpn.yml".format(inventory_path)) as vpn_yml:
                     data = vpn_yml.get_data()
-                    del data[2]['roles'][0]['org']
+                    try:
+                        del data[2]['roles'][0]['org']
+                    except (KeyError, IndexError) as e:
+                        logging.error(e)
 
                     self.overwrite_file("{}/resources/admin-environment/vpn.yml".format(inventory_path), yaml.safe_dump(data, default_flow_style=False))
 
@@ -36,5 +39,9 @@ class Migration(migration.Migration):
 
                 with self.YamlEditor("{}/resources/admin-environment/env.yml".format(inventory_path)) as env_yml:
                     data = env_yml.get_data()
-                    del data['vpn_bucket']
+                    try:
+                        del data['vpn_bucket']
+                    except KeyError, e:
+                        pass
+
                     self.overwrite_file("{}/resources/admin-environment/env.yml".format(inventory_path), yaml.safe_dump(data, default_flow_style=False))

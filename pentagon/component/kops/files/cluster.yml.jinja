@@ -232,18 +232,17 @@ spec:
           omitStages:
             - "RequestReceived"
   hooks:
-   - name: kops-hook-authenticator-config.service
-     before:
-       - kubelet.service
-     roles: [Master]
-     manifest: |
-       [Unit]
-         Description=Initialize AWS IAM Authenticator cert and Kube API Server config
-       [Service]
-         Type=oneshot
+  - name: kops-hook-authenticator-config.service
+    before:
+      - kubelet.service
+    roles: [Master]
+    manifest: |
+      [Unit]
+        Description=Initialize AWS IAM Authenticator cert and Kube API Server config
+      [Service]
+        Type=oneshot
         ExecStartPre=/bin/mkdir -p /srv/kubernetes/aws-iam-authenticator
         ExecStartPre=/bin/sh -c '/usr/bin/test -r /srv/kubernetes/aws-iam-authenticator/README || /bin/echo These files were created by the kops-hook-authenticator-config service, which ran aws-iam-authenticator init via a temporary Docker container. >/srv/kubernetes/aws-iam-authenticator/README'
         ExecStartPre=/bin/chown 10000:10000 /srv/kubernetes/aws-iam-authenticator
         ExecStartPost=/bin/sh -c '(/usr/bin/id -u aws-iam-authenticator >/dev/null 2>&1 || /usr/sbin/groupadd -g 10000 aws-iam-authenticator) ; (/usr/bin/id -u aws-iam-authenticator >/dev/null 2>&1 || /usr/sbin/useradd -s /usr/sbin/nologin -c "AWS IAM Authenticator configs" -d /srv/kubernetes/aws-iam-authenticator -u 10000 -g aws-iam-authenticator aws-iam-authenticator)'
         ExecStart=/bin/sh -c '(set -x ; /usr/bin/docker run --net=host --rm -w /srv/kubernetes/aws-iam-authenticator -v /srv/kubernetes/aws-iam-authenticator:/srv/kubernetes/aws-iam-authenticator --name aws-iam-authenticator-initialize gcr.io/heptio-images/authenticator:v0.3.0 init -i clustername ; /bin/mv /srv/kubernetes/aws-iam-authenticator/heptio-authenticator-aws.kubeconfig /srv/kubernetes/aws-iam-authenticator/kubeconfig.yaml)'
-

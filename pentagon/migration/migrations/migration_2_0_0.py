@@ -14,9 +14,10 @@ class Migration(migration.Migration):
             inventory_path = "inventory/{}".format(item)
             logging.debug('Inventory Path: {}'.format(inventory_path))
 
-            with self.YamlEditor('{}/config/local/vars.yml'.format(inventory_path)) as vars_yml:
-                if not vars_yml.get('HELM_HOME'):
-                    vars_yml['HELM_HOME'] = '${INFRASTRUCTURE_REPO}/helm'
-                    vars_yml.write()
+            if os.path.isfile('{}/config/local/vars.yml'.format(inventory_path)):
+                with self.YamlEditor('{}/config/local/vars.yml'.format(inventory_path)) as vars_yml:
+                    if not vars_yml.get('HELM_HOME'):
+                        vars_yml['HELM_HOME'] = '${INFRASTRUCTURE_REPO}/helm'
+                        vars_yml.write()
 
             self.delete('roles')

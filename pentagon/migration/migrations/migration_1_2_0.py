@@ -44,15 +44,15 @@ class Migration(migration.Migration):
                     account_vars[llist[0]] = llist[1]
             else:
                 account_vars = OrderedDict()
+            if os.path.isfile('{}/config/local/vars.yml'.format(inventory_path)):
+                config_vars_yml = self.YamlEditor('{}/config/local/vars.yml'.format(inventory_path))
+                config_vars_yml.update(account_vars_yml)
+                config_vars_yml.update(account_vars)
 
-            config_vars_yml = self.YamlEditor('{}/config/local/vars.yml'.format(inventory_path))
-            config_vars_yml.update(account_vars_yml)
-            config_vars_yml.update(account_vars)
+                config_vars_yml['ANSIBLE_CONFIG'] = '${{INFRASTRUCTURE_REPO}}/inventory/{}/config'.format(item)
+                config_vars_yml['KUBECONFIG'] = "${{INFRASTRUCTURE_REPO}}/inventory/{item}/config/private/kubeconfig".format(item=item)
 
-            config_vars_yml['ANSIBLE_CONFIG'] = '${{INFRASTRUCTURE_REPO}}/inventory/{}/config'.format(item)
-            config_vars_yml['KUBECONFIG'] = "${{INFRASTRUCTURE_REPO}}/inventory/{item}/config/private/kubeconfig".format(item=item)
-
-            config_vars_yml.write()
+                config_vars_yml.write()
             self.delete('{}/account'.format(inventory_path))
 
             if os.path.exists("inventory/{item}/config/local/1password.yml".format(item=item)):
