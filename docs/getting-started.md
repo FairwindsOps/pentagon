@@ -38,6 +38,7 @@ Pentagon is “batteries included”- not only does one get a network with a clu
 * `cd <project-name>-infrastructure`
 
 #### Manual steps
+* `export INFRASTRUCTURE_REPO=<absolute path to the checked out infra repo>`
 * `. yaml_source inventory/default/config/local/vars.yml`
 * `. yaml_source inventory/default/config/private/secrets.yml`
   * Sources environment variables required for the following steps. This will be required each time you work with the infrastructure repository or if you move the repository to another location.
