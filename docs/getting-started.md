@@ -37,14 +37,7 @@ Pentagon is “batteries included”- not only does one get a network with a clu
   * Arguments may also be set using environment variable in the format `PENTAGON_<argument_name_with_underscores>`.
 * `cd <project-name>-infrastructure`
 
-
-#### Automatic
-* `make all`
-  * conducts all following steps short of Kubernetes Cluster Creation
-* skip to [Create Kubernetes Cluster](#create-kubernetes-cluster)
-
 #### Manual steps
-* `pip install -r requirements.txt`
 * `. yaml_source inventory/default/config/local/vars.yml`
 * `. yaml_source inventory/default/config/private/secrets.yml`
   * Sources environment variables required for the following steps. This will be required each time you work with the infrastructure repository or if you move the repository to another location.
