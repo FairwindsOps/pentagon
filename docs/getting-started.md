@@ -52,6 +52,7 @@ Pentagon is “batteries included”- not only does one get a network with a clu
 This creates the VPC and private, public, and admin subnets in that VPC for non Kubernetes resources. Read more about networking [here](network.md).
 * `cd inventory/default/terraform`
 * Edit `aws_vpc.auto.tfvars` and verify the generated `aws_azs` actually exist in `aws_region`
+* `terraform init`
 * `terraform plan`
 * `terraform apply` 
 * In `inventory/default/clusters/*/vars.yml`, set `VPC_ID` using the newly created VPC ID. You can find that ID in Terraform output or using the AWS web console.
@@ -60,8 +61,8 @@ This creates the VPC and private, public, and admin subnets in that VPC for non 
 If you don't already have a Route53 Hosted Zone configured, do that now.
 * Create a Route53 Hosted Zone (e.g. `pentagon.mycompany.com`)
 * In `inventory/default/clusters/*/vars.yml`
-  * Set `cluster_name` to a hostname that ends with your hosted zone (e.g. `working-1.pentagon.mycompany.com`)
-  * Set `dns_zone` to your Hosted Zone (e.g. `pentagon.mycompany.com`)
+  * Set `CLUSTER_NAME` to a hostname that ends with your hosted zone (e.g. `working-1.pentagon.mycompany.com`)
+  * Set `DNS_ZONE` to your Hosted Zone (e.g. `pentagon.mycompany.com`)
 
 ### Setup a VPN
 This creates a AWS instance running [OpenVPN](https://openvpn.net/). Read more about the VPN [here](vpn.md).
