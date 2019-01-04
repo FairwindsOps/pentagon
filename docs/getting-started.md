@@ -43,6 +43,8 @@ Pentagon is “batteries included”- not only does one get a network with a clu
 * `. yaml_source inventory/default/config/private/secrets.yml`
   * Sources environment variables required for the following steps. This will be required each time you work with the infrastructure repository or if you move the repository to another location.
 * `bash inventory/default/config/local/local-config-init`
+* If using AWS, create an S3 bucket named `<project-name>-infrastructure` in your AWS account. Terraform will store its state file here. Make sure the AWS IAM user has write access to it. 
+  * `aws s3 mb s3://<project-name>-infrastructure`
 
 ## AWS
 
