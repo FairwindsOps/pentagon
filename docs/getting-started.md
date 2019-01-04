@@ -29,7 +29,7 @@ Pentagon is “batteries included”- not only does one get a network with a clu
 
 ## Quick Start
 ### Create a AWS Pentagon Project
-* `pentagon start-project <project-name> --aws-access-key <aws-access-key> --aws-secret-key <aws-secret-key> --aws-default-region <aws-default-region> --dns-zone <your-dns-zone>`
+* `pentagon start-project <project-name> --aws-access-key <aws-access-key> --aws-secret-key <aws-secret-key> --aws-default-region <aws-default-region> --dns-zone <your-dns-zone-name>`
 ### Create a GCP/GKE Pentagon Project
 * `pentagon --log-level=DEBUG start-project --cloud=gcp  <project-name> --gcp-zones=<zone_1>,<zone_2>,..,<zone_n> --gcp-project <gcp_project_name> --gcp-region <gcp_region>`
 ###
@@ -51,16 +51,17 @@ Pentagon is “batteries included”- not only does one get a network with a clu
 ### Create a VPC
 This creates the VPC and private, public, and admin subnets in that VPC for non Kubernetes resources. Read more about networking [here](network.md).
 * `cd inventory/default/terraform`
-* Edit `aws_vpc.auto.tfvars`and verify the generated `aws_azs` actually exist in `aws_region`
-* `make all`
+* Edit `aws_vpc.auto.tfvars` and verify the generated `aws_azs` actually exist in `aws_region`
+* `terraform plan`
+* `terraform apply` 
 * In `inventory/default/clusters/*/vars.yml`, set `VPC_ID` using the newly created VPC ID. You can find that ID in Terraform output or using the AWS web console.
 
 ### Configure DNS and Route53
 If you don't already have a Route53 Hosted Zone configured, do that now.
 * Create a Route53 Hosted Zone (e.g. `pentagon.mycompany.com`)
 * In `inventory/default/clusters/*/vars.yml`
-  * Set `CLUSTER_NAME` to a hostname that ends with your hosted zone (e.g. `working-1.pentagon.mycompany.com`)
-  * Set `DNS_ZONE` to your Hosted Zone (e.g. `pentagon.mycompany.com`)
+  * Set `cluster_name` to a hostname that ends with your hosted zone (e.g. `working-1.pentagon.mycompany.com`)
+  * Set `dns_zone` to your Hosted Zone (e.g. `pentagon.mycompany.com`)
 
 ### Setup a VPN
 This creates a AWS instance running [OpenVPN](https://openvpn.net/). Read more about the VPN [here](vpn.md).
