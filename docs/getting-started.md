@@ -29,7 +29,7 @@ Pentagon is “batteries included”- not only does one get a network with a clu
 
 ## Quick Start
 ### Create a AWS Pentagon Project
-* `pentagon start-project <project-name> --aws-access-key <aws-access-key> --aws-secret-key <aws-secret-key> --aws-default-region <aws-default-region> --dns-zone <your-dns-zone>`
+* `pentagon start-project <project-name> --aws-access-key <aws-access-key> --aws-secret-key <aws-secret-key> --aws-default-region <aws-default-region> --dns-zone <your-dns-zone-name>`
 ### Create a GCP/GKE Pentagon Project
 * `pentagon --log-level=DEBUG start-project --cloud=gcp  <project-name> --gcp-zones=<zone_1>,<zone_2>,..,<zone_n> --gcp-project <gcp_project_name> --gcp-region <gcp_region>`
 ###
@@ -37,26 +37,24 @@ Pentagon is “batteries included”- not only does one get a network with a clu
   * Arguments may also be set using environment variable in the format `PENTAGON_<argument_name_with_underscores>`.
 * `cd <project-name>-infrastructure`
 
-
-#### Automatic
-* `make all`
-  * conducts all following steps short of Kubernetes Cluster Creation
-* skip to [Create Kubernetes Cluster](#create-kubernetes-cluster)
-
 #### Manual steps
-* `pip install -r requirements.txt`
+* `export INFRASTRUCTURE_REPO=<absolute path to the checked out infra repo>`
 * `. yaml_source inventory/default/config/local/vars.yml`
 * `. yaml_source inventory/default/config/private/secrets.yml`
   * Sources environment variables required for the following steps. This will be required each time you work with the infrastructure repository or if you move the repository to another location.
 * `bash inventory/default/config/local/local-config-init`
+* If using AWS, create an S3 bucket named `<project-name>-infrastructure` in your AWS account. Terraform will store its state file here. Make sure the AWS IAM user has write access to it. 
+  * `aws s3 mb s3://<project-name>-infrastructure`
 
 ## AWS
 
 ### Create a VPC
 This creates the VPC and private, public, and admin subnets in that VPC for non Kubernetes resources. Read more about networking [here](network.md).
 * `cd inventory/default/terraform`
-* Edit `aws_vpc.auto.tfvars`and verify the generated `aws_azs` actually exist in `aws_region`
-* `make all`
+* Edit `aws_vpc.auto.tfvars` and verify the generated `aws_azs` actually exist in `aws_region`
+* `terraform init`
+* `terraform plan`
+* `terraform apply` 
 * In `inventory/default/clusters/*/vars.yml`, set `VPC_ID` using the newly created VPC ID. You can find that ID in Terraform output or using the AWS web console.
 
 ### Configure DNS and Route53
