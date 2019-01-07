@@ -43,7 +43,7 @@ Pentagon is “batteries included”- not only does one get a network with a clu
 * `. yaml_source inventory/default/config/private/secrets.yml`
   * Sources environment variables required for the following steps. This will be required each time you work with the infrastructure repository or if you move the repository to another location.
 * `bash inventory/default/config/local/local-config-init`
-* If using AWS, create an S3 bucket named `<project-name>-infrastructure` in your AWS account. Terraform will store its state file here. Make sure the AWS IAM user has write access to it. 
+* If using AWS, create an S3 bucket named `<project-name>-infrastructure` in your AWS account. Terraform will store its state file here. Make sure the AWS IAM user has write access to it.
   * `aws s3 mb s3://<project-name>-infrastructure`
 
 ## AWS
@@ -54,7 +54,7 @@ This creates the VPC and private, public, and admin subnets in that VPC for non 
 * Edit `aws_vpc.auto.tfvars` and verify the generated `aws_azs` actually exist in `aws_region`
 * `terraform init`
 * `terraform plan`
-* `terraform apply` 
+* `terraform apply`
 * In `inventory/default/clusters/*/vars.yml`, set `VPC_ID` using the newly created VPC ID. You can find that ID in Terraform output or using the AWS web console.
 
 ### Configure DNS and Route53
@@ -80,8 +80,7 @@ Pentagon uses Kops to create clusters in AWS. The default layout creates configu
 
 * Make sure your KOPS variables are set correctly with `. yaml_source inventory/default/config/local/vars.yml && . yaml_source inventory/default/config/private/secrets.yml`
 * Move into to the path for the cluster you want to work on with `cd inventory/default/clusters/<production|working>`
-* If you are using the `aws_vpc` Terraform provided, ensure you have set `nat_gateways` in the `vars.yml` for each cluster and that they the order of the `nat_gateway` ids matches the order of the subnets listed. This will ensure that the Kops cluster will have a properly configured network with the private subnets associated to the existing NAT gateways.  
-* You can do this using the Makefile `make vpc_id` and `make nat_gateways`.
+* If you are using the `aws_vpc` Terraform provided, ensure you have set `nat_gateways` in the `vars.yml` for each cluster and that they the order of the `nat_gateway` ids matches the order of the subnets listed. This will ensure that the Kops cluster will have a properly configured network with the private subnets associated to the existing NAT gateways.
 
 ### Create Kubernetes Cluster
 * Use the [Kops component](components.md#kopscluster) to create your cluster.

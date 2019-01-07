@@ -52,7 +52,7 @@ Per user configuration needs to be generated. These files cannot directly use th
 
 ### VPC
 
-The VPC Terraform code is in `default/vpc` and has a `Makefile` to help with the commands needed.
+The VPC Terraform code is in `default/vpc`.
 
 ### Kubernetes
 
