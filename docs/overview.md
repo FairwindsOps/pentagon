@@ -11,7 +11,7 @@ After running `pentagon start-project` you will have a directory with a layout s
 ```
 See also [Extended Layout](#extended-layout-description)
 
-Generally speaking, the layout of the infrastructure repository is heierachical. That is to say, higher level directories contain scripts, resources, and variables that are intended to be used earlier in the creation of your infrastructure. 
+Generally speaking, the layout of the infrastructure repository is heierachical. That is to say, higher level directories contain scripts, resources, and variables that are intended to be used earlier in the creation of your infrastructure.
 
 ## Core Directories
 
@@ -19,11 +19,11 @@ Generally speaking, the layout of the infrastructure repository is heierachical.
 The inventory directory is used to store an arbitrary segment of your infrastructure. It can be a separate AWS account, AWS VPC, GCP Project or, GCP Netrowk. It can be as fine grained as you like, but the config directory in each "inventory item" is scoped to, at most, one AWS Account+VPC or one GCP Project+Network.  By default, the `inventory` directoy includes one `default` directory with configurtion for one VPC and two Kops clusters. You can pass `pentagon start-project` the `--no-configure` flag to build your own.
 
 ### inventory/(default)/config/
-The config directory is separated into `local` and `private`. Files, scripts, and templates in `config/local` are checked into source control and should not contain any workstation specific values. 
+The config directory is separated into `local` and `private`. Files, scripts, and templates in `config/local` are checked into source control and should not contain any workstation specific values.
 
-`config/local/env-vars.sh` uses a specific list of variable names, locates the values in `config/local/vars.yml` and `config/private/secrets.yml` and exports them as an environment variable. These environment variables are used throughout the infrastructure repository so make sure you `source config/local/env-vars.sh`. 
+`config/local/env-vars.sh` uses a specific list of variable names, locates the values in `config/local/vars.yml` and `config/private/secrets.yml` and exports them as an environment variable. These environment variables are used throughout the infrastructure repository so make sure you `source config/local/env-vars.sh`.
 
-Some configurations require absolute paths which, if checked into source control, can make working with teams challenging. The `config/local/local-config-init` script makes this easier by providing a fast way to generate workstation specific configurations from the `ansible.cfg-default` and `ssh_config-default` template files. The generated workstation specific configuration files are written to `config/private`. 
+Some configurations require absolute paths which, if checked into source control, can make working with teams challenging. The `config/local/local-config-init` script makes this easier by providing a fast way to generate workstation specific configurations from the `ansible.cfg-default` and `ssh_config-default` template files. The generated workstation specific configuration files are written to `config/private`.
 
 `config/private/ssh_config` and `config/private/ansible.cfg` greatly simplify interaction with your cloud VMs. It is configured to automatically use the correct key and user name based on the IP address of the host. You can either use the command `ssh -F '${INFRASTRUCTURE_REPO}/config/local/ssh_config` or alias SSH with `alias ssh="ssh -F '${INFRASTRUCTURE_REPO}/config/local/ssh_config'`.
 
@@ -69,19 +69,18 @@ This is not checked into Git.
 ## Extended Layout Description
 
 ```
-├── Makefile
 ├── README.md
 ├── ansible-requirements.yml
 ├── config.yml
 ├── inventory
-│   └── default                              * Directory for default cloud 
+│   └── default                              * Directory for default cloud
 │       ├── clusters                         * Directory for Clusters
 │       │   ├── production                   * Production Cluster Directory
 │       │   │   └── vars.yml                 * Variables specific to production. Used by `pentagon add kops.cluster`
 │       │   └── working                      * Working Cluster Directory
 │       │       └── vars.yml                 * Variables specific to working. Used by `pentagon add kops.cluster`
 │       ├── config                           * Configuration Directory
-│       │   ├── local                        * Local, non-secret configuration 
+│       │   ├── local                        * Local, non-secret configuration
 │       │   │   ├── ansible.cfg-default      * templating code to create private configuration
 │       │   │   ├── local-config-init
 │       │   │   ├── ssh_config-default
@@ -105,12 +104,11 @@ This is not checked into Git.
 │       │       ├── env.yml
 │       │       └── vpn.yml
 │       └── terraform                        * Terraform for entire inventory item
-│           ├── Makefile
 │           ├── aws_vpc.auto.tfvars
 │           ├── aws_vpc.tf
 │           ├── aws_vpc_variables.tf
 │           ├── backend.tf
 │           └── provider.tf
-├── plugins                                  * Ansible plugins 
+├── plugins                                  * Ansible plugins
 └── requirements.txt
 ```
