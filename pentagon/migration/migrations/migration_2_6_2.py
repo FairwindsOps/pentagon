@@ -301,18 +301,17 @@ class Migration(migration.Migration):
                                         for document in yaml.load_all(yaml_file.read()):
                                             if document.get('kind') == 'InstanceGroup':
                                                 if document['spec']['role'] == 'Node':
-                                                    for hook in document['spec'].get('hooks',[]):
+                                                    for hook in document['spec'].get('hooks', []):
                                                         if hook.get('manifest') is not None:
                                                             hook['manifest'] = literal_unicode(hook['manifest'])
                                                     nodes.append(document)
                                                 elif document['spec']['role'] == 'Master':
-                                                    for hook in document['spec'].get('hooks',[]):
+                                                    for hook in document['spec'].get('hooks', []):
                                                         if hook.get('manifest') is not None:
                                                             hook['manifest'] = literal_unicode(hook['manifest'])
                                                     masters.append(document)
                                                 else:
                                                     continue
-
 
                                     os.remove("{}/cluster-config/{}".format(item_path, f))
                             with open("{}/cluster-config/{}".format(item_path, 'nodes.yml'), 'w') as nodes_file:
@@ -321,13 +320,13 @@ class Migration(migration.Migration):
                             with open("{}/cluster-config/{}".format(item_path, 'masters.yml'), 'w') as masters_file:
                                 masters_file.write(yaml.dump_all(masters, default_flow_style=False))
 
-                        # becauce the nodes.yml may hav multiple documents, we need to abuse the YamlEditor class a little bit
+                        # Because the nodes.yml may have multiple documents, we need to abuse the YamlEditor class a little bit
                         with open(old_node_groups) as oig:
                             new_node_groups = []
                             for node_group in yaml.load_all(oig.read()):
 
-                                # Keep exisiting node group in the file to eash manual steps
-                                for hook in node_group['spec'].get('hooks',[]):
+                                # Keep exisiting node group in the file to ease manual steps
+                                for hook in node_group['spec'].get('hooks', []):
                                     if hook.get('manifest') is not None:
                                         hook['manifest'] = literal_unicode(hook['manifest'])
 
@@ -388,19 +387,27 @@ class Migration(migration.Migration):
 
                             hooks = cluster_spec.get("hooks")
                             if hooks:
+                                logging.debug(hooks)
                                 for hook in hooks:
                                     if hook['name'] == 'kops-hook-authenticator-config.service':
-                                        hooks.pop(hooks.index(hook))
-                            else:
-                                cluster_spec['hooks'] = []
+                                        kops_hook_index = hooks.index(hook)
+                                        logging.debug("Found kops auth hook at index %d", kops_hook_index)
+                                    else:
+                                        logging.debug("Found other existing hook %s", hook['name'])
+                                        hook['manifest'] = literal_unicode(hook['manifest'])
 
-                            # Using the above magic to keep formatting on the literal strings in the yaml
+                                logging.debug("Removing existing kops-hook-authenticator-config.service at %d", kops_hook_index)
+                                hooks.pop(kops_hook_index)
+                            else:
+                                logging.debug("No hooks found in cluster spec.")
+                                cluster_spec['hooks'] = []
 
                             for policy_type in cluster_spec.get('additionalPolicies', {}):
                                 cluster_spec['additionalPolicies'][policy_type] = literal_unicode(cluster_spec['additionalPolicies'][policy_type])
 
                             hook = yaml.load(aws_iam_kops_hook)
                             hook['manifest'] = literal_unicode(hook['manifest'])
+                            cluster_spec['hooks'].append(hook)
 
                             file_assets = cluster_spec.get('fileAssets')
                             if not file_assets:
@@ -417,8 +424,6 @@ class Migration(migration.Migration):
                             for fa in file_assets:
                                 if fa.get('content'):
                                     fa['content'] = literal_unicode(fa['content'])
-
-                            cluster_spec['hooks'].append(hook)
 
                             if not cluster_spec.get('kubeAPIServer'):
                                 cluster_spec['kubeAPIServer'] = {}
