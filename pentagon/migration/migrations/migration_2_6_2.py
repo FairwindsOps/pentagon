@@ -24,7 +24,7 @@ ig_message = """
 
 readme = """
 
-# Migration 2.6.2 -> 2.7.0
+# Migration 2.6.2 -> 2.7.1
 
 ## This migration:
 - removes older artifacts like the `post-kops.sh` if they exist
@@ -255,7 +255,7 @@ yaml.add_representer(literal_unicode, literal_unicode_representer)
 
 class Migration(migration.Migration):
     _starting_version = '2.6.2'
-    _ending_version = '2.7.0'
+    _ending_version = '2.7.1'
 
     _readme_string = readme
 
@@ -301,18 +301,25 @@ class Migration(migration.Migration):
                                         for document in yaml.load_all(yaml_file.read()):
                                             if document.get('kind') == 'InstanceGroup':
                                                 if document['spec']['role'] == 'Node':
+                                                    for hook in document['spec'].get('hooks',[]):
+                                                        if hook.get('manifest') is not None:
+                                                            hook['manifest'] = literal_unicode(hook['manifest'])                                                      
                                                     nodes.append(document)
                                                 elif document['spec']['role'] == 'Master':
+                                                    for hook in document['spec'].get('hooks',[]):
+                                                        if hook.get('manifest') is not None:
+                                                            hook['manifest'] = literal_unicode(hook['manifest'])
                                                     masters.append(document)
                                                 else:
                                                     continue
+
 
                                     os.remove("{}/cluster-config/{}".format(item_path, f))
                             with open("{}/cluster-config/{}".format(item_path, 'nodes.yml'), 'w') as nodes_file:
                                 nodes_file.write(yaml.dump_all(nodes, default_flow_style=False))
 
                             with open("{}/cluster-config/{}".format(item_path, 'masters.yml'), 'w') as masters_file:
-                                masters_file.write(yaml.dump_all(nodes, default_flow_style=False))
+                                masters_file.write(yaml.dump_all(masters, default_flow_style=False))
 
                         # becauce the nodes.yml may hav multiple documents, we need to abuse the YamlEditor class a little bit
                         with open(old_node_groups) as oig:
@@ -320,6 +327,10 @@ class Migration(migration.Migration):
                             for node_group in yaml.load_all(oig.read()):
 
                                 # Keep exisiting node group in the file to eash manual steps
+                                for hook in node_group['spec'].get('hooks'):
+                                    if hook.get('manifest') is not None:
+                                        hook['manifest'] = literal_unicode(hook['manifest'])
+                                
                                 new_node_groups.append(node_group)
 
                                 sn_count = len(node_group['spec']['subnets'])
