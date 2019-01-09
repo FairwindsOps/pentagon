@@ -10,9 +10,9 @@ Pentagon is a framework for generating an Infrastructure As Code Repository (IAC
 
 It is loosely modeled after Rails or Django and aims to provide an extensible framework for component modules. These component modules may be native or external but when external modules are installed, the interface is transparent to the user. Pentagon generators produce configuration files that should have sensible defaults provided for most values, but can be overridden by configuration.
 
-### Pentagon provides a way to keep you IACRs up to date.
+### Pentagon provides a way to keep your IACRs up to date.
 
-As new decisions are made, new features are added, and standards or requirements change, it is important to keep you IACR up to date. As Pentagon versions changes, so should your IACRs. Pentagon provides a migration framework so that updating the configuration and content of you IACR is defined in code. Any structure or code change should involve a new versioned migration. Exceptions may be where an update would be a breaking change or where large scale recreation of assets is required.
+As new decisions are made, new features are added, and standards or requirements change, it is important to keep your IACR up to date. As Pentagon versions changes, so should your IACRs. Pentagon provides a migration framework so that updating the configuration and content of your IACR is defined in code. Any structure or code change should involve a new versioned migration. Exceptions may be where an update would be a breaking change or where large scale recreation of assets is required.
 
 ## Scope
 
@@ -28,6 +28,7 @@ As new decisions are made, new features are added, and standards or requirements
 - Automations and scripts to support workflows for infrastructure management practices
 - Tooling to support interaction with the infrastructure repository
 - Creating, or modifying any infrastructure resources
-Architecture
+
+## Architecture
 
 TBD
