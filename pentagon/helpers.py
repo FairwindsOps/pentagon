@@ -35,10 +35,11 @@ def render_template(template_name, template_path, target, context, delete_templa
 
     with open(target, 'w+') as vars_file:
         try:
-            template = jinja2.Environment(loader=jinja2.FileSystemLoader(template_path)).get_template(template_name)
+            env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_path))
             for k,v in jinja_filters.get_jinja_filters().items():
-                template.filters[k] = v
+                env.filters[k] = v
 
+            template = env.get_template(template_name)
             vars_file.write(template.render(context))
         except Exception, e:
             logging.error("Error writing {}. {}".format(target, traceback.print_exc(e)))
