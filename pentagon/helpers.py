@@ -8,6 +8,7 @@ import oyaml as yaml
 from Crypto.PublicKey import RSA
 from stat import *
 from collections import OrderedDict
+import filters as jinja_filters
 
 
 def render_template(template_name, template_path, target, context, delete_template=True, overwrite=False):
@@ -35,6 +36,9 @@ def render_template(template_name, template_path, target, context, delete_templa
     with open(target, 'w+') as vars_file:
         try:
             template = jinja2.Environment(loader=jinja2.FileSystemLoader(template_path)).get_template(template_name)
+            for k,v in jinja_filters.get_jinja_filters().items():
+                template.filters[k] = v
+
             vars_file.write(template.render(context))
         except Exception, e:
             logging.error("Error writing {}. {}".format(target, traceback.print_exc(e)))
