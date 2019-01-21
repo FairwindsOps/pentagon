@@ -1,7 +1,6 @@
 import re
 
 
-
 def register_filters():
 	"""Register a function with decorator"""
 	registry = {}
@@ -13,7 +12,6 @@ def register_filters():
 
 
 filter = register_filters()
-
 
 
 def get_jinja_filters():
