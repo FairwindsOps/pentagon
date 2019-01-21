@@ -2,7 +2,7 @@ import re
 
 
 
-def get_filters():
+def register_filters():
 	"""Register a function with decorator"""
 	registry = {}
 	def registrar(func):
@@ -12,7 +12,13 @@ def get_filters():
 	return registrar
 
 
-filter = get_filters()
+filter = register_filters()
+
+
+
+def get_jinja_filters():
+	"""Return all registered custom jinja filters"""
+	return filter.all
 
 
 @filter
@@ -24,11 +30,3 @@ def regex_trim(input, regex, replace=''):
 	replace (string - optional): a string to replace any matches with.  Defaults to trimming the match.
 	"""
 	return re.sub(regex, replace, input)
-
-
-
-
-
-if __name__ == '__main__':
-	for k,v in filter.all.items():
-		print(v)
