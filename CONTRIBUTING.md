@@ -18,7 +18,15 @@ o
     virtualenv venv 
     source venv/bin/activate
     ```
-3. Finally, do `pip install -e . ` to install pentagon into the venv. The `-e` means that it will take any of your file changes into account.
+3. Finally, install pentagon into the venv. The `-e` means that it will take any of your file changes into account.
+    ```
+    pip install -e . 
+    ```
+4. If you run `which pentagon` it should point at the venv inside the newly created repo.
+    ```
+    $ which pentagon
+    .../pentagon/venv/bin/pentagon
+    ```
 
 
 ## Getting Started

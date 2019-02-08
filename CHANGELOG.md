@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Added
 - Instructions on how to setup the development environment.
+
+
 ## 2.7.0 - 2019-1-3
 
 ## Updated
