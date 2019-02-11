@@ -4,6 +4,30 @@ Issues, whether bugs, tasks, or feature requests are essential for keeping Penta
 get things working in your environment. There are a few guidelines that we
 need contributors to follow so that we can have a chance of keeping on
 top of things.
+o
+
+## Setting up your development environment
+
+1. Clone this repo and cd into it
+    ```
+    git clone git@github.com:reactiveops/pentagon.git
+    cd pentagon
+    ```
+2. Create a virtual environment and source it. You need to source everytime you want to develop pentagon.
+    ```
+    virtualenv venv 
+    source venv/bin/activate
+    ```
+3. Finally, install pentagon into the venv. The `-e` means that it will take any of your file changes into account.
+    ```
+    pip install -e . 
+    ```
+4. If you run `which pentagon` it should point at the venv inside the newly created repo.
+    ```
+    $ which pentagon
+    .../pentagon/venv/bin/pentagon
+    ```
+
 
 ## Getting Started
 
