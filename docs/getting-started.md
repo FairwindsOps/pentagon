@@ -25,6 +25,7 @@ Pentagon is “batteries included”- not only does one get a network with a clu
 ## Installation
 * `pip install pentagon`
 
+# Basic Usage
 ## Quick Start
 ### Create a AWS Pentagon Project
 * `pentagon start-project <project-name> --aws-access-key <aws-access-key> --aws-secret-key <aws-secret-key> --aws-default-region <aws-default-region> --dns-zone <your-dns-zone-name>`
@@ -44,6 +45,7 @@ The `pentagon` commands will take no action in your cloud infrastructure. You wi
 * `. yaml_source inventory/default/config/private/secrets.yml`
   * Sources environment variables required for the following steps. This will be required each time you work with the infrastructure repository or if you move the repository to another location.
 * `bash inventory/default/config/local/local-config-init`
+* `. yaml_source inventory/default/config/local/vars.yml`
 * If using AWS, create an S3 bucket named `<project-name>-infrastructure` in your AWS account. Terraform will store its state file here. Make sure the AWS IAM user has write access to it.
   * `aws s3 mb s3://<project-name>-infrastructure`
 
@@ -69,6 +71,7 @@ If you don't already have a Route53 Hosted Zone configured, do that now.
 ### Setup a VPN
 This creates a AWS instance running [OpenVPN](https://openvpn.net/). Read more about the VPN [here](vpn.md).
 * `cd $INFRASTRUCTURE_REPO`
+* `export INVENTORY=default`
 * `ansible-galaxy install -r ansible-requirements.yml`
 * `cd inventory/default/resources/admin-environment`
 * In `env.yml`, set the list of user names that should have access to the VPN under `openvpn_clients`. You can add more later.
@@ -102,19 +105,25 @@ Pentagon uses Kops to create clusters in AWS. The default layout creates configu
 
 ## GCP/GKE
 
-### Create Kubernetes Cluster
-* Use the [Gcp component](components.md#gcp.cluster) to create your cluster.
+This component is deprecated and not maintained. We are working on a new Terraform module to manage GKE clusters. Use this at your own risk
 
-### Creating Resources Outside of Kubernetes
+
+### Intialize Terraform
+* Make backend: `gsutil mb gs://<project_name>-infrastructure`
+* `cd inventory/default/terraform/ && terraform init`
+
+### Create Kubernetes Cluster
+* `cd ${INFRASTRUCTURE_REPO}/inventory/default/clusters/*`
+* `bash create_cluster.sh`
+
+## Creating Resources Outside of Kubernetes
 
 Typically infrastructure will be required outside of your Kubernetes cluster. Other EC2, RDS, or Elasticache instances, etc are often require for an application.
 
 Pentagon convention suggests you use Ansible to create these resources and that the Ansible playbooks can be saved in the `inventory/default/resources/` or the `inventory/default/clusters/<cluster>/resources/` directory. This depends on the scope with which the play book will be utilized. If the resources are not specific to either cluster, then we suggest you save it at the `default/resources/` level. Likewise, if it is a resource that will only be used by one cluster, such as a staging database or a production database, then we suggest writing the Ansible playbook at the `default/cluster/<cluster>/resources/` level. Writing Ansible roles can be very helpful to DRY up your resource configurations.
 
 
-======================================
-
-## Advanced Project Initialization
+# Advanced Project Initialization
 
 If you wish to utilize the templating ability of the `pentagon start-project` command, but need to modify the defaults, a comprehensive list of command line flags (listed below) should be able to customize the output of the `pentagon start-project` command to your liking.
 
