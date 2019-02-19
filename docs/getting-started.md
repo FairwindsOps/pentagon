@@ -16,16 +16,14 @@ Pentagon is “batteries included”- not only does one get a network with a clu
 * python2 >= 2.7 [Install Python](https://www.python.org/downloads/)
 * pip [Install Pip](https://pip.pypa.io/en/stable/installing/)
 * git [Install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* Terraform >=0.9 [Install Terraform ](https://www.terraform.io/downloads.html)
+* Terraform [Install Terraform ](https://www.terraform.io/downloads.html)
 * Ansible [Install Ansible](http://docs.ansible.com/ansible/latest/intro_installation.html)
 * Kubectl [Install kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 * kops [Install kops](https://github.com/kubernetes/kops#installing)
 * jq [Install JQ](https://stedolan.github.io/jq/download/)
 
 ## Installation
-* `pip install git+https://github.com/reactiveops/pentagon.git`
-  * May require the `python-dev` and `libffi-dev` packages on some Linux distributions
-  * Not necessary, but we suggest installing Pentagon into a [VirtualEnv](https://virtualenv.pypa.io/en/stable/)
+* `pip install pentagon`
 
 ## Quick Start
 ### Create a AWS Pentagon Project
@@ -35,10 +33,13 @@ Pentagon is “batteries included”- not only does one get a network with a clu
 ###
 * With the above basic options set, defaults will be set for you. See [Advanced Project Initialization](#advanced-project-initialization) for more options.
   * Arguments may also be set using environment variable in the format `PENTAGON_<argument_name_with_underscores>`.
-* `cd <project-name>-infrastructure`
+  * Or using a yaml file with key value pairs where the key is the option  name
+* Enter the directory project`cd <project-name>-infrastructure`
 
-#### Manual steps
-* `export INFRASTRUCTURE_REPO=<absolute path to the checked out infra repo>`
+#### Next steps
+The `pentagon` commands will take no action in your cloud infrastructure. You will need to run these commands to finish creation of a default project
+
+* `export INFRASTRUCTURE_REPO=$(pwd)`
 * `. yaml_source inventory/default/config/local/vars.yml`
 * `. yaml_source inventory/default/config/private/secrets.yml`
   * Sources environment variables required for the following steps. This will be required each time you work with the infrastructure repository or if you move the repository to another location.
@@ -56,6 +57,7 @@ This creates the VPC and private, public, and admin subnets in that VPC for non 
 * `terraform plan`
 * `terraform apply`
 * In `inventory/default/clusters/*/vars.yml`, set `VPC_ID` using the newly created VPC ID. You can find that ID in Terraform output or using the AWS web console.
+* Also, add the `aws_nat_gateway_ids` from the Terraform output to `inventory/default/clusters/*/vars.yml` as a list `nat_gateways` 
 
 ### Configure DNS and Route53
 If you don't already have a Route53 Hosted Zone configured, do that now.
@@ -66,7 +68,8 @@ If you don't already have a Route53 Hosted Zone configured, do that now.
 
 ### Setup a VPN
 This creates a AWS instance running [OpenVPN](https://openvpn.net/). Read more about the VPN [here](vpn.md).
-* From the root of your project run `ansible-galaxy install -r ansible-requirements.yml`
+* `cd $INFRASTRUCTURE_REPO`
+* `ansible-galaxy install -r ansible-requirements.yml`
 * `cd inventory/default/resources/admin-environment`
 * In `env.yml`, set the list of user names that should have access to the VPN under `openvpn_clients`. You can add more later.
 * Run Ansible a few times
@@ -84,7 +87,7 @@ Pentagon uses Kops to create clusters in AWS. The default layout creates configu
 
 ### Create Kubernetes Cluster
 * Use the [Kops component](components.md#kopscluster) to create your cluster.
-* By default a `vars.yml` will be created at `inventory/default/clusters/working` and `inventory/default/clusters/production`. Those files are sufficient to create a cluster using the kops.cluster but you will need to enter `nat_gateways` and `vpc-id` as described in [kops component documentation](components.md#kopscluster)
+* By default a `vars.yml` will be created at `inventory/default/clusters/working` and `inventory/default/clusters/production`. Those files are sufficient to create a cluster using the kops.cluster but you will need to enter `nat_gateways` and `vpc_id` as described in [kops component documentation](components.md#kopscluster)
 
 * To generate the cluster configs run `pentagon --log-level=DEBUG add kops.cluster -f vars.yml` in the directory of the cluster you wish to create.
 * To actually create the cluster: `cd cluster` then `kops.sh`
