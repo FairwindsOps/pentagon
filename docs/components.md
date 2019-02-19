@@ -46,6 +46,9 @@ Options:
 
 ### gcp.nodepool
 
+**This component is deprecated and not maintained. We are working on a new Terraform module to manage GKE clusters. Use this at your own risk**
+
+
 - add:
     - Creates `./<nodepool_name>/create_nodepool.sh` compiled from the data passed in.
     - `bash ./<nodepool_name>/create_nodepool.sh` will create the nodepool as configured

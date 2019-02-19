@@ -302,6 +302,7 @@ class GCPPentagonProject(PentagonProject):
             'cloud': 'gcp',
             'infrastructure_bucket': self._infrastructure_bucket,
             'gcp_zone': self.get_data('zones')[0],
+            'project_name': self._name
         }
 
         self._context = merge_dict(self._data, merge_dict(context, self.default_context))
