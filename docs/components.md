@@ -20,6 +20,8 @@ Options:
 
 ### gcp.cluster
 
+**This component is deprecated and not maintained. We are working on a new Terraform module to manage GKE clusters. Use this at your own risk**
+
 - add:
     - Creates `./<cluster_name>/create_cluster.sh` compiled from the data passed in.
     - `bash ./<cluster_name>/create_cluster.sh` will create the cluster as configured.
@@ -43,6 +45,9 @@ Options:
       ```
 
 ### gcp.nodepool
+
+**This component is deprecated and not maintained. We are working on a new Terraform module to manage GKE clusters. Use this at your own risk**
+
 
 - add:
     - Creates `./<nodepool_name>/create_nodepool.sh` compiled from the data passed in.
