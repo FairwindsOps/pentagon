@@ -2,7 +2,6 @@ from copy import deepcopy
 
 
 from pentagon import migration
-from pentagon.migration import *
 import yaml
 
 readme = """
@@ -63,8 +62,6 @@ class Migration(migration.Migration):
 
     def run(self):
 
-        old_nodes_file_name = "nodes.yml"
-
         for item in self.inventory:
             inventory_path = "inventory/{}".format(item)
             # If there are no clusters, move on.
@@ -78,7 +75,9 @@ class Migration(migration.Migration):
                 # There is a small amount of variation here where some cluster config
                 # directories are `cluster` and some are `cluster-config`
                 # Align these
+                
                 if os.path.isdir("{}/cluster".format(item_path)):
+                    logging.info("Moving {item_path}/cluster to {item_path}/cluster-config".format(item_path))
                     self.move("{}/cluster".format(item_path), "{}/cluster-config".format(item_path))
 
                 if os.path.isdir(item_path) and os.path.exists("{}/cluster-config/kops.sh".format(item_path)):
