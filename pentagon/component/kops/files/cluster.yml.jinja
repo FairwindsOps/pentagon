@@ -3,6 +3,8 @@ kind: Cluster
 metadata:
   name: {{ cluster_name }}
 spec:
+  kubelet:
+    anonymousAuth: false
   {%- if additional_policies %}
   additionalPolicies:
    {{ additional_policies|indent(4) }}

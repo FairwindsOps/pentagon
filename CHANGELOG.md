@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Instructions on how to setup the development environment.
 - revised cli help text
 - migrations for kops settings that were missed in the last migration
-
+- made `anonymousAuth: false` default for Kops clusters. This currently conflicts with metricserver version > 3.0.0
 
 ## 2.7.1
 ### Fixed

@@ -11,10 +11,12 @@ readme = """
 
 ## This migration:
 - adds kubelet flags that were missing in the last migration to take advantage of the audit policy
+- made `anonymousAuth: false` default for Kops clusters. This currently conflicts with metricserver version > 3.0.0
 
 
 ## Risks:
 - this requires you to roll the cluster
+- metrics-server version compatibility 
 
 ## Follow up tasks:
 - roll the cluster
@@ -88,6 +90,10 @@ class Migration(migration.Migration):
                         with open(cluster_spec_file) as yaml_file:
                             cluster_config = yaml.load(yaml_file.read())
                             cluster_spec = cluster_config['spec']
+
+                            if cluster_spec.get('kubelet') is None:
+                                cluster_spec['kubelet'] = {}
+                            cluster_spec['kubelet']['anonymousAuth'] = False
 
                             hooks = cluster_spec.get("hooks")
                             if hooks:
