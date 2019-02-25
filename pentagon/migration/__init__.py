@@ -193,7 +193,7 @@ class Migration(object):
 
     def _append_migration_readme(self):
         if hasattr(self, "_readme_string"):
-            with open(migration_readme_file, 'w+') as mrf:
+            with open(migration_readme_file, 'a+') as mrf:
                 mrf.write(self._readme_string)
 
     def move(self, source, destination):
