@@ -3,6 +3,8 @@ from copy import deepcopy
 
 from pentagon import migration
 import yaml
+import os
+import logging
 
 readme = """
 
