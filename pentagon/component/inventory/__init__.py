@@ -7,6 +7,7 @@ import traceback
 from pentagon.component import ComponentBase
 from pentagon.component.aws_vpc import AWSVpc as Vpc
 from pentagon.component.vpn import Vpn
+from pentagon.component import gcp
 from pentagon.helpers import create_rsa_key
 from pentagon.defaults import AWSPentagonDefaults as PentagonDefaults
 
@@ -23,6 +24,12 @@ class Inventory(ComponentBase):
     ]
 
     def __init__(self, data, additional_args=None, **kwargs):
+        # HACK this if is to support start-project workflow
+        if 'cloud' in data.keys():
+            # HACK satisfy AWS requirements above in _required_parameters
+            if data['cloud'] == 'gcp':
+                data['aws_access_key'] = 'shouldneverbeused'
+                data['aws_secret_key'] = 'shouldneverbeused'
         super(Inventory, self).__init__(data, additional_args, **kwargs)
         self._ssh_keys = {
             'admin_vpn_key': self._data.get('admin_vpn_key', PentagonDefaults.ssh['admin_vpn_key']),
@@ -44,6 +51,7 @@ class Inventory(ComponentBase):
             self._destination = destination
 
         self._overwrite = overwrite
+        self._display_settings_to_user()
 
         try:
             self._add_files()
@@ -56,15 +64,16 @@ class Inventory(ComponentBase):
 
                 Aws(self._data).add("{}/terraform".format(self._destination))
                 if self._data.get('configure_vpn', True):
-                    Vpn(self._data).add("{}/resources".format(self._destination), overwrite=True)
+                    Vpn(self._data).add(
+                        "{}/resources".format(self._destination), overwrite=True)
 
             if self._data['cloud'].lower() == 'gcp':
-                Gcp(self._data).add(self._destination)
+                Gcp(self._data).add('{}/terraform/'.format(self._destination))
 
             self._remove_init_file()
             self._render_directory_templates()
         except Exception as e:
-            logging.error("Error occured configuring component")
+            logging.error("Error occurred configuring component")
             logging.error(e)
             logging.debug(traceback.format_exc(e))
             sys.exit(1)
@@ -90,4 +99,5 @@ class Aws(ComponentBase):
 class Gcp(ComponentBase):
 
     def add(self, destination):
-        pass
+        gcp.cluster.Public(self._data).add(
+            "./{}".format(destination), overwrite=True)

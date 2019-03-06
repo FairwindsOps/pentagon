@@ -42,11 +42,13 @@ class PentagonProject(object):
         self._outfile = self.get_data('output_file')
 
         # Setting local path info
-        self._repository_name = os.path.expanduser("{}-infrastructure".format(name))
+        self._repository_name = os.path.expanduser(
+            "{}-infrastructure".format(name))
         self._repository_directory = "{}".format(
             self._repository_name)
 
-        self._infrastructure_bucket = self.get_data('infrastructure_bucket', self._repository_name)
+        self._infrastructure_bucket = self.get_data(
+            'infrastructure_bucket', self._repository_name)
 
         self._private_path = "inventory/default/config/private"
 
@@ -64,7 +66,8 @@ class PentagonProject(object):
 
     def __write_config_file(self):
         """ Write sanitized yaml file of starting arguments """
-        logging.info("Writing arguments to file for Posterity: {}".format(self._outfile))
+        logging.info(
+            "Writing arguments to file for Posterity: {}".format(self._outfile))
         config = {}
 
         for key, value in self._data.items():
@@ -74,7 +77,8 @@ class PentagonProject(object):
 
         logging.debug(config)
         try:
-            write_yaml_file(self._repository_directory + "/" + self._outfile, config)
+            write_yaml_file(self._repository_directory +
+                            "/" + self._outfile, config)
         except Exception as e:
             logging.debug(traceback.format_exc(e))
             logging.error("Failed to write arguments to file")
@@ -82,7 +86,8 @@ class PentagonProject(object):
 
     def __repository_directory_exists(self):
         """ Tests if the repository directory already exists """
-        logging.debug("Checking for repository {}".format(self._repository_directory))
+        logging.debug("Checking for repository {}".format(
+            self._repository_directory))
         if os.path.isdir(self._repository_directory):
             return True
             logging.debug("Already Exists")
@@ -101,7 +106,8 @@ class PentagonProject(object):
             if self._configure_project is not False:
                 self.configure_default_project()
         else:
-            raise PentagonException('Project path exists. Cowardly refusing to overwrite existing project.')
+            raise PentagonException(
+                'Project path exists. Cowardly refusing to overwrite existing project.')
 
     def __create_repo_core(self):
         logging.debug(self._repository_directory)
@@ -147,11 +153,14 @@ class AWSPentagonProject(PentagonProject):
         }
 
         # AWS Specific Stuff
-        self._aws_access_key = self.get_data('aws_access_key', self._aws_access_key_placeholder)
-        self._aws_secret_key = self.get_data('aws_secret_key', self._aws_secret_key_placeholder)
+        self._aws_access_key = self.get_data(
+            'aws_access_key', self._aws_access_key_placeholder)
+        self._aws_secret_key = self.get_data(
+            'aws_secret_key', self._aws_secret_key_placeholder)
         if self.get_data('aws_default_region'):
             self._aws_default_region = self.get_data('aws_default_region')
-            self._aws_availability_zone_count = int(self.get_data('aws_availability_zone_count', self.PentagonDefaults.vpc['aws_availability_zone_count']))
+            self._aws_availability_zone_count = int(self.get_data(
+                'aws_availability_zone_count', self.PentagonDefaults.vpc['aws_availability_zone_count']))
             self._aws_availability_zones = self.get_data('aws_availability_zones') or allege_aws_availability_zones(
                 self._aws_default_region, self._aws_availability_zone_count)
 
@@ -161,41 +170,60 @@ class AWSPentagonProject(PentagonProject):
             self._aws_availability_zones = self._aws_availability_zones_placeholder
 
         # VPC information
-        self._vpc_name = self.get_data('vpc_name', self.PentagonDefaults.vpc['vpc_name'])
-        self._vpc_cidr_base = self.get_data('vpc_cidr_base', self.PentagonDefaults.vpc['vpc_cidr_base'])
+        self._vpc_name = self.get_data(
+            'vpc_name', self.PentagonDefaults.vpc['vpc_name'])
+        self._vpc_cidr_base = self.get_data(
+            'vpc_cidr_base', self.PentagonDefaults.vpc['vpc_cidr_base'])
         self._vpc_id = self.get_data('vpc_id', self._vpc_id)
 
         # DNS
         self._dns_zone = self.get_data('dns_zone', '{}.com'.format(self._name))
 
         # Kubernetes version
-        self._kubernetes_version = self.get_data('kubernetes_version', self.PentagonDefaults.kubernetes['kubernetes_version'])
+        self._kubernetes_version = self.get_data(
+            'kubernetes_version', self.PentagonDefaults.kubernetes['kubernetes_version'])
 
         # Working Kubernetes
-        self._working_kubernetes_cluster_name = self.get_data('working_kubernetes_cluster_name', 'working-1.{}'.format(self._dns_zone))
-        self._working_kubernetes_dns_zone = self.get_data('working_kubernetes_dns_zone', '{}'.format(self._dns_zone))
+        self._working_kubernetes_cluster_name = self.get_data(
+            'working_kubernetes_cluster_name', 'working-1.{}'.format(self._dns_zone))
+        self._working_kubernetes_dns_zone = self.get_data(
+            'working_kubernetes_dns_zone', '{}'.format(self._dns_zone))
 
-        self._working_kubernetes_node_count = self.get_data('working_kubernetes_node_count', self.PentagonDefaults.kubernetes['node_count'])
-        self._working_kubernetes_master_aws_zones = self.get_data('working_kubernetes_master_aws_zones', self._aws_availability_zones)
-        self._working_kubernetes_master_node_type = self.get_data('working_kubernetes_master_node_type', self.PentagonDefaults.kubernetes['master_node_type'])
-        self._working_kubernetes_worker_node_type = self.get_data('working_kubernetes_worker_node_type', self.PentagonDefaults.kubernetes['worker_node_type'])
-        self._working_kubernetes_v_log_level = self.get_data('working_kubernetes_v_log_level', self.PentagonDefaults.kubernetes['v_log_level'])
-        self._working_kubernetes_network_cidr = self.get_data('working_kubernetes_network_cidr', self.PentagonDefaults.kubernetes['network_cidr'])
-        self._working_third_octet = self.get_data('working_third_octet', self.PentagonDefaults.kubernetes['working_third_octet'])
+        self._working_kubernetes_node_count = self.get_data(
+            'working_kubernetes_node_count', self.PentagonDefaults.kubernetes['node_count'])
+        self._working_kubernetes_master_aws_zones = self.get_data(
+            'working_kubernetes_master_aws_zones', self._aws_availability_zones)
+        self._working_kubernetes_master_node_type = self.get_data(
+            'working_kubernetes_master_node_type', self.PentagonDefaults.kubernetes['master_node_type'])
+        self._working_kubernetes_worker_node_type = self.get_data(
+            'working_kubernetes_worker_node_type', self.PentagonDefaults.kubernetes['worker_node_type'])
+        self._working_kubernetes_v_log_level = self.get_data(
+            'working_kubernetes_v_log_level', self.PentagonDefaults.kubernetes['v_log_level'])
+        self._working_kubernetes_network_cidr = self.get_data(
+            'working_kubernetes_network_cidr', self.PentagonDefaults.kubernetes['network_cidr'])
+        self._working_third_octet = self.get_data(
+            'working_third_octet', self.PentagonDefaults.kubernetes['working_third_octet'])
 
         # Production Kubernetes
-        self._production_kubernetes_cluster_name = self.get_data('production_kubernetes_cluster_name', 'production-1.{}'.format(self._dns_zone))
-        self._production_kubernetes_dns_zone = self.get_data('production_kubernetes_dns_zone', '{}'.format(self._dns_zone))
+        self._production_kubernetes_cluster_name = self.get_data(
+            'production_kubernetes_cluster_name', 'production-1.{}'.format(self._dns_zone))
+        self._production_kubernetes_dns_zone = self.get_data(
+            'production_kubernetes_dns_zone', '{}'.format(self._dns_zone))
 
-        self._production_kubernetes_node_count = self.get_data('production_kubernetes_node_count', self.PentagonDefaults.kubernetes['node_count'])
-        self._production_kubernetes_master_aws_zones = self.get_data('production_kubernetes_master_aws_zones', self._aws_availability_zones)
+        self._production_kubernetes_node_count = self.get_data(
+            'production_kubernetes_node_count', self.PentagonDefaults.kubernetes['node_count'])
+        self._production_kubernetes_master_aws_zones = self.get_data(
+            'production_kubernetes_master_aws_zones', self._aws_availability_zones)
         self._production_kubernetes_master_node_type = self.get_data(
             'production_kubernetes_master_node_type', self.PentagonDefaults.kubernetes['master_node_type'])
         self._production_kubernetes_worker_node_type = self.get_data(
             'production_kubernetes_worker_node_type', self.PentagonDefaults.kubernetes['worker_node_type'])
-        self._production_kubernetes_v_log_level = self.get_data('production_kubernetes_v_log_level', self.PentagonDefaults.kubernetes['v_log_level'])
-        self._production_kubernetes_network_cidr = self.get_data('production_kubernetes_network_cidr', self.PentagonDefaults.kubernetes['network_cidr'])
-        self._production_third_octet = self.get_data('production_third_octet', self.PentagonDefaults.kubernetes['production_third_octet'])
+        self._production_kubernetes_v_log_level = self.get_data(
+            'production_kubernetes_v_log_level', self.PentagonDefaults.kubernetes['v_log_level'])
+        self._production_kubernetes_network_cidr = self.get_data(
+            'production_kubernetes_network_cidr', self.PentagonDefaults.kubernetes['network_cidr'])
+        self._production_third_octet = self.get_data(
+            'production_third_octet', self.PentagonDefaults.kubernetes['production_third_octet'])
 
         self._vpn_ami_id = self.get_data('vpn_ami_id')
 
@@ -251,7 +279,8 @@ class AWSPentagonProject(PentagonProject):
             'kops_state_store_bucket': self._infrastructure_bucket,
             'third_octet': self._working_third_octet
         }
-        write_yaml_file("{}/inventory/default/clusters/working/vars.yml".format(self._repository_directory), context)
+        write_yaml_file(
+            "{}/inventory/default/clusters/working/vars.yml".format(self._repository_directory), context)
 
     def __add_kops_production_cluster(self):
         context = {
@@ -272,64 +301,52 @@ class AWSPentagonProject(PentagonProject):
             'kops_state_store_bucket': self._infrastructure_bucket,
             'third_octet': self._production_third_octet
         }
-        write_yaml_file("{}/inventory/default/clusters/production/vars.yml".format(self._repository_directory), context)
+        write_yaml_file(
+            "{}/inventory/default/clusters/production/vars.yml".format(self._repository_directory), context)
 
     def configure_default_project(self):
-        inventory.Inventory(self.context).add('{}/inventory/default'.format(self._repository_directory))
+        inventory.Inventory(self.context).add(
+            '{}/inventory/default'.format(self._repository_directory))
         self.__add_kops_working_cluster()
         self.__add_kops_production_cluster()
 
 
 class GCPPentagonProject(PentagonProject):
-    from defaults import GCPPentagonDefaults as PentagonDefaults
-
-    local_defaults = {
-        'working_cluster_name': 'working',
-        'production_cluster_name': 'production',
-    }
-
     def __init__(self, name, data={}):
+        # Build translated data for inventory input
+        self._gcp_inventory_context = self._build_inv_params(name, data)
+        # Add the project_name since it isn't passed in from click
+        self._gcp_inventory_context['project_name'] = name
+        self._gcp_inventory_context['project'] = self._gcp_inventory_context['gcp_project']
+        self._gcp_inventory_context['name'] = name
         super(GCPPentagonProject, self).__init__(name, data)
-        self.default_context = self.PentagonDefaults.kubernetes
-        if type(self.default_context['scopes']) == str:
-            self.default_context['scopes'] = self.default_context['scopes'].split(',')
-        self._data['zones'] = self.get_data('gcp_zones').split(',')
-        self.default_context['project'] = self.get_data('gcp_project')
 
-        context = {
-            'name': 'default',
-            'create_keys': False,
-            'cloud': 'gcp',
-            'infrastructure_bucket': self._infrastructure_bucket,
-            'gcp_zone': self.get_data('zones')[0],
-            'project_name': self._name
+    @staticmethod
+    def _build_inv_params(name, input_context):
+        gcp_context = input_context.copy()
+        inventory_map = {
+            'gcp_nodes_cidr': 'nodes_cidr',
+            'gcp_services_cidr': 'services_cidr',
+            'gcp_pods_cidr': 'pods_cidr',
+            'gcp_cluster_name': 'cluster_name',
         }
 
-        self._context = merge_dict(self._data, merge_dict(context, self.default_context))
+        for old_key, new_key in inventory_map.iteritems():
+            if new_key in gcp_context.keys():
+                if gcp_context[new_key]:
+                    raise KeyError(
+                        'Key already exists, this should not happen.')
+            gcp_context[new_key] = gcp_context.pop(old_key)
 
-    def add_working_cluster(self):
-        context = self.default_context
-        context.update({
-            'labels': 'cluster=working',
-            'zone': self.get_data('zones')[0],
-            'node_locations': self.get_data('zones'),
-            'cluster_name': self.local_defaults.get('working_cluster_name'),
-            'cluster_ipv4_cidr': self.PentagonDefaults.kubernetes['working_cluster_ipv4_cidr']
-        })
-        gcp.Cluster(context).add('{}/inventory/default/clusters/working'.format(self._repository_directory))
+        # for two levels downstream into gke generator tf
+        gcp_context['region'] = gcp_context['gcp_region']
 
-    def add_production_cluster(self):
-        context = self.default_context
-        context.update({
-            'labels': 'cluster=production',
-            'zone': self.get_data('zones')[0],
-            'locations': self.get_data('zones'),
-            'cluster_name': self.local_defaults.get('production_cluster_name'),
-            'cluster_ipv4_cidr': self.PentagonDefaults.kubernetes['production_cluster_ipv4_cidr']
-        })
-        gcp.Cluster(context).add('{}/inventory/default/clusters/production'.format(self._repository_directory))
+        return gcp_context
 
     def configure_default_project(self):
-        inventory.Inventory(self._context).add('{}/inventory/default'.format(self._repository_directory))
-        self.add_working_cluster()
-        self.add_production_cluster()
+        inventory.Inventory(self._gcp_inventory_context).add(
+            '{}/inventory/{}'.format(
+                self._repository_directory,
+                self._gcp_inventory_context['project']
+            )
+        )

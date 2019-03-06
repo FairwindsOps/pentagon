@@ -1,67 +1,38 @@
-import datetime
+from datetime import datetime
 
 
 class AWSPentagonDefaults(object):
     ssh = {
         'admin_vpn_key': 'admin-vpn',
-        'working_kube_key': 'working-kube',
-        'working_private_key': 'working-private',
         'production_kube_key': 'production-kube',
         'production_private_key': 'production-private',
+        'working_kube_key': 'working-kube',
+        'working_private_key': 'working-private',
     }
 
     kubernetes = {
-        'node_count': 3,
-        'master_node_type': 't2.medium',
-        'master_node_image': '379101102735/debian-stretch-hvm-x86_64-gp2-2018-10-01-66564',
-        'worker_node_type': 't2.medium',
-        'worker_node_image': '379101102735/debian-stretch-hvm-x86_64-gp2-2018-10-01-66564',
-        'node_root_volume_size': 200,
-        'v_log_level': 10,
-        'network_cidr': '172.20.0.0/16',
-        'kubernetes_version': '1.10.8',
-        'network_mask': 24,
-        'third_octet': 16,
-        'production_third_octet': 16,
-        'working_third_octet': 24,
-        'third_octet_increment': 1,
         'authorization': {'rbac': {}},
+        'kubernetes_version': '1.10.8',
+        'master_node_image': '379101102735/debian-stretch-hvm-x86_64-gp2-2018-10-01-66564',
+        'master_node_type': 't2.medium',
+        'network_cidr': '172.20.0.0/16',
+        'network_mask': 24,
         'networking': {'flannel': {'backend': 'vxlan'}},
         'node_additional_policies': '[{"Effect": "Allow","Action": ["autoscaling:DescribeAutoScalingGroups", "autoscaling:DescribeAutoScalingInstances", "autoscaling:DescribeTags", "autoscaling:SetDesiredCapacity", "autoscaling:TerminateInstanceInAutoScalingGroup"],"Resource": "*"}]',
-        'ssh_key_path': '~/.ssh/id_rsa.pub'
+        'node_count': 3,
+        'node_root_volume_size': 200,
+        'production_third_octet': 16,
+        'ssh_key_path': '~/.ssh/id_rsa.pub',
+        'third_octet_increment': 1,
+        'third_octet': 16,
+        'v_log_level': 10,
+        'worker_node_image': '379101102735/debian-stretch-hvm-x86_64-gp2-2018-10-01-66564',
+        'worker_node_type': 't2.medium',
+        'working_third_octet': 24,
     }
 
     vpc = {
-        'vpc_name': datetime.datetime.today().strftime('%Y%m%d'),
-        'vpc_cidr_base': '172.20',
         'aws_availability_zone_count': 3,
-    }
-
-
-class GCPPentagonDefaults(object):
-
-    kubernetes = {
-        'cluster_version': "1.8.7-gke.1",
-        'enable_basic_auth': False,
-        'machine_type': 'n1-standard-2',
-        'image_type': 'COS',
-        'num_nodes': 1,
-        'working_cluster_ipv4_cidr': '172.20.0.0/16',
-        'production_cluster_ipv4_cidr': '172.21.0.0/16',
-        'network': 'default',
-        'subnetwork': 'default',
-        'enable_autoscaling': True,
-        'min_nodes': 1,
-        'max_nodes': 3,
-        'enable_autoupgrade': True,
-        'scopes': [
-            'https://www.googleapis.com/auth/compute',
-            'https://www.googleapis.com/auth/devstorage.read_only',
-            'https://www.googleapis.com/auth/logging.write',
-            'https://www.googleapis.com/auth/monitoring',
-            'https://www.googleapis.com/auth/servicecontrol',
-            'https://www.googleapis.com/auth/service.management.readonly',
-            'https://www.googleapis.com/auth/trace.append'
-        ]
-
+        'vpc_cidr_base': '172.20',
+        'vpc_name': datetime.today().strftime('%Y%m%d'),
     }

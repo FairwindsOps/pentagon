@@ -5,6 +5,7 @@ provider "aws" {
 }
 {%- elif cloud == 'gcp' %}
 provider "google" {
+    version = "~> 2.0"
     # Configuration set in env vars $GOOGLE_PROJECT, $GCLOUD_PROJECT
 }
 {%- endif %}

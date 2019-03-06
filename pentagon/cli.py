@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import sys
 import os
 import click
 import logging
@@ -7,15 +6,12 @@ import coloredlogs
 import traceback
 import oyaml as yaml
 import json
-
-import pentagon
 import migration
-
 from pydoc import locate
-from pentagon import PentagonException
+from .pentagon import PentagonException
+from .pentagon import GCPPentagonProject, AWSPentagonProject, PentagonProject
 from helpers import merge_dict
-
-from meta import __version__, __author__
+from meta import __version__
 
 
 class RequiredIf(click.Option):
@@ -59,8 +55,6 @@ def cli(ctx, log_level, *args, **kwargs):
 @click.option('--force/--no-force', help="Ignore existing directories and copy project.")
 @click.option('--cloud', default="aws", help="Cloud provider to create default inventory. Defaults to 'aws'. [aws,gcp,none]")
 @click.option('--hash-type', default="aws", type=click.Choice(['aws', 'gcp']), help="Type of cloud project to create. Defaults to 'aws'")
-# General Cloud Options
-@click.option('--zones', help="Availability zones as a comma delimited list", cls=RequiredIf, required_if='cloud=gcp')
 # Currently only AWS but maybe we can/should add GCP later
 @click.option('--configure-vpn/--no-configure-vpn', default=True, help="Whether or not to configure a vpn. Default True.")
 @click.option('--vpc-name', help="Name of VPC to create.")
@@ -107,8 +101,12 @@ def cli(ctx, log_level, *args, **kwargs):
 @click.option('--production-kubernetes-v-log-level', help="V Log Level kubernetes production cluster.")
 # GCP Cloud options
 @click.option('--gcp-project', prompt=True, help="Google Cloud Project to create clusters in.", cls=RequiredIf, required_if='cloud=gcp')
-@click.option('--gcp-zones', prompt=True, help="Google Cloud Project zones to create clusters in. Comma separated list.", cls=RequiredIf, required_if='cloud=gcp')
-@click.option('--gcp-region', prompt=True, help="Google Cloud Region to create regional resources in.", cls=RequiredIf, required_if='cloud=gcp')
+@click.option('--gcp-region', prompt=True, help="Google Cloud Project Region to use for Cluster.", cls=RequiredIf, required_if='cloud=gcp')
+@click.option('--gcp-cluster-name', prompt=True, help="Google GKE Cluster Name.", cls=RequiredIf, required_if='cloud=gcp')
+@click.option('--gcp-nodes-cidr', prompt=True, help="Google GKE Nodes CIDR.", cls=RequiredIf, required_if='cloud=gcp')
+@click.option('--gcp-services-cidr', prompt=True, help="Google GKE services CIDR.", cls=RequiredIf, required_if='cloud=gcp')
+@click.option('--gcp-pods-cidr', prompt=True, help="Google GKE pods CIDR.", cls=RequiredIf, required_if='cloud=gcp')
+@click.option('--gcp-kubernetes-version', prompt=True, help="Version of kubernetes to use for cluster nodes.", cls=RequiredIf, required_if='cloud=gcp')
 def start_project(ctx, name, **kwargs):
     """ Create an infrastructure project from scratch with the configured options """
 
@@ -117,19 +115,21 @@ def start_project(ctx, name, **kwargs):
         logging.basicConfig(level=kwargs.get('log_level'))
         file_data = {}
         if kwargs.get('config_file'):
-            file_data = parse_infile(kwargs.get('config_file'))[0]
+            file_data = parse_in_file(kwargs.get('config_file'))[0]
         kwargs.update(file_data)
         logging.debug(kwargs)
         cloud = kwargs.get('cloud')
         if cloud.lower() == 'aws':
-            project = pentagon.AWSPentagonProject(name, kwargs)
+            project = AWSPentagonProject(name, kwargs)
         elif cloud.lower() == 'gcp':
-            project = pentagon.GCPPentagonProject(name, kwargs)
+            project = GCPPentagonProject(name, kwargs)
         elif cloud.lower() == 'none':
-            project = pentagon.PentagonProject(name, kwargs)
+            project = PentagonProject(name, kwargs)
         else:
-            raise PentagonException("Value passed for option --cloud not 'aws' or 'gcp'")
-        logging.debug('Creating {} project {} with {}'.format(cloud.upper(), name, kwargs))
+            raise PentagonException(
+                "Value passed for option --cloud not 'aws' or 'gcp'")
+        logging.debug('Creating {} project {} with {}'.format(
+            cloud.upper(), name, kwargs))
         project.start()
     except Exception as e:
         logging.error(e)
@@ -182,7 +182,7 @@ def _run(action, component_path, additional_args, options):
     try:
         file = options.get('file', None)
         if file is not None:
-            documents = parse_infile(file)
+            documents = parse_in_file(file)
     except Exception as e:
         logging.error("Error parsing data from file or -D arguments")
         logging.error(e)
@@ -201,9 +201,11 @@ def _run(action, component_path, additional_args, options):
                         data_copy[flex_key] = value
                 data = data_copy
 
-                getattr(component_class(data, additional_args), action)(options.get('out'))
+                getattr(component_class(data, additional_args),
+                        action)(options.get('out'))
             else:
-                logging.error("Error locating module or class: {}".format(component_path))
+                logging.error(
+                    "Error locating module or class: {}".format(component_path))
     except Exception, e:
         logging.error(e)
         logging.debug(traceback.format_exc(e))
@@ -228,12 +230,18 @@ def get_component_class(component_path):
         component_class_name = component_path
 
     # Compile list of possible class paths
-    possible_component_paths.append('{}.{}'.format(component_name, component_class_name))
-    possible_component_paths.append('{}.{}'.format(component_name, component_class_name.title()))
-    possible_component_paths.append('pentagon.component.{}.{}'.format(component_name, component_class_name))
-    possible_component_paths.append('pentagon.component.{}.{}'.format(component_name, component_class_name.title()))
-    possible_component_paths.append('pentagon_{}.{}'.format(component_name, component_class_name))
-    possible_component_paths.append('pentagon_{}.{}'.format(component_name, component_class_name.title()))
+    possible_component_paths.append(
+        '{}.{}'.format(component_name, component_class_name))
+    possible_component_paths.append('{}.{}'.format(
+        component_name, component_class_name.title()))
+    possible_component_paths.append(
+        'pentagon.component.{}.{}'.format(component_name, component_class_name))
+    possible_component_paths.append('pentagon.component.{}.{}'.format(
+        component_name, component_class_name.title()))
+    possible_component_paths.append(
+        'pentagon_{}.{}'.format(component_name, component_class_name))
+    possible_component_paths.append('pentagon_{}.{}'.format(
+        component_name, component_class_name.title()))
 
     # Find Class if it exists
     for class_path in possible_component_paths:
@@ -246,7 +254,7 @@ def get_component_class(component_path):
         logging.debug('{} Not found'.format(class_path))
 
 
-def parse_infile(file):
+def parse_in_file(file):
     """ Parse data structure from file into dictionary for component use """
     with open(file, 'r') as data_file:
         try:
@@ -259,13 +267,15 @@ def parse_infile(file):
         data_file.seek(0)
 
         try:
-            data = list(yaml.load_all(data_file, Loader=yaml.loader.BaseLoader))
+            data = list(yaml.load_all(
+                data_file, Loader=yaml.loader.BaseLoader))
             logging.debug("Data parsed from file {}: {}".format(file, data))
             return data
         except yaml.YAMLError as yaml_error:
             pass
 
-    logging.error("Unable to parse in file. {} {} ".format(json_error, yaml_error))
+    logging.error("Unable to parse in file. {} {} ".format(
+        json_error, yaml_error))
 
 
 def parse_data(data, d=None):
@@ -277,7 +287,7 @@ def parse_data(data, d=None):
         key = kv.split('=')[0]
         try:
             val = kv.split('=', 1)[1]
-        except IndexError, e:
+        except IndexError:
             val = True
 
         d[key] = val

@@ -1,0 +1,59 @@
+# These local variables can be used as inputs to both a network and this GKE VPC Native cluster module.                                                                                                                                       
+locals {
+  project            = "{{ project }}"
+  region             = "{{ region }}"
+  network_name       = "{{ network_name }}"
+  kubernetes_version = "{{ kubernetes_version }}"
+}
+
+module "network_{{ cluster_id }}" {
+  source = "git@github.com:reactiveops/terraform-gcp-vpc-native.git//default?ref={{ tf_module_gcp_vpc_native_version }}"
+
+  // base network parameters
+  network_name     = "${local.network_name}"
+  subnetwork_name  = "{{ nodes_subnetwork_name }}"
+  region           = "${local.region}"
+  enable_flow_logs = "false"
+
+  //specify the staging subnetwork primary and secondary CIDRs for IP aliasing
+  subnetwork_range    = "{{ nodes_cidr }}"
+  subnetwork_pods     = "{{ pods_cidr }}"
+  subnetwork_services = "{{ services_cidr }}"
+}
+
+# Ref: https://github.com/reactiveops/terraform-gcp-vpc-native
+module "cluster_{{ cluster_id }}" {
+  # Change the ref below to use a vX.Y.Z release instead of master.
+  source = "git@github.com:/reactiveops/terraform-gke//public-vpc-native?ref={{ tf_module_gke_module_version }}"
+
+  name                             = "{{ cluster_name }}-{{ cluster_id }}"
+  region                           = "${local.region}"
+  project                          = "${local.project}"
+  kubernetes_version               = "${local.kubernetes_version}"
+  network_name                     = "${local.network_name}"
+  nodes_subnetwork_name            = "${module.network_{{ cluster_id }}.subnetwork}"
+  pods_secondary_ip_range_name     = "${module.network_{{ cluster_id }}.gke_pods_1}"
+  services_secondary_ip_range_name = "${module.network_{{ cluster_id }}.gke_services_1}"
+
+  master_authorized_network_cidrs = [
+    {
+      # This is the module default, but demonstrates specifying this input.
+      cidr_block   = "0.0.0.0/0"
+      display_name = "from the Internet"
+    },
+  ]
+}
+
+module "node_pool_{{ cluster_id }}" {
+  source = "git@github.com:/reactiveops/terraform-gke//node_pool?ref={{ tf_module_nodepool_module_version }}"
+
+  name             = "node-pool-1"
+  region           = "${module.cluster_{{ cluster_id }}.region}"
+  gke_cluster_name = "${module.cluster_{{ cluster_id }}.name}"
+  machine_type     = "n1-standard-2"
+  min_node_count   = "1"
+  max_node_count   = "1"
+
+  # Match the Kubernetes version from the GKE cluster!
+  kubernetes_version = "${module.cluster_{{ cluster_id }}.kubernetes_version}"
+}

@@ -1,3 +1,3 @@
 
-__version__ = "2.7.3"
+__version__ = "3.0.0"
 __author__ = 'ReactiveOps, Inc.'
