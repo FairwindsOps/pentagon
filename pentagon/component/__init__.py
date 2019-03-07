@@ -5,6 +5,7 @@ import logging
 import traceback
 import sys
 import re
+import click
 
 from pentagon.helpers import render_template
 from pentagon.defaults import AWSPentagonDefaults as PentagonDefaults
@@ -155,9 +156,9 @@ class ComponentBase(object):
                 str(value),
                 is_default,
             ))
+
         if sys.stdin.isatty() and not os.getenv('CI', False):
-            response = raw_input("This look ok to proceed? (y/N) ")
-            if response == 'y' or response == 'Y':
+            if click.confirm('This look ok to proceed?'):
                 return
             else:
                 logging.info("Exiting because you did not accept the inputs.")
