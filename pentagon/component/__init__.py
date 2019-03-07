@@ -142,16 +142,17 @@ class ComponentBase(object):
         logging.info("  Path: \"{}\"".format(self._destination_directory_name))
         logging.info("Displaying provided and default values for this component: "
                      "(e.g. '-Dparam_name=abcd')")
-        for key, value in self._data.iteritems():
+        for key in sorted(self._data):
+            value = self._data[key]
             using_defaults = False
             if key in self._defaults.keys():
                 if self._data[key] == self._defaults[key]:
                     using_defaults = True
 
             is_default = "(Default Value)" if using_defaults else ""
-            logging.info("  {0:34} = {1:20} {2}".format(
+            logging.info("  {0:40} = {1:20} {2}".format(
                 key,
-                value,
+                str(value),
                 is_default,
             ))
         if sys.stdin.isatty() and not os.getenv('CI', False):
