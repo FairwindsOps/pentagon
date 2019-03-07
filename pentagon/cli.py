@@ -28,8 +28,8 @@ class RequiredIf(click.Option):
         super(RequiredIf, self).__init__(*args, **kwargs)
 
     def handle_parse_result(self, ctx, opts, args):
-        other_present = self.required_option in opts
-        if not other_present or opts[self.required_option] != self.required_value:
+        other_present = self.required_option in ctx.params
+        if not other_present or ctx.params[self.required_option] != self.required_value:
             self.prompt = None
 
         return super(RequiredIf, self).handle_parse_result(
