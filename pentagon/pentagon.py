@@ -255,7 +255,6 @@ class AWSPentagonProject(PentagonProject):
             'name': 'default',
             'project_name': self._name,
             'configure_vpn': self.get_data('configure_vpn'),
-            'prompt': self.get_data('prompt', True)
         }
         logging.debug(self._context)
         return self._context
@@ -278,7 +277,6 @@ class AWSPentagonProject(PentagonProject):
             'network_cidr_base': self._vpc_cidr_base,
             'kops_state_store_bucket': self._infrastructure_bucket,
             'third_octet': self._working_third_octet,
-            'prompt': self.get_data('prompt', True)
         }
         write_yaml_file(
             "{}/inventory/default/clusters/working/vars.yml".format(self._repository_directory), context)
@@ -301,7 +299,6 @@ class AWSPentagonProject(PentagonProject):
             'network_cidr_base': self._vpc_cidr_base,
             'kops_state_store_bucket': self._infrastructure_bucket,
             'third_octet': self._production_third_octet,
-            'prompt': self.get_data('prompt', True)
         }
         write_yaml_file(
             "{}/inventory/default/clusters/production/vars.yml".format(self._repository_directory), context)

@@ -122,8 +122,7 @@ class ComponentBase(object):
         self._destination = destination
         self._overwrite = overwrite
 
-        if self._data.get('prompt', True):
-            self._display_settings_to_user()
+        self._display_settings_to_user()
         try:
             # Add all files from the component templates to the destination directory
             self._add_files()

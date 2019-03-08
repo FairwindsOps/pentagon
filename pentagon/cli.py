@@ -67,7 +67,6 @@ def cli(ctx, log_level, *args, **kwargs):
 @click.option('--configure/--no-configure', default=True, help='Configure project with default settings.')
 @click.option('--force/--no-force', help="Ignore existing directories and copy project.")
 @click.option('--cloud', default="aws", help="Cloud provider to create default inventory. Defaults to 'aws'. [aws,gcp,none]")
-@click.option('--prompt/--no-prompt', default=True, help="Prompt for confirmation before creating project. Defaults to Prompt")
 # Currently only AWS but maybe we can/should add GCP later
 @click.option('--configure-vpn/--no-configure-vpn', default=True, help="Whether or not to configure a vpn. Default True.")
 @click.option('--vpc-name', help="Name of VPC to create.")
@@ -155,7 +154,6 @@ def start_project(ctx, name, **kwargs):
 @click.option('--data', '-D', multiple=True, help='Individual Key=Value pairs used by the component. There should be no spaces surrounding the `=`')
 @click.option('--file', '-f', help='File to read Key=Value pair from (yaml or json are supported)')
 @click.option('--out', '-o', default='./', help="Path to output module result, if any")
-@click.option('--prompt/--no-prompt', default=True, help="Prompt for confirmation before creating project. Defaults to Prompt")
 @click.argument('additional-args', nargs=-1, default=None)
 def add(ctx, component_path, additional_args, **kwargs):
     _run('add', component_path, additional_args, kwargs)
@@ -167,7 +165,6 @@ def add(ctx, component_path, additional_args, **kwargs):
 @click.option('--data', '-D', multiple=True, help='Individual Key=Value pairs used by the component.')
 @click.option('--file', '-f', help='File to read Key=Value pair from (yaml or json are supported).')
 @click.option('--out', '-o', default='./', help="Path to output module result, if any.")
-@click.option('--prompt/--no-prompt', default=True, help="Prompt for confirmation before creating project. Defaults to Prompt")
 @click.argument('additional-args', nargs=-1, default=None)
 def get(ctx, component_path, additional_args, **kwargs):
     _run('get', component_path, additional_args, kwargs)

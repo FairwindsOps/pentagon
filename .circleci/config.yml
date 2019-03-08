@@ -29,11 +29,13 @@ jobs:
             # this fails but that is the intent hence "|| true"
             last_version=$(pip install pentagon==  2>&1 | grep "Could not find" | awk -F',' '{ print $(NF -1) }' | sed s/[[:blank:]]/''/g) || true
             sudo pip install pentagon==${last_version}
-            yes | pentagon start-project migration-test
+            # || true here is because we are wedged in that we need to test a previous version where this will error out
+            yes | pentagon start-project migration-test || true
             cd migration-test-infrastructure
             export INFRASTRUCTURE_REPO=$(pwd)
             cd inventory/default/clusters/production
-            yes | pentagon add kops.cluster -f vars.yml -o cluster-config
+            # || true here is because we are wedged in that we need to test a previous version where this will error out
+            yes | pentagon add kops.cluster -f vars.yml -o cluster-config || true
             cd $INFRASTRUCTURE_REPO
             # faking git config. The repo must have at least one commit for the migration to work
             git add . && git -c user.name='fake' -c user.email='fake@email.org' commit -m 'initial commit'
