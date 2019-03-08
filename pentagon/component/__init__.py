@@ -154,12 +154,13 @@ class ComponentBase(object):
                 value,
                 is_default,
             ))
-        response = raw_input("This look ok to proceed? (y/N) ")
-        if response == 'y' or response == 'Y':
-            return
-        else:
-            logging.info("Exiting because you did not accept the inputs.")
-            exit()
+        if sys.stdin.isatty():
+            response = raw_input("This look ok to proceed? (y/N) ")
+            if response == 'y' or response == 'Y':
+                return
+            else:
+                logging.info("Exiting because you did not accept the inputs.")
+                exit()
 
     def _add_files(self, sub_path=None):
         """ Copies files and templates from <component>/files """
