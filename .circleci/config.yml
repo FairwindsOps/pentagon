@@ -30,7 +30,7 @@ jobs:
             last_version=$(pip install pentagon==  2>&1 | grep "Could not find" | awk -F',' '{ print $(NF -1) }' | sed s/[[:blank:]]/''/g) || true
             sudo pip install pentagon==${last_version}
             # || true here is because we are wedged in that we need to test a previous version where this will error out
-            yes | pentagon start-project migration-test || true
+            yes | pentagon start-project migration-test --aws-access-key=fake --aws-secret-key=fake || true
             cd migration-test-infrastructure
             export INFRASTRUCTURE_REPO=$(pwd)
             cd inventory/default/clusters/production

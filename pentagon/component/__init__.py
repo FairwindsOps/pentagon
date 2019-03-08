@@ -158,7 +158,7 @@ class ComponentBase(object):
                 is_default,
             ))
 
-        if sys.stdin.isatty() and not os.getenv('CI', False):
+        if sys.stdin.isatty():
             if click.confirm('This look ok to proceed?'):
                 return
             else:
