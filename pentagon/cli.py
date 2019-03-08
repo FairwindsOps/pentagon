@@ -67,7 +67,7 @@ def cli(ctx, log_level, *args, **kwargs):
 @click.option('--configure/--no-configure', default=True, help='Configure project with default settings.')
 @click.option('--force/--no-force', help="Ignore existing directories and copy project.")
 @click.option('--cloud', default="aws", help="Cloud provider to create default inventory. Defaults to 'aws'. [aws,gcp,none]")
-@click.option('--hash-type', default="aws", type=click.Choice(['aws', 'gcp']), help="Type of cloud project to create. Defaults to 'aws'")
+@click.option('--prompt/--no-prompt', default=True, help="Prompt for confirmation before creating project. Defaults to Prompt")
 # Currently only AWS but maybe we can/should add GCP later
 @click.option('--configure-vpn/--no-configure-vpn', default=True, help="Whether or not to configure a vpn. Default True.")
 @click.option('--vpc-name', help="Name of VPC to create.")
