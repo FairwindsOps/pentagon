@@ -1,0 +1,1 @@
+kops create secret sshpublickey admin -i ~/.ssh/id_rsa.pub --name 

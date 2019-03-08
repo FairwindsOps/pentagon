@@ -121,6 +121,7 @@ class ComponentBase(object):
     def add(self, destination, overwrite=False):
         self._destination = destination
         self._overwrite = overwrite
+
         if self._data.get('prompt', True):
             self._display_settings_to_user()
         try:

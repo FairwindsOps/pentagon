@@ -155,6 +155,7 @@ def start_project(ctx, name, **kwargs):
 @click.option('--data', '-D', multiple=True, help='Individual Key=Value pairs used by the component. There should be no spaces surrounding the `=`')
 @click.option('--file', '-f', help='File to read Key=Value pair from (yaml or json are supported)')
 @click.option('--out', '-o', default='./', help="Path to output module result, if any")
+@click.option('--prompt/--no-prompt', default=True, help="Prompt for confirmation before creating project. Defaults to Prompt")
 @click.argument('additional-args', nargs=-1, default=None)
 def add(ctx, component_path, additional_args, **kwargs):
     _run('add', component_path, additional_args, kwargs)
@@ -166,6 +167,7 @@ def add(ctx, component_path, additional_args, **kwargs):
 @click.option('--data', '-D', multiple=True, help='Individual Key=Value pairs used by the component.')
 @click.option('--file', '-f', help='File to read Key=Value pair from (yaml or json are supported).')
 @click.option('--out', '-o', default='./', help="Path to output module result, if any.")
+@click.option('--prompt/--no-prompt', default=True, help="Prompt for confirmation before creating project. Defaults to Prompt")
 @click.argument('additional-args', nargs=-1, default=None)
 def get(ctx, component_path, additional_args, **kwargs):
     _run('get', component_path, additional_args, kwargs)
@@ -205,6 +207,7 @@ def _run(action, component_path, additional_args, options):
         for doc in documents:
             if callable(component_class):
                 data = merge_dict(doc, data, clobber=True)
+                data['prompt'] = options.get('prompt', True)
                 # Making data keys more flexible and allowing keys with
                 # - to be be corrected in place
                 data_copy = data.copy()
