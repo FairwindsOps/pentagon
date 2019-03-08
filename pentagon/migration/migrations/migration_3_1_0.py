@@ -106,11 +106,10 @@ class Migration(migration.Migration):
                                 for index, hook in enumerate(hooks):
                                     hook['manifest'] = literal_unicode(hook['manifest'])
                                     if hook['name'] == 'patch-runc':
-                                        logging.info("Found patch-run hook at index %s", index)
+                                        logging.info("Found patch-runc hook at index %s", index)
                                         runCHookIndex = index
                                 if runCHookIndex:
                                     hooks[runCHookIndex] = runCHook
-#                                    hooks[runCHookIndex]['manifest'] = literal_unicode(hooks[runCHookIndex]['manifest'])
                                 else:
                                     hooks.append(runCHook)
                             else:
