@@ -154,7 +154,7 @@ class ComponentBase(object):
                 value,
                 is_default,
             ))
-        if sys.stdin.isatty():
+        if sys.stdin.isatty() and not os.getenv('CI', False):
             response = raw_input("This look ok to proceed? (y/N) ")
             if response == 'y' or response == 'Y':
                 return
