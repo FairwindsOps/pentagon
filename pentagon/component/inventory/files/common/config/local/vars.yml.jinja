@@ -1,6 +1,7 @@
 ANSIBLE_CONFIG: '${INFRASTRUCTURE_REPO}/inventory/${INVENTORY}/config/private/ansible.cfg'
 KUBECONFIG: '${INFRASTRUCTURE_REPO}/inventory/${INVENTORY}/config/private/kube_config'
 HELM_HOME: "${INFRASTRUCTURE_REPO}/helm"
+TILLER_NAMESPACE: "tiller"
 
 {%- if cloud | lower == 'aws' %}
 VPC_NAME: "{{ vpc_name }}"
