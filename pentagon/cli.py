@@ -107,6 +107,7 @@ def cli(ctx, log_level, *args, **kwargs):
 @click.option('--gcp-services-cidr', prompt=True, help="Google GKE services CIDR.", cls=RequiredIf, required_if='cloud=gcp')
 @click.option('--gcp-pods-cidr', prompt=True, help="Google GKE pods CIDR.", cls=RequiredIf, required_if='cloud=gcp')
 @click.option('--gcp-kubernetes-version', prompt=True, help="Version of kubernetes to use for cluster nodes.", cls=RequiredIf, required_if='cloud=gcp')
+@click.option('--gcp-infra-bucket', prompt=True, help="The bucket where terraform will store its state for GCP.", cls=RequiredIf, required_if='cloud=gcp')
 def start_project(ctx, name, **kwargs):
     """ Create an infrastructure project from scratch with the configured options """
 

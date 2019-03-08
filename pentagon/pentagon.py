@@ -329,6 +329,8 @@ class GCPPentagonProject(PentagonProject):
             'gcp_services_cidr': 'services_cidr',
             'gcp_pods_cidr': 'pods_cidr',
             'gcp_cluster_name': 'cluster_name',
+            'gcp_kubernetes_version': 'kubernetes_version',
+            'gcp_infra_bucket': 'infrastructure_bucket',
         }
 
         for old_key, new_key in inventory_map.iteritems():
