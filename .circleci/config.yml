@@ -53,7 +53,7 @@ jobs:
       - run:
           name: Test Start Project
           command: |
-            docker run --rm pentagon pentagon start-project circleci-test
+            docker run --rm pentagon bash -c "yes | pentagon start-project circleci-test --aws-access-key=fake --aws-secret-key=fake"
 
   release:
     docker:
