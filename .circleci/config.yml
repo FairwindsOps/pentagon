@@ -27,7 +27,7 @@ jobs:
           name: Test Migration
           command: |
             # this fails but that is the intent hence "|| true"
-            last_version=$(pip install pentagon==  2>&1 | grep "Could not find" | awk -F',' '{ print $(NF -1) }' | sed s/[[:blank:]]/''/g) || true
+            last_version=$(pip install -q pentagon==  2>&1 | grep "Could not find" | awk -F',' '{ print $(NF -1) }' | sed s/[[:blank:]]/''/g) || true
             sudo pip install pentagon==${last_version}
             pentagon start-project migration-test
             cd migration-test-infrastructure
@@ -37,12 +37,12 @@ jobs:
             cd $INFRASTRUCTURE_REPO
             # faking git config. The repo must have at least one commit for the migration to work
             git add . && git -c user.name='fake' -c user.email='fake@email.org' commit -m 'initial commit'
-            sudo pip install -e ~/pentagon
+            sudo pip install -q -e ~/pentagon
             pentagon migrate --yes
       - run:
           name: Unit Tests
           command: |
-            sudo pip install -r ${HOME}/pentagon/tests/requirements.txt
+            sudo pip install -q -r ${HOME}/pentagon/tests/requirements.txt
             nosetests
       - run:
           name: Build Docker Image
@@ -78,7 +78,7 @@ jobs:
       - run:
           name: package and upload
           command: |
-            sudo pip install twine
+            sudo pip install -q twine
             python setup.py sdist bdist_wheel
             twine upload dist/*
 
