@@ -5,6 +5,7 @@ import logging
 import traceback
 import sys
 import re
+import click
 
 from pentagon.helpers import render_template
 from pentagon.defaults import AWSPentagonDefaults as PentagonDefaults
@@ -120,6 +121,7 @@ class ComponentBase(object):
     def add(self, destination, overwrite=False):
         self._destination = destination
         self._overwrite = overwrite
+
         self._display_settings_to_user()
         try:
             # Add all files from the component templates to the destination directory
@@ -142,21 +144,22 @@ class ComponentBase(object):
         logging.info("  Path: \"{}\"".format(self._destination_directory_name))
         logging.info("Displaying provided and default values for this component: "
                      "(e.g. '-Dparam_name=abcd')")
-        for key, value in self._data.iteritems():
+        for key in sorted(self._data):
+            value = self._data[key]
             using_defaults = False
             if key in self._defaults.keys():
                 if self._data[key] == self._defaults[key]:
                     using_defaults = True
 
             is_default = "(Default Value)" if using_defaults else ""
-            logging.info("  {0:34} = {1:20} {2}".format(
+            logging.info("  {0:40} = {1:20} {2}".format(
                 key,
-                value,
+                str(value),
                 is_default,
             ))
-        if sys.stdin.isatty() and not os.getenv('CI', False):
-            response = raw_input("This look ok to proceed? (y/N) ")
-            if response == 'y' or response == 'Y':
+
+        if sys.stdin.isatty():
+            if click.confirm('This look ok to proceed?'):
                 return
             else:
                 logging.info("Exiting because you did not accept the inputs.")

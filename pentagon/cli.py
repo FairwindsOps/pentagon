@@ -28,12 +28,25 @@ class RequiredIf(click.Option):
         super(RequiredIf, self).__init__(*args, **kwargs)
 
     def handle_parse_result(self, ctx, opts, args):
-        other_present = self.required_option in opts
-        if not other_present or opts[self.required_option] != self.required_value:
+        other_present = self.required_option in ctx.params
+        if not other_present or ctx.params[self.required_option] != self.required_value:
             self.prompt = None
 
         return super(RequiredIf, self).handle_parse_result(
             ctx, opts, args)
+
+
+def validate_not_empty_string(ctx, param, value):
+    ''' Validates that value of prompted entry is not and empty string '''
+    try:
+        if value is not None and value.strip() == '':
+            raise click.BadParameter('{} cannot be empty'.format(param.name))
+        else:
+            return value
+    except click.BadParameter as e:
+        click.echo(e)
+        value = click.prompt(param.prompt)
+        return validate_not_empty_string(ctx, param, value)
 
 
 @click.group()
@@ -54,7 +67,6 @@ def cli(ctx, log_level, *args, **kwargs):
 @click.option('--configure/--no-configure', default=True, help='Configure project with default settings.')
 @click.option('--force/--no-force', help="Ignore existing directories and copy project.")
 @click.option('--cloud', default="aws", help="Cloud provider to create default inventory. Defaults to 'aws'. [aws,gcp,none]")
-@click.option('--hash-type', default="aws", type=click.Choice(['aws', 'gcp']), help="Type of cloud project to create. Defaults to 'aws'")
 # Currently only AWS but maybe we can/should add GCP later
 @click.option('--configure-vpn/--no-configure-vpn', default=True, help="Whether or not to configure a vpn. Default True.")
 @click.option('--vpc-name', help="Name of VPC to create.")
@@ -76,8 +88,8 @@ def cli(ctx, log_level, *args, **kwargs):
 @click.option('--production-kubernetes-worker-node-type', help="Node type of the kube workers.")
 @click.option('--production-kubernetes-network-cidr', help="Network CIDR of the kubernetes working cluster.")
 # AWS Cloud options
-@click.option('--aws-access-key', prompt=True, default=lambda: os.environ.get('PENTAGON_aws_access_key'), help="AWS access key.", cls=RequiredIf, required_if='cloud=aws')
-@click.option('--aws-secret-key', prompt=True, default=lambda: os.environ.get('PENTAGON_aws_secret_key'), help="AWS secret key.", cls=RequiredIf, required_if='cloud=aws')
+@click.option('--aws-access-key', prompt=True, callback=validate_not_empty_string, default=lambda: os.environ.get('PENTAGON_aws_access_key'), help="AWS access key.", cls=RequiredIf, required_if='cloud=aws')
+@click.option('--aws-secret-key', prompt=True, callback=validate_not_empty_string, default=lambda: os.environ.get('PENTAGON_aws_secret_key'), help="AWS secret key.", cls=RequiredIf, required_if='cloud=aws')
 @click.option('--aws-default-region', help="AWS default region.", cls=RequiredIf, required_if='cloud=aws')
 @click.option('--aws-availability-zones', help="[Deprecated] Use \"--availability-zones\". AWS availability zones as a comma delimited with spaces. Default to region a, region b, ... region z.")
 @click.option('--aws-availability-zone-count', help="Number of availability zones to use.")
@@ -100,14 +112,13 @@ def cli(ctx, log_level, *args, **kwargs):
 @click.option('--production-kubernetes-dns-zone', help="DNS Zone of the kubernetes production cluster.")
 @click.option('--production-kubernetes-v-log-level', help="V Log Level kubernetes production cluster.")
 # GCP Cloud options
-@click.option('--gcp-project', prompt=True, help="Google Cloud Project to create clusters in.", cls=RequiredIf, required_if='cloud=gcp')
-@click.option('--gcp-region', prompt=True, help="Google Cloud Project Region to use for Cluster.", cls=RequiredIf, required_if='cloud=gcp')
-@click.option('--gcp-cluster-name', prompt=True, help="Google GKE Cluster Name.", cls=RequiredIf, required_if='cloud=gcp')
-@click.option('--gcp-nodes-cidr', prompt=True, help="Google GKE Nodes CIDR.", cls=RequiredIf, required_if='cloud=gcp')
-@click.option('--gcp-services-cidr', prompt=True, help="Google GKE services CIDR.", cls=RequiredIf, required_if='cloud=gcp')
-@click.option('--gcp-pods-cidr', prompt=True, help="Google GKE pods CIDR.", cls=RequiredIf, required_if='cloud=gcp')
-@click.option('--gcp-kubernetes-version', prompt=True, help="Version of kubernetes to use for cluster nodes.", cls=RequiredIf, required_if='cloud=gcp')
-@click.option('--gcp-infra-bucket', prompt=True, help="The bucket where terraform will store its state for GCP.", cls=RequiredIf, required_if='cloud=gcp')
+@click.option('--gcp-project', prompt=True, callback=validate_not_empty_string, help="Google Cloud Project to create clusters in.", cls=RequiredIf, required_if='cloud=gcp')
+@click.option('--gcp-region', prompt=True, callback=validate_not_empty_string, help="Google Cloud Project Region to use for Cluster.", cls=RequiredIf, required_if='cloud=gcp')
+@click.option('--gcp-cluster-name', prompt=True, callback=validate_not_empty_string, help="Google GKE Cluster Name.", cls=RequiredIf, required_if='cloud=gcp')
+@click.option('--gcp-nodes-cidr', prompt=True, callback=validate_not_empty_string, help="Google GKE Nodes CIDR.", cls=RequiredIf, required_if='cloud=gcp')
+@click.option('--gcp-services-cidr', prompt=True, callback=validate_not_empty_string, help="Google GKE services CIDR.", cls=RequiredIf, required_if='cloud=gcp')
+@click.option('--gcp-pods-cidr', prompt=True, callback=validate_not_empty_string, help="Google GKE pods CIDR.", cls=RequiredIf, required_if='cloud=gcp')
+@click.option('--gcp-kubernetes-version', prompt=True, callback=validate_not_empty_string, help="Version of kubernetes to use for cluster nodes.", cls=RequiredIf, required_if='cloud=gcp')
 def start_project(ctx, name, **kwargs):
     """ Create an infrastructure project from scratch with the configured options """
 
@@ -193,6 +204,7 @@ def _run(action, component_path, additional_args, options):
         for doc in documents:
             if callable(component_class):
                 data = merge_dict(doc, data, clobber=True)
+                data['prompt'] = options.get('prompt', True)
                 # Making data keys more flexible and allowing keys with
                 # - to be be corrected in place
                 data_copy = data.copy()

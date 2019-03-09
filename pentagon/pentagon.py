@@ -34,7 +34,6 @@ class PentagonProject(object):
         self._data = data
         self._name = name
         logging.debug(self._data)
-
         self._force = self.get_data('force')
         self._configure_project = self.get_data('configure')
 
@@ -255,7 +254,7 @@ class AWSPentagonProject(PentagonProject):
             'admin_vpn_key': self._ssh_keys['admin_vpn_key'],
             'name': 'default',
             'project_name': self._name,
-            'configure_vpn': self.get_data('configure_vpn')
+            'configure_vpn': self.get_data('configure_vpn'),
         }
         logging.debug(self._context)
         return self._context
@@ -277,7 +276,7 @@ class AWSPentagonProject(PentagonProject):
             'network_cidr': self._working_kubernetes_network_cidr,
             'network_cidr_base': self._vpc_cidr_base,
             'kops_state_store_bucket': self._infrastructure_bucket,
-            'third_octet': self._working_third_octet
+            'third_octet': self._working_third_octet,
         }
         write_yaml_file(
             "{}/inventory/default/clusters/working/vars.yml".format(self._repository_directory), context)
@@ -299,7 +298,7 @@ class AWSPentagonProject(PentagonProject):
             'network_cidr': self._production_kubernetes_network_cidr,
             'network_cidr_base': self._vpc_cidr_base,
             'kops_state_store_bucket': self._infrastructure_bucket,
-            'third_octet': self._production_third_octet
+            'third_octet': self._production_third_octet,
         }
         write_yaml_file(
             "{}/inventory/default/clusters/production/vars.yml".format(self._repository_directory), context)
@@ -312,6 +311,7 @@ class AWSPentagonProject(PentagonProject):
 
 
 class GCPPentagonProject(PentagonProject):
+
     def __init__(self, name, data={}):
         # Build translated data for inventory input
         self._gcp_inventory_context = self._build_inv_params(name, data)
