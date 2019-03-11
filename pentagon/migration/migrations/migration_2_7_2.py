@@ -88,10 +88,6 @@ class Migration(migration.Migration):
                             cluster_config = yaml.load(yaml_file.read())
                             cluster_spec = cluster_config['spec']
 
-                            if cluster_spec.get('kubelet') is None:
-                                cluster_spec['kubelet'] = {}
-                            cluster_spec['kubelet']['anonymousAuth'] = False
-
                             for policy_type in cluster_spec.get('additionalPolicies', {}):
                                 cluster_spec['additionalPolicies'][policy_type] = literal_unicode(cluster_spec['additionalPolicies'][policy_type])
 
