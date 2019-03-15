@@ -285,7 +285,7 @@ class Migration(migration.Migration):
                 except Exception:
                     pass
 
-                if os.path.isdir(item_path) and os.path.exists("{}/cluster-config/kops.sh".format(item_path)):
+                if os.path.isdir(item_path) and os.path.exists("{}/cluster-config/cluster.yml".format(item_path)):
                     logging.info("Migrating {} {}.".format(item, cluster_item))
 
                     # Start node rejiggering, `if` here for code folding in IDE
@@ -392,12 +392,12 @@ class Migration(migration.Migration):
                                     if hook['name'] == 'kops-hook-authenticator-config.service':
                                         kops_hook_index = hooks.index(hook)
                                         logging.debug("Found kops auth hook at index %d", kops_hook_index)
+                                        hooks.pop(kops_hook_index)
+                                        logging.debug("Removing existing kops-hook-authenticator-config.service at %d", kops_hook_index)
                                     else:
                                         logging.debug("Found other existing hook %s", hook['name'])
                                         hook['manifest'] = literal_unicode(hook['manifest'])
 
-                                logging.debug("Removing existing kops-hook-authenticator-config.service at %d", kops_hook_index)
-                                hooks.pop(kops_hook_index)
                             else:
                                 logging.debug("No hooks found in cluster spec.")
                                 cluster_spec['hooks'] = []
@@ -416,7 +416,7 @@ class Migration(migration.Migration):
 
                             audit_policy_file_assets = yaml.load(audit_log_file_assets_string)
 
-                            existing_audit_file_assets = [ fa for fa in file_assets if fa['name'] == audit_policy_file_assets['name'] ]
+                            existing_audit_file_assets = [fa for fa in file_assets if fa['name'] == audit_policy_file_assets['name']]
 
                             if len(existing_audit_file_assets) == 0:
                                 file_assets.append(audit_policy_file_assets)

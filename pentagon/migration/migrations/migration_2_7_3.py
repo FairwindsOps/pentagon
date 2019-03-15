@@ -78,7 +78,7 @@ class Migration(migration.Migration):
             for cluster_item in os.listdir('{}/clusters/'.format(inventory_path)):
                 item_path = '{}/clusters/{}'.format(inventory_path, cluster_item)
 
-                if os.path.isdir(item_path) and os.path.exists("{}/cluster-config/kops.sh".format(item_path)):
+                if os.path.isdir(item_path) and os.path.exists("{}/cluster-config/cluster.yml".format(item_path)):
                     logging.info("Migrating {} {}.".format(item, cluster_item))
 
                     # Setup cluster spec with patch-runc hook
