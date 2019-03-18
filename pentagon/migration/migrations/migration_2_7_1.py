@@ -82,7 +82,7 @@ class Migration(migration.Migration):
                     logging.info("Moving {item_path}/cluster to {item_path}/cluster-config".format(item_path))
                     self.move("{}/cluster".format(item_path), "{}/cluster-config".format(item_path))
 
-                if os.path.isdir(item_path) and os.path.exists("{}/cluster-config/kops.sh".format(item_path)):
+                if os.path.isdir(item_path) and os.path.exists("{}/cluster-config/cluster.yml".format(item_path)):
                     logging.info("Migrating {} {}.".format(item, cluster_item))
 
                     # Setup cluster spec with aws-iam auth and audit logging

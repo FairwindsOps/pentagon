@@ -8,18 +8,17 @@ import logging
 
 readme = """
 
-# Migration 2.7.2 -> 3.1.0
+# Migration 3.1.0 -> 3.1.1
 
 ## This migration:
-- adds an updated kops hook to patch docker-runc
-
+- Fixes the bug introduced with the last migration.  This bug caused the migration to break if the patch-runc
+  hook existed at index 0.  This migration will fix any repos that have not been merged since then.
 
 ## Risks:
-- this requires you to roll the cluster
+- this requires you to roll the cluster if you have not already adopted the newest patch-runc hook.
 
 ## Follow up tasks:
-- roll the cluster
-
+- roll the cluster if you have not already adopted the newest patch-runc hook.
 """
 
 # Magic to make block formatting in yaml.dump work as expected
@@ -61,6 +60,7 @@ roles:
 runCHook = yaml.load(runCHookContents)
 runCHook['manifest'] = literal_unicode(runCHook['manifest'])
 
+
 class Migration(migration.Migration):
     _starting_version = '2.7.2'
     _ending_version = '3.1.0'
@@ -96,22 +96,18 @@ class Migration(migration.Migration):
                                     fa['content'] = literal_unicode(fa['content'])
 
                             hooks = cluster_spec.get("hooks")
-                            runCHookIndex = None
+                            new_hooks = []
                             if hooks:
                                 logging.debug(hooks)
-                                for index, hook in enumerate(hooks):
+                                for hook in hooks:
                                     hook['manifest'] = literal_unicode(hook['manifest'])
                                     if hook['name'] == 'patch-runc':
-                                        logging.info("Found patch-runc hook at index %s", index)
-                                        runCHookIndex = index
-                                if runCHookIndex:
-                                    hooks[runCHookIndex] = runCHook
-                                else:
-                                    hooks.append(runCHook)
-                            else:
-                                cluster_spec["hooks"] = []
-                                cluster_spec["hooks"].append(runCHook)
+                                        logging.info("Found patch-runc hook. Removing it.")
+                                    else:
+                                        new_hooks.append(hook)
 
+                            cluster_spec["hooks"] = new_hooks
+                            cluster_spec["hooks"].append(runCHook)
 
                         with open(cluster_spec_file, 'w') as yaml_file:
                             yaml_file.write(yaml.dump(cluster_config, default_flow_style=False))
