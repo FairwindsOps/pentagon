@@ -19,7 +19,7 @@ class AWSPentagonDefaults(object):
         'network_mask': 24,
         'networking': {'flannel': {'backend': 'vxlan'}},
         'node_additional_policies': '[{"Effect": "Allow","Action": ["autoscaling:DescribeAutoScalingGroups", "autoscaling:DescribeAutoScalingInstances", "autoscaling:DescribeTags", "autoscaling:SetDesiredCapacity", "autoscaling:TerminateInstanceInAutoScalingGroup"],"Resource": "*"}]',
-        'node_count': 3,
+        'node_count': 1,
         'node_root_volume_size': 200,
         'production_third_octet': 16,
         'ssh_key_path': '~/.ssh/id_rsa.pub',
