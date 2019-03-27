@@ -18,42 +18,39 @@ jobs:
   build:
     docker:
       - image: circleci/python:2
-    environment: ~
     working_directory: ~/pentagon
     steps:
+      - run:
+          name: Setup PATH to support pip user installs
+          command: echo 'export PATH=$PATH:/home/circleci/.local/bin' >> $BASH_ENV
       - checkout
-      - setup_remote_docker
       - run:
           name: Test Migration
           command: |
             # this fails but that is the intent hence "|| true"
             last_version=$(pip install pentagon==  2>&1 | grep "Could not find" | awk -F',' '{ print $(NF -1) }' | sed s/[[:blank:]]/''/g) || true
-            sudo pip install pentagon==${last_version}
-            # || true here is because we are wedged in that we need to test a previous version where this will error out
-            yes | pentagon start-project migration-test --aws-access-key=fake --aws-secret-key=fake || true
+            pip install --user pentagon==${last_version}
+            # nohup to get rid of interactive and thus prompts
+            nohup pentagon start-project migration-test --aws-access-key=fake --aws-secret-key=fake
             cd migration-test-infrastructure
             export INFRASTRUCTURE_REPO=$(pwd)
             cd inventory/default/clusters/production
-            # || true here is because we are wedged in that we need to test a previous version where this will error out
-            yes | pentagon add kops.cluster -f vars.yml -o cluster-config || true
+            nohup pentagon add kops.cluster -f vars.yml -o cluster-config
             cd $INFRASTRUCTURE_REPO
             # faking git config. The repo must have at least one commit for the migration to work
             git add . && git -c user.name='fake' -c user.email='fake@email.org' commit -m 'initial commit'
-            sudo pip install -e ~/pentagon
+            pip install --user ~/pentagon
+            pentagon --version
             pentagon migrate --yes
       - run:
           name: Unit Tests
           command: |
-            sudo pip install -r ${HOME}/pentagon/tests/requirements.txt
+            pip install --user -r ${HOME}/pentagon/tests/requirements.txt
             nosetests
-      - run:
-          name: Build Docker Image
-          command: |
-            docker build -t pentagon .
       - run:
           name: Test Start Project
           command: |
-            docker run --rm pentagon bash -c "yes | pentagon start-project circleci-test --aws-access-key=fake --aws-secret-key=fake"
+            nohup pentagon start-project circleci-test --aws-access-key=fake --aws-secret-key=fake
 
   release:
     docker:
