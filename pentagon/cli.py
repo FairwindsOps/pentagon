@@ -281,7 +281,7 @@ def parse_in_file(file):
 
         try:
             data = list(yaml.load_all(
-                data_file, Loader=yaml.loader.BaseLoader))
+                data_file, Loader=yaml.loader.FullLoader))
             logging.debug("Data parsed from file {}: {}".format(file, data))
             return data
         except yaml.YAMLError as yaml_error:
