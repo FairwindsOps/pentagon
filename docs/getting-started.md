@@ -41,6 +41,7 @@ Pentagon is “batteries included”- not only does one get a network with a clu
 The `pentagon` commands will take no action in your cloud infrastructure. You will need to run these commands to finish creation of a default project
 
 * `export INFRASTRUCTURE_REPO=$(pwd)`
+* `export INVENTORY=default`
 * `. yaml_source inventory/default/config/local/vars.yml`
 * `. yaml_source inventory/default/config/private/secrets.yml`
   * Sources environment variables required for the following steps. This will be required each time you work with the infrastructure repository or if you move the repository to another location.
@@ -64,22 +65,18 @@ This creates the VPC and private, public, and admin subnets in that VPC for non 
 ### Configure DNS and Route53
 If you don't already have a Route53 Hosted Zone configured, do that now.
 * Create a Route53 Hosted Zone (e.g. `pentagon.mycompany.com`)
-* In `inventory/default/clusters/*/vars.yml`
-  * Set `CLUSTER_NAME` to a hostname that ends with your hosted zone (e.g. `working-1.pentagon.mycompany.com`)
-  * Set `DNS_ZONE` to your Hosted Zone (e.g. `pentagon.mycompany.com`)
+* In `inventory/default/clusters/*/vars.yml`, set `dns_zone` to your Hosted Zone (e.g. `pentagon.mycompany.com`)
 
 ### Setup a VPN
 This creates a AWS instance running [OpenVPN](https://openvpn.net/). Read more about the VPN [here](vpn.md).
 * `cd $INFRASTRUCTURE_REPO`
-* `export INVENTORY=default`
 * `ansible-galaxy install -r ansible-requirements.yml`
 * `cd inventory/default/resources/admin-environment`
 * In `env.yml`, set the list of user names that should have access to the VPN under `openvpn_clients`. You can add more later.
 * Run Ansible a few times
   * Run `ansible-playbook vpn.yml` until it fails on `VPN security groups`
-  * Run `ansible-playbook vpn.yml` until it fails `Gathering Facts` after you agree to trust the SSH key for the host.
-  * Run `ansible-playbook vpn.yml` one last time and it will succeed.
-  * Edit `inventory/config/private/ssh_config` and add the IP address from the SSH key prompt to the `#VPN instance` section.
+  * Run `ansible-playbook vpn.yml` a second time and it will succeed 
+  * Edit `inventory/default/config/private/ssh_config` and add the IP address from ansible's output to the `#VPN instance` section.
 
 ### Configure a Kubernetes Cluster
 Pentagon uses Kops to create clusters in AWS. The default layout creates configurations for two Kubernetes clusters: `working` and `production`. See [Overview](overview.md) for a more comprehensive description of the directory layout.
