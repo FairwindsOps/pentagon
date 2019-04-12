@@ -18,8 +18,11 @@ class Cluster(ComponentBase):
         'private_subnets': ['10.0.0.0/22', '10.0.4.0/22', '10.0.8.0/22'],
         'public_subnets': ['10.0.12.0/22', '10.0.16.0/22', '10.0.20.0/22']
     }
-    def add(self, destination):
-        pass
-
-    def get(self, destination):
-        pass
+    
+    @property
+    def _files_directory(self):
+        _template_path = 'files'
+        if pkg_resources.resource_isdir(__name__, _template_path):
+            return pkg_resources.resource_filename(__name__, _template_path)
+        else:
+            raise StandardError('Could not find template path ({})'.format(_template_path))
