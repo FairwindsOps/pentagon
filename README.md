@@ -1,5 +1,7 @@
 # Pentagon
 
+# *Pentagon has been deprecated and will no longer be maintained.*
+
 ## What is Pentagon?
 
 **Pentagon is a cli tool to generate repeatable, cloud-based [Kubernetes](https://kubernetes.io/) infrastructure.**
